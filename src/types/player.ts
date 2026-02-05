@@ -75,6 +75,8 @@ export interface GameResult {
 export interface PlayerWeekStats {
   player: Player;
   games: number;
+  totalMinutes: number;
+  totalPts: number;
   per: number;
   pts: number;        // simple average
   reb: number;        // simple average
@@ -82,6 +84,7 @@ export interface PlayerWeekStats {
   ts: number;         // cumulative calculation
   plusMinus: number;  // cumulative total
   imageUrl?: string;
+  profileUrl: string;
   gameResults: GameResult[];
 }
 

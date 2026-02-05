@@ -1,13 +1,20 @@
 import type { GameStats, Game, GameResult, PlayerWeekStats } from '@/types/player';
-import { calculatePER } from './per';
+import { calculatePER, parseMinutes } from './per';
 import idMap from './nba-player-id-map.json';
 
 const NBA_HEADSHOT_BASE = 'https://cdn.nba.com/headshots/nba/latest/1040x760';
+const NBA_PROFILE_BASE = 'https://www.nba.com/player';
 
 export function getPlayerImageUrl(playerId: number): string {
   const nbaId = idMap[String(playerId)];
   const id = nbaId != null ? nbaId : playerId;
   return `${NBA_HEADSHOT_BASE}/${id}.png`;
+}
+
+export function getPlayerProfileUrl(playerId: number): string {
+  const nbaId = idMap[String(playerId)];
+  const id = nbaId != null ? nbaId : playerId;
+  return `${NBA_PROFILE_BASE}/${id}`;
 }
 
 export function calculateTrueShooting(stats: GameStats[]): number {
@@ -78,6 +85,7 @@ export function aggregatePlayerStats(
   const ts = calculateTrueShooting(stats);
 
   const plusMinus = stats.reduce((sum, s) => sum + (s.plus_minus || 0), 0);
+  const totalMinutes = stats.reduce((sum, s) => sum + parseMinutes(s.min), 0);
 
   // PER calculation (uses cumulative totals)
   const rawPer = calculatePER(stats);
@@ -95,6 +103,8 @@ export function aggregatePlayerStats(
   return {
     player: stats[0].player,
     games: gamesPlayed,
+    totalMinutes,
+    totalPts,
     per,
     pts: avgPts,
     reb: avgReb,
@@ -102,6 +112,7 @@ export function aggregatePlayerStats(
     ts,
     plusMinus,
     imageUrl: getPlayerImageUrl(stats[0].player.id),
+    profileUrl: getPlayerProfileUrl(stats[0].player.id),
     gameResults,
   };
 }

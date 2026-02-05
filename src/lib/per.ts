@@ -62,7 +62,7 @@ export function calculatePER(stats: GameStats[]): number {
   return Number.isFinite(per) ? per : 0;
 }
 
-function parseMinutes(minString: string | null | undefined): number {
+export function parseMinutes(minString: string | null | undefined): number {
   if (minString == null || typeof minString !== 'string') return 0;
   const trimmed = minString.trim();
   if (trimmed === '') return 0;

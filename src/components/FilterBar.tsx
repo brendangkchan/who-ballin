@@ -1,0 +1,77 @@
+'use client';
+
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { DEFAULT_MIN_GAMES, DEFAULT_MIN_PTS, DEFAULT_MIN_MINUTES } from '@/lib/filters';
+
+export default function FilterBar() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [minGames, setMinGames] = useState(searchParams.get('minGames') ?? String(DEFAULT_MIN_GAMES));
+  const [minPts, setMinPts] = useState(searchParams.get('minPts') ?? String(DEFAULT_MIN_PTS));
+  const [minMinutes, setMinMinutes] = useState(searchParams.get('minMinutes') ?? String(DEFAULT_MIN_MINUTES));
+
+  useEffect(() => {
+    setMinGames(searchParams.get('minGames') ?? String(DEFAULT_MIN_GAMES));
+    setMinPts(searchParams.get('minPts') ?? String(DEFAULT_MIN_PTS));
+    setMinMinutes(searchParams.get('minMinutes') ?? String(DEFAULT_MIN_MINUTES));
+  }, [searchParams]);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    const mg = minGames || String(DEFAULT_MIN_GAMES);
+    const mp = minPts || String(DEFAULT_MIN_PTS);
+    const mm = minMinutes || String(DEFAULT_MIN_MINUTES);
+    if (mg !== String(DEFAULT_MIN_GAMES)) params.set('minGames', mg);
+    if (mp !== String(DEFAULT_MIN_PTS)) params.set('minPts', mp);
+    if (mm !== String(DEFAULT_MIN_MINUTES)) params.set('minMinutes', mm);
+    const qs = params.toString();
+    router.push(qs ? `/?${qs}` : '/');
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-4 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <label className="flex flex-col gap-1">
+        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Min games</span>
+        <input
+          type="number"
+          name="minGames"
+          min={0}
+          value={minGames}
+          onChange={(e) => setMinGames(e.target.value)}
+          className="w-20 rounded border border-zinc-300 px-2 py-1.5 text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Min pts</span>
+        <input
+          type="number"
+          name="minPts"
+          min={0}
+          value={minPts}
+          onChange={(e) => setMinPts(e.target.value)}
+          className="w-20 rounded border border-zinc-300 px-2 py-1.5 text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+        />
+      </label>
+      <label className="flex flex-col gap-1">
+        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Min minutes</span>
+        <input
+          type="number"
+          name="minMinutes"
+          min={0}
+          value={minMinutes}
+          onChange={(e) => setMinMinutes(e.target.value)}
+          className="w-20 rounded border border-zinc-300 px-2 py-1.5 text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+        />
+      </label>
+      <button
+        type="submit"
+        className="rounded bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+      >
+        Apply
+      </button>
+    </form>
+  );
+}

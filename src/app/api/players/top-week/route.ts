@@ -3,6 +3,7 @@ import { subDays, format } from 'date-fns';
 import { getAllGames, getLastCompletedGame, getStatsForGames, getCurrentNBASeason } from '@/lib/balldontlie';
 import { aggregatePlayerStats } from '@/lib/utils';
 import { RateLimiter } from '@/lib/rateLimiter';
+import { parseFilters } from '@/lib/filters';
 import type { Game, GameStats, PlayerWeekStats, DebugInfo } from '@/types/player';
 
 export const revalidate = 3600; // Revalidate every hour
@@ -79,6 +80,11 @@ export async function GET(request: NextRequest) {
   };
 
   try {
+    const filters = parseFilters(request.nextUrl.searchParams);
+    debugInfo.warnings.push(
+      `Filters: minGames=${filters.minGames}, minPts=${filters.minPts}, minMinutes=${filters.minMinutes}`
+    );
+
     // Track API calls
     const trackApiCall = (endpoint: string, status: number, duration: number) => {
       debugInfo.requests++;
@@ -239,13 +245,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Step 6: Sort by PER (all players, no limit)
-    playerWeekStats.sort((a, b) => b.per - a.per);
+    // Step 6: Filter by min games, min points, min minutes
+    const filtered = playerWeekStats.filter(
+      p =>
+        p.games >= filters.minGames &&
+        p.totalPts >= filters.minPts &&
+        p.totalMinutes >= filters.minMinutes
+    );
+
+    // Step 7: Sort by PER
+    filtered.sort((a, b) => b.per - a.per);
 
     debugInfo.processingTime = Date.now() - startTime;
 
     const response = {
-      players: playerWeekStats,
+      players: filtered,
       ...(process.env.NODE_ENV === 'development' && { debug: debugInfo }),
     };
 

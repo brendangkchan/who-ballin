@@ -16,12 +16,20 @@ export default function PlayerCard({ player, rank }: PlayerCardProps) {
   return (
     <div className="flex gap-4 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
       <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <Image
-          src={player.imageUrl || '/placeholder-player.svg'}
-          alt={fullName}
-          fill
-          className="object-cover"
-        />
+        <a
+          href={player.profileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block h-full w-full"
+          aria-label={`View ${fullName} on NBA.com`}
+        >
+          <Image
+            src={player.imageUrl || '/placeholder-player.svg'}
+            alt={fullName}
+            fill
+            className="object-cover"
+          />
+        </a>
       </div>
       <div className="flex-1">
         <div className="flex items-center gap-2">
