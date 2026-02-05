@@ -20,6 +20,9 @@
 # production
 /build
 
+# build-map script checkpoint (resume after 429)
+scripts/.build-map-checkpoint.json
+
 # misc
 .DS_Store
 *.pem
