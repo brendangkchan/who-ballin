@@ -5,10 +5,11 @@ import { getTeamColors } from '@/lib/nba-team-colors';
 
 interface PlayerCardProps {
   player: PlayerWeekStats;
-  rank: number;
+  rank?: number;
+  label?: string;
 }
 
-export default function PlayerCard({ player, rank }: PlayerCardProps) {
+export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const fullName = `${player.player.first_name} ${player.player.last_name}`;
   const teamName = player.player.team
     ? `${player.player.team.city} ${player.player.team.name}`
@@ -34,24 +35,59 @@ export default function PlayerCard({ player, rank }: PlayerCardProps) {
         </a>
       </div>
       <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-accent">#{rank}</span>
-          <h3 className="text-xl font-semibold text-foreground">
-            {fullName}
-          </h3>
-        </div>
-        {teamColors && (
-          <div
-            className="mt-2 h-1 w-24 rounded-full"
-            style={{
-              background: teamColors.secondary
-                ? `linear-gradient(90deg, ${teamColors.secondary}, transparent)`
-                : `linear-gradient(90deg, ${teamColors.primary}, transparent)`,
-            }}
-            aria-hidden
-          />
+        {label != null ? (
+          <div className="block">
+            <span className="block pb-1 text-lg font-bold text-foreground">
+              {label}
+            </span>
+            {teamColors && (
+              <div
+                className="mt-1 h-2.5 w-full rounded-full"
+                style={{
+                  background: teamColors.secondary
+                    ? `linear-gradient(90deg, ${teamColors.secondary}, transparent)`
+                    : `linear-gradient(90deg, ${teamColors.primary}, transparent)`,
+                }}
+                aria-hidden
+              />
+            )}
+            <h3
+              className="mt-2 text-2xl font-extrabold sm:text-3xl"
+              style={teamColors ? { color: teamColors.primary } : undefined}
+            >
+              {fullName}
+            </h3>
+            <p
+              className={`mt-1 text-sm font-normal ${teamColors ? 'opacity-80' : 'text-foreground-muted'}`}
+              style={teamColors ? { color: teamColors.primary } : undefined}
+            >
+              {teamName}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-2">
+              {rank != null && (
+                <span className="text-lg font-bold text-accent">#{rank}</span>
+              )}
+              <h3 className="text-xl font-semibold text-foreground">
+                {fullName}
+              </h3>
+            </div>
+            {teamColors && (
+              <div
+                className="mt-2 h-1 w-24 rounded-full"
+                style={{
+                  background: teamColors.secondary
+                    ? `linear-gradient(90deg, ${teamColors.secondary}, transparent)`
+                    : `linear-gradient(90deg, ${teamColors.primary}, transparent)`,
+                }}
+                aria-hidden
+              />
+            )}
+            <p className="mt-3 text-sm text-foreground-muted">{teamName}</p>
+          </>
         )}
-        <p className="mt-3 text-sm text-foreground-muted">{teamName}</p>
         <div
           className="mt-4 flex flex-wrap gap-x-6 gap-y-2 rounded-lg p-4 text-sm"
           style={

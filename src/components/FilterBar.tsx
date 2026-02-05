@@ -1,11 +1,12 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { DEFAULT_MIN_GAMES, DEFAULT_MIN_PTS, DEFAULT_MIN_MINUTES } from '@/lib/filters';
 
 export default function FilterBar() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [minGames, setMinGames] = useState(searchParams.get('minGames') ?? String(DEFAULT_MIN_GAMES));
@@ -28,7 +29,8 @@ export default function FilterBar() {
     if (mp !== String(DEFAULT_MIN_PTS)) params.set('minPts', mp);
     if (mm !== String(DEFAULT_MIN_MINUTES)) params.set('minMinutes', mm);
     const qs = params.toString();
-    router.push(qs ? `/?${qs}` : '/');
+    const base = pathname || '/';
+    router.push(qs ? `${base}?${qs}` : base);
   }
 
   return (

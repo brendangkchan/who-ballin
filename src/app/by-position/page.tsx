@@ -5,6 +5,7 @@ import RefreshButtonWrapper from '@/components/RefreshButtonWrapper';
 import FilterBar from '@/components/FilterBar';
 import DebugPanel from '@/components/DebugPanel';
 import { parseFilters, DEFAULT_MIN_GAMES, DEFAULT_MIN_PTS, DEFAULT_MIN_MINUTES } from '@/lib/filters';
+import { pickBestByPosition } from '@/lib/position-utils';
 import type { PlayerWeekStats, DebugInfo } from '@/types/player';
 import type { PlayerFilters } from '@/lib/filters';
 
@@ -28,7 +29,7 @@ async function getTopPlayers(filters: PlayerFilters) {
   }>;
 }
 
-function PlayersList({
+function ByPositionContent({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
@@ -41,12 +42,12 @@ function PlayersList({
         </div>
       }
     >
-      <PlayersContent searchParams={searchParams} />
+      <ByPositionList searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function PlayersContent({
+async function ByPositionList({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
@@ -57,10 +58,27 @@ async function PlayersContent({
 
   if (players.length === 0) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex flex-col items-center justify-center gap-4 py-12">
+        <p className="text-foreground-muted">No games found in the last week.</p>
+        <Link href="/" className="text-accent hover:underline">
+          View all players
+        </Link>
+      </div>
+    );
+  }
+
+  const best = pickBestByPosition(players);
+  const hasAny = best.guard || best.forward || best.center;
+
+  if (!hasAny) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 py-12">
         <p className="text-foreground-muted">
-          No games found in the last week.
+          No qualifying players with position data found this week.
         </p>
+        <Link href="/" className="text-accent hover:underline">
+          View all players
+        </Link>
       </div>
     );
   }
@@ -68,16 +86,22 @@ async function PlayersContent({
   return (
     <>
       <div className="space-y-0">
-        {players.map((player, index) => (
-          <PlayerCard key={player.player.id} player={player} rank={index + 1} />
-        ))}
+        {best.guard && (
+          <PlayerCard player={best.guard} label="Best Guard" />
+        )}
+        {best.forward && (
+          <PlayerCard player={best.forward} label="Best Forward" />
+        )}
+        {best.center && (
+          <PlayerCard player={best.center} label="Best Center" />
+        )}
       </div>
       {debug && <DebugPanel debugInfo={debug} />}
     </>
   );
 }
 
-export default function Home({
+export default function ByPositionPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
@@ -88,19 +112,19 @@ export default function Home({
         <div className="mb-10 flex items-center justify-between sm:mb-12">
           <div>
             <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
-              Who Ballin
+              By Position
             </h1>
             <div className="mt-2 h-1 w-16 bg-accent" aria-hidden />
             <p className="mt-4 max-w-xl text-foreground-muted">
-              Players with at least {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, and {DEFAULT_MIN_MINUTES} minutes this week, ranked by Player Efficiency Rating (PER).
+              Best guard, forward, and center this week (by PER). Same filters apply: at least {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, {DEFAULT_MIN_MINUTES} minutes.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/by-position"
+              href="/"
               className="text-sm font-medium text-foreground-muted hover:text-foreground"
             >
-              By Position
+              All Players
             </Link>
             <RefreshButtonWrapper />
           </div>
@@ -112,9 +136,8 @@ export default function Home({
             </div>
           </Suspense>
         )}
-        <PlayersList searchParams={searchParams} />
+        <ByPositionContent searchParams={searchParams} />
       </main>
     </div>
   );
 }
-
