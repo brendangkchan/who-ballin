@@ -39,6 +39,12 @@ export interface GameStats {
     date: string;
   };
   player: Player;
+  team?: {
+    id: number;
+    abbreviation: string;
+    city: string;
+    name: string;
+  };
   pts: number;
   reb: number;
   ast: number;

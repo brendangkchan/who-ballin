@@ -96,12 +96,22 @@ export function aggregatePlayerStats(
     .map(stat => {
       const game = games.find(g => g.id === stat.game.id);
       if (!game) return null;
-      return calculateGameResult(stat, game, stat.player.team?.id || 0);
+      return calculateGameResult(stat, game, stat.player.team?.id ?? stat.team?.id ?? 0);
     })
     .filter((result): result is GameResult => result !== null);
 
+  // Use team from most recent game (player may have been traded mid-week)
+  const statsByDate = [...stats].sort((a, b) =>
+    new Date(b.game.date).getTime() - new Date(a.game.date).getTime()
+  );
+  const mostRecentStat = statsByDate[0];
+  const basePlayer = mostRecentStat.player;
+  const statTeam = mostRecentStat.team;
+
   return {
-    player: stats[0].player,
+    player: statTeam
+      ? { ...basePlayer, team: { id: statTeam.id, abbreviation: statTeam.abbreviation, city: statTeam.city, name: statTeam.name } }
+      : basePlayer,
     games: gamesPlayed,
     totalMinutes,
     totalPts,
@@ -111,8 +121,8 @@ export function aggregatePlayerStats(
     ast: avgAst,
     ts,
     plusMinus,
-    imageUrl: getPlayerImageUrl(stats[0].player.id),
-    profileUrl: getPlayerProfileUrl(stats[0].player.id),
+    imageUrl: getPlayerImageUrl(basePlayer.id),
+    profileUrl: getPlayerProfileUrl(basePlayer.id),
     gameResults,
   };
 }

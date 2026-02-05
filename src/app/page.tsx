@@ -3,7 +3,7 @@ import PlayerCard from '@/components/PlayerCard';
 import RefreshButtonWrapper from '@/components/RefreshButtonWrapper';
 import FilterBar from '@/components/FilterBar';
 import DebugPanel from '@/components/DebugPanel';
-import { parseFilters } from '@/lib/filters';
+import { parseFilters, DEFAULT_MIN_GAMES, DEFAULT_MIN_PTS, DEFAULT_MIN_MINUTES } from '@/lib/filters';
 import type { PlayerWeekStats, DebugInfo } from '@/types/player';
 import type { PlayerFilters } from '@/lib/filters';
 
@@ -36,7 +36,7 @@ function PlayersList({
     <Suspense
       fallback={
         <div className="flex items-center justify-center py-12">
-          <p className="text-zinc-600 dark:text-zinc-400">Loading players...</p>
+          <p className="text-foreground-muted">Loading players...</p>
         </div>
       }
     >
@@ -57,7 +57,7 @@ async function PlayersContent({
   if (players.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-zinc-600 dark:text-zinc-400">
+        <p className="text-foreground-muted">
           No games found in the last week.
         </p>
       </div>
@@ -66,7 +66,7 @@ async function PlayersContent({
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-0">
         {players.map((player, index) => (
           <PlayerCard key={player.player.id} player={player} rank={index + 1} />
         ))}
@@ -82,15 +82,16 @@ export default function Home({
   searchParams: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
 }) {
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black">
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center justify-between">
+    <div className="min-h-screen bg-background font-sans">
+      <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+        <div className="mb-10 flex items-center justify-between sm:mb-12">
           <div>
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-              All Players This Week
+            <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
+              Who Ballin
             </h1>
-            <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-              Ranked by Player Efficiency Rating (PER)
+            <div className="mt-2 h-1 w-16 bg-accent" aria-hidden />
+            <p className="mt-4 max-w-xl text-foreground-muted">
+              Players with at least {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, and {DEFAULT_MIN_MINUTES} minutes this week, ranked by Player Efficiency Rating (PER).
             </p>
           </div>
           <RefreshButtonWrapper />

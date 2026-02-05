@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Who Ballin - Top NBA Players This Week",
-  description: "See all NBA players ranked by PER from the last week",
+  description: "Players with at least 2 games, 20 pts, and 40 minutes this week, ranked by PER",
 };
 
 export default function RootLayout({

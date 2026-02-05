@@ -32,46 +32,55 @@ export default function FilterBar() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-4 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Min games</span>
+    <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-4 py-4">
+      <FilterLabel label="Min games">
         <input
           type="number"
           name="minGames"
           min={0}
           value={minGames}
           onChange={(e) => setMinGames(e.target.value)}
-          className="w-20 rounded border border-zinc-300 px-2 py-1.5 text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+          className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground"
         />
-      </label>
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Min pts</span>
+      </FilterLabel>
+      <FilterLabel label="Min pts">
         <input
           type="number"
           name="minPts"
           min={0}
           value={minPts}
           onChange={(e) => setMinPts(e.target.value)}
-          className="w-20 rounded border border-zinc-300 px-2 py-1.5 text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+          className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground"
         />
-      </label>
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Min minutes</span>
+      </FilterLabel>
+      <FilterLabel label="Min minutes">
         <input
           type="number"
           name="minMinutes"
           min={0}
           value={minMinutes}
           onChange={(e) => setMinMinutes(e.target.value)}
-          className="w-20 rounded border border-zinc-300 px-2 py-1.5 text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+          className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground"
         />
-      </label>
+      </FilterLabel>
       <button
         type="submit"
-        className="rounded bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        className="rounded bg-accent px-4 py-1.5 text-sm font-medium text-foreground transition-colors hover:opacity-90"
       >
         Apply
       </button>
     </form>
+  );
+}
+
+function FilterLabel({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="flex flex-col gap-1">
+      <span className="flex items-center gap-2 text-sm font-medium text-foreground-muted">
+        <span className="h-4 w-1 shrink-0 bg-accent" aria-hidden />
+        {label}
+      </span>
+      {children}
+    </label>
   );
 }
