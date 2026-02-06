@@ -94,7 +94,11 @@ export default function Home({
               These dudes been ballin' this <strong>past week</strong>. These are the top 10 guys ranked by offensive production using <a href="https://www.espn.com/nba/columns/story?columnist=hollinger_john&id=2850240" target="_blank" rel="noopener noreferrer" className="text-accent-navy font-bold hover:underline">PER</a> ("box score on steroids") filtering out the outliers.
             </p>
             <p className="max-w-md mt-4 text-xs text-foreground-muted">
-              Minimum {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, and {DEFAULT_MIN_MINUTES} min this week on teams that won more than lost.
+              Minimum {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, and {DEFAULT_MIN_MINUTES} min this week on teams that won more than lost. Powered by{' '}
+              <a href="https://www.balldontlie.io" target="_blank" rel="noopener noreferrer" className="text-accent-navy hover:underline">
+                balldontlie.io
+              </a>
+              .
             </p>
           </div>
         </div>

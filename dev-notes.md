@@ -5,7 +5,6 @@
 TODO
 - report card for team by win % grade letter
 - add blurb link to API
-- change limit to 10
 - move game note into stat section
 - manual id fill out
 
