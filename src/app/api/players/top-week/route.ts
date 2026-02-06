@@ -1,70 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 import { subDays, format } from 'date-fns';
 import { getAllGames, getLastCompletedGame, getAllStatsForGames, getCurrentNBASeason } from '@/lib/balldontlie';
 import { aggregatePlayerStats } from '@/lib/utils';
-import { RateLimiter } from '@/lib/rateLimiter';
 import { parseFilters } from '@/lib/filters';
 import type { Game, GameStats, PlayerWeekStats, DebugInfo } from '@/types/player';
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 3600;
 
-const RATE_LIMIT_PER_MIN = 50;
+const BATCH_SIZE = 20; // Keep under 2MB per cache entry; 50 games ~2.4MB
 
-function chunkArray<T>(array: T[], size: number): T[][] {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks;
+function getCachedGames(startDateStr: string, endDateStr: string) {
+  return unstable_cache(
+    async () => {
+      const games = await getAllGames(startDateStr, endDateStr);
+      return games.filter((g) => g.status === 'Final');
+    },
+    ['games', startDateStr, endDateStr],
+    { revalidate: 86400, tags: ['top-week'] }
+  )();
 }
 
-async function fetchStatsBatched(
-  gameIds: number[],
-  batchSize: number,
-  rateLimiter: RateLimiter,
-  debugInfo: DebugInfo
-): Promise<GameStats[]> {
-  const allStats: GameStats[] = [];
-  const batches = chunkArray(gameIds, batchSize);
-  debugInfo.batchCount = batches.length;
-
-  for (let i = 0; i < batches.length; i++) {
-    const batch = batches[i];
-    const startTime = Date.now();
-
-    try {
-      const statsData = await getAllStatsForGames(
-        batch,
-        () => rateLimiter.waitIfNeeded()
+function getCachedStatsBatch(
+  startDateStr: string,
+  endDateStr: string,
+  batchIndex: number
+) {
+  return unstable_cache(
+    async () => {
+      const games = await getCachedGames(startDateStr, endDateStr);
+      const gameIds = games.map((g) => g.id);
+      const batch = gameIds.slice(
+        batchIndex * BATCH_SIZE,
+        (batchIndex + 1) * BATCH_SIZE
       );
-      const duration = Date.now() - startTime;
-
-      debugInfo.apiCalls.push({
-        endpoint: `/stats (batch ${i + 1}/${batches.length})`,
-        status: 200,
-        duration,
-        timestamp: new Date().toISOString(),
-      });
-
-      if (statsData && statsData.length > 0) {
-        allStats.push(...(statsData as GameStats[]));
-      }
-      console.debug('[top-week] stats batch', i + 1, '/', batches.length, ':', (statsData?.length ?? 0), 'stats, total', allStats.length, 'in', duration, 'ms');
-    } catch (error: any) {
-      console.debug('[top-week] stats batch', i + 1, 'error:', error?.message ?? error);
-      const duration = Date.now() - startTime;
-      debugInfo.apiCalls.push({
-        endpoint: `/stats (batch ${i + 1}/${batches.length})`,
-        status: error.status || 500,
-        duration,
-        timestamp: new Date().toISOString(),
-      });
-      debugInfo.errors.push(`Error fetching stats batch ${i + 1}: ${error.message}`);
-      // Continue with other batches
-    }
-  }
-
-  return allStats;
+      if (batch.length === 0) return [];
+      const statsData = await getAllStatsForGames(batch, undefined);
+      return (statsData ?? []) as GameStats[];
+    },
+    ['stats', startDateStr, endDateStr, String(batchIndex)],
+    { revalidate: 86400, tags: ['top-week'] }
+  )();
 }
 
 export async function GET(request: NextRequest) {
@@ -87,32 +63,20 @@ export async function GET(request: NextRequest) {
   try {
     console.debug('[top-week] GET request started');
     const filters = parseFilters(request.nextUrl.searchParams);
-    const rateLimiter = new RateLimiter({ maxRequests: RATE_LIMIT_PER_MIN, windowMs: 60000 });
     console.debug('[top-week] filters:', filters);
 
     debugInfo.warnings.push(
       `Filters: minGames=${filters.minGames}, minPts=${filters.minPts}, minMinutes=${filters.minMinutes}`
     );
     debugInfo.warnings.push(
-      `API: rateLimit=${RATE_LIMIT_PER_MIN}/min, all games in last 7 days`
+      'API: cached games+stats (end=yesterday), all games in last 7 days'
     );
     debugInfo.warnings.push(
       'Qualifying: exclude lost>50% games, exclude negative +/- unless won all'
     );
 
-    // Track API calls
-    const trackApiCall = (endpoint: string, status: number, duration: number) => {
-      debugInfo.requests++;
-      debugInfo.apiCalls.push({
-        endpoint,
-        status,
-        duration,
-        timestamp: new Date().toISOString(),
-      });
-    };
-
-    // Step 1: Determine date range
-    const endDate = new Date();
+    // Step 1: Determine date range (end = yesterday so all games are completed)
+    const endDate = subDays(new Date(), 1);
     const startDate = subDays(endDate, 7);
     const startDateStr = format(startDate, 'yyyy-MM-dd');
     const endDateStr = format(endDate, 'yyyy-MM-dd');
@@ -121,71 +85,29 @@ export async function GET(request: NextRequest) {
     debugInfo.dateRange.end = endDateStr;
     console.debug('[top-week] date range:', startDateStr, '..', endDateStr);
 
-    // Add NBA season info to debug
     const nbaSeason = getCurrentNBASeason();
     debugInfo.warnings.push(
       `NBA Season: ${nbaSeason} (calculated from current date: ${new Date().toISOString()})`
     );
 
-    // Step 2: Fetch games from last week
-    let gamesCallStart = Date.now();
+    // Step 2: Fetch games (cached for 24h)
     let games: Game[] = [];
+    let activeStart = startDateStr;
+    let activeEnd = endDateStr;
 
     try {
-      games = await getAllGames(startDateStr, endDateStr);
-      const gamesCallDuration = Date.now() - gamesCallStart;
-      trackApiCall('/games', 200, gamesCallDuration);
-      console.debug('[top-week] games fetch:', games.length, 'games in', gamesCallDuration, 'ms');
-
-      // DEBUG: Log what we got
-      debugInfo.warnings.push(
-        `Fetched ${games.length} total games from API (before filtering)`
-      );
-      if (games.length > 0) {
-        const statuses = games.reduce((acc: Record<string, number>, g) => {
-          acc[g.status] = (acc[g.status] || 0) + 1;
-          return acc;
-        }, {});
-        debugInfo.warnings.push(
-          `Game statuses: ${JSON.stringify(statuses)}`
-        );
-        debugInfo.warnings.push(
-          `Date range used: ${startDateStr} to ${endDateStr}`
-        );
-      } else {
-        debugInfo.warnings.push(
-          `No games returned from API for date range: ${startDateStr} to ${endDateStr}`
-        );
-      }
+      games = await getCachedGames(startDateStr, endDateStr);
+      debugInfo.gamesProcessed = games.length;
+      console.debug('[top-week] games:', games.length);
     } catch (error: any) {
-      const gamesCallDuration = Date.now() - gamesCallStart;
-      trackApiCall('/games', error.status || 500, gamesCallDuration);
       debugInfo.errors.push(`Failed to fetch games: ${error.message}`);
       throw error;
     }
 
-    // Filter to completed games only (all games in last 7 days)
-    const beforeFilter = games.length;
-    games = games.filter(g => g.status === 'Final');
-    console.debug('[top-week] games filter: ', beforeFilter, '->', games.length, '(Final only)');
-
-    // DEBUG: Log filtering results
-    if (beforeFilter > 0 && games.length === 0) {
-      debugInfo.warnings.push(
-        `All ${beforeFilter} games were filtered out (none had status='Final')`
-      );
-    } else if (beforeFilter > games.length) {
-      debugInfo.warnings.push(
-        `Filtered ${beforeFilter} games down to ${games.length} (removed non-Final games)`
-      );
-    }
-
-    debugInfo.gamesProcessed = games.length;
-
-    // If no games found, try fallback
+    // If no games found, try fallback (off-season etc.)
     if (games.length === 0) {
       console.debug('[top-week] no games, trying fallback');
-      debugInfo.warnings.push('No games found in last 7 days, trying fallback');
+      debugInfo.warnings.push('No games found, trying fallback');
       debugInfo.dateRange.usedFallback = true;
 
       try {
@@ -193,22 +115,39 @@ export async function GET(request: NextRequest) {
         if (lastGame) {
           const fallbackEnd = new Date(lastGame.date);
           const fallbackStart = subDays(fallbackEnd, 7);
-          const fallbackStartStr = format(fallbackStart, 'yyyy-MM-dd');
-          const fallbackEndStr = format(fallbackEnd, 'yyyy-MM-dd');
+          activeStart = format(fallbackStart, 'yyyy-MM-dd');
+          activeEnd = format(fallbackEnd, 'yyyy-MM-dd');
 
-          debugInfo.dateRange.start = fallbackStartStr;
-          debugInfo.dateRange.end = fallbackEndStr;
+          debugInfo.dateRange.start = activeStart;
+          debugInfo.dateRange.end = activeEnd;
 
-          games = await getAllGames(fallbackStartStr, fallbackEndStr);
-          games = games.filter(g => g.status === 'Final');
-          console.debug('[top-week] fallback games:', games.length);
-
+          games = await getCachedGames(activeStart, activeEnd);
           debugInfo.gamesProcessed = games.length;
-          trackApiCall('/games (fallback)', 200, Date.now() - gamesCallStart);
+          console.debug('[top-week] fallback games:', games.length);
         }
       } catch (error: any) {
         debugInfo.errors.push(`Fallback failed: ${error.message}`);
       }
+    }
+
+    // Step 3: Fetch stats batches (cached for 24h)
+    let allStats: GameStats[] = [];
+    const numBatches = Math.ceil(games.length / BATCH_SIZE);
+    debugInfo.batchCount = numBatches;
+
+    try {
+      for (let i = 0; i < numBatches; i++) {
+        const batch = await getCachedStatsBatch(activeStart, activeEnd, i);
+        allStats.push(...batch);
+      }
+      debugInfo.statsProcessed = allStats.length;
+      debugInfo.warnings.push(
+        `Fetched ${games.length} games, ${allStats.length} stats (cached)`
+      );
+      console.debug('[top-week] stats:', allStats.length);
+    } catch (error: any) {
+      debugInfo.errors.push(`Failed to fetch stats: ${error.message}`);
+      throw error;
     }
 
     if (games.length === 0) {
@@ -218,22 +157,6 @@ export async function GET(request: NextRequest) {
         ...(process.env.NODE_ENV === 'development' && { debug: debugInfo }),
       });
     }
-
-    // Step 3: Fetch stats with batching (all games)
-    const gameIds = games.map(g => g.id);
-    const batchSize = 50;
-    console.debug('[top-week] fetching stats:', gameIds.length, 'games in', Math.ceil(gameIds.length / batchSize), 'batches');
-
-    const allStats = await fetchStatsBatched(
-      gameIds,
-      batchSize,
-      rateLimiter,
-      debugInfo
-    );
-
-    debugInfo.statsProcessed = allStats.length;
-    debugInfo.rateLimitDelays = rateLimiter.getTotalWaitTime();
-    console.debug('[top-week] stats fetch complete:', allStats.length, 'stats,', rateLimiter.getTotalWaitTime(), 'ms rate limit delays');
 
     // Step 4: Group stats by player
     const playerStatsMap = new Map<number, GameStats[]>();

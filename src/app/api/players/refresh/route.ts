@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export async function POST() {
     try {
+        revalidateTag('top-week', 'max');
         revalidatePath('/');
         revalidatePath('/api/players/top-week');
         return NextResponse.json({
