@@ -22,7 +22,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
 
   const rankingStatsContent = (
     <>
-      <div className="text-xs text-foreground-muted">averaged</div>
+      <div className="text-foreground-muted text-[clamp(0.6875rem,0.3vw+0.65rem,0.75rem)]">averaged</div>
       <div className="flex gap-x-6 gap-y-2">
         <Stat label="pts" value={player.pts.toFixed(1)} size="lg" />
         <Stat label="reb" value={player.reb.toFixed(1)} size="lg" />
@@ -30,11 +30,11 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
       </div>
       <div className="mt-1 flex flex-wrap items-baseline gap-x-1 gap-y-1">
         <span>
-          <span className="ml-4 text-sm text-foreground-muted">on </span>
-          <span className="text-xl font-bold text-accent">{player.ts.toFixed(1)}%</span>
-          <span className="ml-1 text-sm text-foreground-muted">TS</span>
+          <span className="ml-4 text-foreground-muted text-[clamp(0.8125rem,0.4vw+0.75rem,0.875rem)]">on </span>
+          <span className="font-bold text-accent text-[clamp(1rem,2vw+0.75rem,1.25rem)]">{player.ts.toFixed(1)}%</span>
+          <span className="ml-1 text-foreground-muted text-[clamp(0.8125rem,0.4vw+0.75rem,0.875rem)]">TS</span>
         </span>
-        <span className="text-sm text-foreground-muted">
+        <span className="text-foreground-muted text-[clamp(0.8125rem,0.4vw+0.75rem,0.875rem)]">
           and was
           <span
             className={
@@ -247,8 +247,8 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
 }
 
 function Stat({ label, value, size = 'default' }: { label: string; value: string; size?: 'default' | 'lg' }) {
-  const valueClass = size === 'lg' ? 'text-3xl' : 'text-2xl';
-  const labelClass = size === 'lg' ? 'text-base' : 'text-sm';
+  const valueClass = size === 'lg' ? 'text-[clamp(1.25rem,4vw+1rem,1.875rem)]' : 'text-[clamp(1.125rem,2vw+0.875rem,1.5rem)]';
+  const labelClass = size === 'lg' ? 'text-[clamp(0.875rem,0.5vw+0.75rem,1rem)]' : 'text-[clamp(0.8125rem,0.4vw+0.75rem,0.875rem)]';
   return (
     <div>
       <span className={`${valueClass} font-bold text-foreground`}>{value}</span>
@@ -260,8 +260,8 @@ function Stat({ label, value, size = 'default' }: { label: string; value: string
 function PerStat({ value }: { value: string }) {
   return (
     <div>
-      <span className="text-2xl font-bold text-accent">{value}</span>
-      <span className="ml-1 text-sm font-normal text-foreground-muted">PER</span>
+      <span className="font-bold text-accent text-[clamp(1.125rem,2vw+0.875rem,1.5rem)]">{value}</span>
+      <span className="ml-1 font-normal text-foreground-muted text-[clamp(0.8125rem,0.4vw+0.75rem,0.875rem)]">PER</span>
     </div>
   );
 }
@@ -271,7 +271,7 @@ function GameResultRow({ game }: { game: any }) {
   const scoreText = `${game.playerTeamScore}-${game.opponentScore}`;
 
   return (
-    <div className="text-base font-normal text-foreground">
+    <div className="font-normal text-foreground text-[clamp(0.875rem,0.5vw+0.8rem,1rem)]">
       {opponentName}: {scoreText}
     </div>
   );

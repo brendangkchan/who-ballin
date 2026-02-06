@@ -42,7 +42,7 @@ export default function FilterBar() {
           min={0}
           value={minGames}
           onChange={(e) => setMinGames(e.target.value)}
-          className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground"
+          className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground text-[clamp(0.75rem,1vw+0.7rem,0.875rem)]"
         />
       </FilterLabel>
       <FilterLabel label="Min pts">
@@ -52,7 +52,7 @@ export default function FilterBar() {
           min={0}
           value={minPts}
           onChange={(e) => setMinPts(e.target.value)}
-          className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground"
+          className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground text-[clamp(0.75rem,1vw+0.7rem,0.875rem)]"
         />
       </FilterLabel>
       <FilterLabel label="Min minutes">
@@ -62,12 +62,12 @@ export default function FilterBar() {
           min={0}
           value={minMinutes}
           onChange={(e) => setMinMinutes(e.target.value)}
-          className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground"
+          className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground text-[clamp(0.75rem,1vw+0.7rem,0.875rem)]"
         />
       </FilterLabel>
       <button
         type="submit"
-        className="rounded bg-accent px-4 py-1.5 text-sm font-medium text-foreground transition-colors hover:opacity-90"
+        className="rounded bg-accent px-4 py-1.5 font-medium text-foreground transition-colors hover:opacity-90 text-[clamp(0.75rem,1vw+0.7rem,0.875rem)]"
       >
         Apply
       </button>
@@ -78,7 +78,7 @@ export default function FilterBar() {
 function FilterLabel({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="flex items-center gap-2 text-sm font-medium text-foreground-muted">
+      <span className="flex items-center gap-2 font-medium text-foreground-muted text-[clamp(0.75rem,1vw+0.7rem,0.875rem)]">
         <span className="h-4 w-1 shrink-0 bg-accent" aria-hidden />
         {label}
       </span>

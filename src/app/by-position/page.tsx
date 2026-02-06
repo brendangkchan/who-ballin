@@ -111,10 +111,10 @@ export default function ByPositionPage({
       <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
         <div className="mb-10 flex items-center justify-between sm:mb-12">
           <div>
-            <h1 className="font-serif text-[3.375rem] font-extrabold text-foreground sm:text-[4.5rem]">
+            <h1 className="font-serif font-extrabold text-foreground text-[clamp(1.5rem,8vw+1rem,4.5rem)] leading-[0.9]">
               <span className="highlight-title">By Position</span>
             </h1>
-            <p className="mt-4 max-w-xl text-foreground-muted">
+            <p className="mt-4 max-w-xl text-foreground-muted text-[clamp(0.875rem,0.5vw+0.8rem,1rem)]">
               Best guard, forward, and center this week (by PER). Same filters apply: at least {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, {DEFAULT_MIN_MINUTES} minutes. Powered by{' '}
               <a href="https://www.balldontlie.io" target="_blank" rel="noopener noreferrer" className="text-accent-navy hover:underline">
                 balldontlie.io
@@ -125,7 +125,7 @@ export default function ByPositionPage({
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="text-sm font-medium text-foreground-muted hover:text-foreground"
+              className="font-medium text-foreground-muted hover:text-foreground text-[clamp(0.8125rem,0.4vw+0.75rem,0.875rem)]"
             >
               All Players
             </Link>

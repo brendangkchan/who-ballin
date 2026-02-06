@@ -6,10 +6,9 @@ TODO
 - report card for team by win % grade letter
 - move game note into stat section
 - manual id fill out
+- env vars in vercel
 
 mobile
-- hide stat section and game log in player info
-- show it outside and below instead
 - scale image and font down for player info or just handle overflow
 
 narratives
