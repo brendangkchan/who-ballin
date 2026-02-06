@@ -103,7 +103,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           <div className="block sm:hidden mt-6 pl-2 text-left">
             {rankingStatsContent}
           </div>
-          <div className="note-card mt-20">
+          <div className="note-card mt-8 sm:mt-12">
             <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
               <div>
                 <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
