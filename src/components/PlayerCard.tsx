@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { format } from 'date-fns';
 import type { PlayerWeekStats } from '@/types/player';
 import { getTeamColors } from '@/lib/nba-team-colors';
 
@@ -17,7 +16,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const teamColors = getTeamColors(player.player.team?.abbreviation);
 
   return (
-    <div className="flex gap-5 py-6 sm:gap-6 sm:py-8">
+    <div className="flex gap-5 rounded-lg bg-neutral-100 p-6 sm:gap-6 sm:p-8">
       <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-full bg-foreground-muted/10">
         <a
           href={player.profileUrl}
@@ -35,105 +34,92 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
         </a>
       </div>
       <div className="flex-1">
-        {label != null ? (
-          <div className="block">
-            <span className="block pb-1 text-lg font-bold text-foreground">
-              {label}
-            </span>
-            {teamColors && (
-              <div
-                className="mt-1 h-2.5 w-full rounded-full"
-                style={{
-                  background: teamColors.secondary
-                    ? `linear-gradient(90deg, ${teamColors.secondary}, transparent)`
-                    : `linear-gradient(90deg, ${teamColors.primary}, transparent)`,
-                }}
-                aria-hidden
-              />
-            )}
+        <div className="block">
+          {(label != null || rank != null) && (
+            <div
+              className="block w-full rounded py-1 pl-2 pr-4"
+              style={
+                teamColors
+                  ? {
+                      background: `linear-gradient(90deg, ${teamColors.labelGradientStart}, transparent)`,
+                    }
+                  : undefined
+              }
+            >
+              <span className="block text-lg font-bold text-foreground">
+                {label ?? (rank != null ? `#${rank}` : null)}
+              </span>
+            </div>
+          )}
+          <div
+            className={`flex items-baseline justify-between gap-4 ${label != null || rank != null ? 'mt-2' : ''}`}
+          >
             <h3
-              className="mt-2 text-2xl font-extrabold sm:text-3xl"
+              className="font-serif text-2xl font-extrabold sm:text-3xl"
               style={teamColors ? { color: teamColors.primary } : undefined}
             >
               {fullName}
             </h3>
             <p
-              className={`mt-1 text-sm font-normal ${teamColors ? 'opacity-80' : 'text-foreground-muted'}`}
-              style={teamColors ? { color: teamColors.primary } : undefined}
+              className="text-xl italic"
+              style={
+                teamColors
+                  ? { color: teamColors.primary, opacity: 0.9 }
+                  : { color: 'var(--foreground-muted)' }
+              }
             >
               {teamName}
             </p>
           </div>
-        ) : (
-          <>
-            <div className="flex items-center gap-2">
-              {rank != null && (
-                <span className="text-lg font-bold text-accent">#{rank}</span>
-              )}
-              <h3 className="text-xl font-semibold text-foreground">
-                {fullName}
-              </h3>
-            </div>
-            {teamColors && (
-              <div
-                className="mt-2 h-1 w-24 rounded-full"
-                style={{
-                  background: teamColors.secondary
-                    ? `linear-gradient(90deg, ${teamColors.secondary}, transparent)`
-                    : `linear-gradient(90deg, ${teamColors.primary}, transparent)`,
-                }}
-                aria-hidden
-              />
-            )}
-            <p className="mt-3 text-sm text-foreground-muted">{teamName}</p>
-          </>
-        )}
-        <div
-          className="mt-4 flex flex-wrap gap-x-6 gap-y-2 rounded-lg p-4 text-sm"
-          style={
-            teamColors
-              ? {
-                  background: `${teamColors.primary}15`,
-                }
-              : undefined
-          }
-        >
-          <Stat label="pts" value={player.pts.toFixed(1)} />
-          <Stat label="reb" value={player.reb.toFixed(1)} />
-          <Stat label="ast" value={player.ast.toFixed(1)} />
-          <Stat label="ts%" value={`${player.ts.toFixed(1)}%`} />
-          <Stat
-            label="+/-"
-            value={
-              player.plusMinus > 0
-                ? `+${player.plusMinus.toFixed(1)}`
-                : player.plusMinus.toFixed(1)
-            }
-          />
-          <PerStat value={player.per.toFixed(1)} />
         </div>
-        <div
-          className="mt-4 rounded-lg p-4"
-          style={
-            teamColors
-              ? {
-                  background: `${teamColors.primary}15`,
-                }
-              : undefined
-          }
-        >
-          <p className="mb-2 text-xs font-semibold text-foreground">
-            Games This Week
-          </p>
-          <div className="space-y-1">
-            {player.gameResults.map((game, index) => (
-              <GameResultRow key={index} game={game} />
-            ))}
+        <div className="mt-4 flex flex-col gap-2 rounded-lg bg-neutral-200/60 p-4 text-sm">
+          <div className="flex items-baseline gap-x-6 gap-y-2">
+            <Stat label="pts" value={player.pts.toFixed(1)} />
+            <Stat label="reb" value={player.reb.toFixed(1)} />
+            <Stat label="ast" value={player.ast.toFixed(1)} />
+            <span className="text-sm font-normal italic text-foreground-muted">
+              in {Math.round(player.totalMinutes)} min
+            </span>
+          </div>
+          <div className="flex gap-x-6 gap-y-2">
+            <Stat label="ts%" value={`${player.ts.toFixed(1)}%`} />
+            <Stat
+              label="+/-"
+              value={
+                player.plusMinus > 0
+                  ? `+${player.plusMinus.toFixed(1)}`
+                  : player.plusMinus.toFixed(1)
+              }
+            />
+            <PerStat value={player.per.toFixed(1)} />
           </div>
         </div>
-        <p className="mt-2 text-xs text-foreground-muted">
-          {player.games} game{player.games !== 1 ? 's' : ''} this week
-        </p>
+        <div className="mt-4 grid grid-cols-2 gap-4 rounded-lg bg-neutral-200/60 p-4">
+          <div>
+            <p className="mb-2 font-bold text-green-700 dark:text-green-400">
+              Beat
+            </p>
+            <div className="space-y-1">
+              {player.gameResults
+                .filter((g) => g.result === 'W')
+                .map((game, index) => (
+                  <GameResultRow key={index} game={game} />
+                ))}
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 font-bold text-red-700 dark:text-red-400">
+              Lost to
+            </p>
+            <div className="space-y-1">
+              {player.gameResults
+                .filter((g) => g.result === 'L')
+                .map((game, index) => (
+                  <GameResultRow key={index} game={game} />
+                ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -158,24 +144,12 @@ function PerStat({ value }: { value: string }) {
 }
 
 function GameResultRow({ game }: { game: any }) {
-  const gameDate = format(new Date(game.date), 'MMM d');
-  const opponentName = game.opponent.abbreviation;
-  const vsText = game.isHome ? 'vs' : '@';
+  const opponentName = game.opponent.name ?? game.opponent.abbreviation;
   const scoreText = `${game.playerTeamScore}-${game.opponentScore}`;
-  const isWin = game.result === 'W';
 
   return (
-    <div
-      className={`flex items-center gap-2 rounded px-2 py-1 text-xs ${
-        isWin
-          ? 'bg-green-500/10 text-green-700 dark:text-green-400'
-          : 'bg-red-500/10 text-red-700 dark:text-red-400'
-      }`}
-    >
-      <span className="text-foreground-muted" aria-hidden>↳</span>
-      <span className="font-medium">
-        {gameDate} {vsText} {opponentName}: {scoreText} ({game.result})
-      </span>
+    <div className="text-base font-normal text-foreground">
+      {opponentName}: {scoreText}
     </div>
   );
 }
