@@ -4,12 +4,11 @@
 
 TODO
 - report card for team by win % grade letter
-- move game note into stat section
 - manual id fill out
 - env vars in vercel
+- move game note into stat section
 
 mobile
-- scale image and font down for player info or just handle overflow
 
 narratives
 - comeback

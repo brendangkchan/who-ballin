@@ -9,6 +9,23 @@ interface PlayerCardProps {
   label?: string;
 }
 
+function getTeamGrade(
+  winsCount: number,
+  lossesCount: number
+): { letter: string; colorClass: string } {
+  const total = winsCount + lossesCount;
+  if (total === 0) {
+    return { letter: '—', colorClass: 'text-foreground-muted' };
+  }
+  const pct = (winsCount / total) * 100;
+  if (pct >= 100) return { letter: 'A+', colorClass: 'text-emerald-700 dark:text-emerald-600' };
+  if (pct >= 70) return { letter: 'A', colorClass: 'text-emerald-700 dark:text-emerald-600' };
+  if (pct >= 60) return { letter: 'B', colorClass: 'text-amber-600 dark:text-amber-500' };
+  if (pct >= 50) return { letter: 'C', colorClass: 'text-amber-600 dark:text-amber-500' };
+  if (pct >= 40) return { letter: 'D', colorClass: 'text-rose-700 dark:text-rose-600' };
+  return { letter: 'F', colorClass: 'text-rose-700 dark:text-rose-600' };
+}
+
 export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const fullName = `${player.player.first_name} ${player.player.last_name}`;
   const teamName = player.player.team
@@ -17,6 +34,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const teamColors = getTeamColors(player.player.team?.abbreviation);
   const wins = player.gameResults.filter((g) => g.result === 'W');
   const losses = player.gameResults.filter((g) => g.result === 'L');
+  const { letter: gradeLetter, colorClass: gradeColorClass } = getTeamGrade(wins.length, losses.length);
 
   const isRankingMode = rank != null && label == null;
 
@@ -119,6 +137,10 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           </div>
           <div className="note-card mt-8 sm:mt-12">
             <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
+              <div className="col-span-2 mb-2 flex items-baseline">
+                <span className="mr-2 font-serif text-lg font-bold text-foreground">Weekly Grade: </span>
+                <span className={`font-sans text-xl font-bold ${gradeColorClass}`}>{gradeLetter}</span>
+              </div>
               <div>
                 <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
                   {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
@@ -231,6 +253,10 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
             </div>
             <div className="note-card mt-4">
               <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
+                <div className="col-span-2 mb-2 flex items-baseline">
+                  <span className="mr-2 font-serif text-lg font-bold text-foreground">Weekly Grade: </span>
+                  <span className={`font-sans text-lg font-bold ${gradeColorClass}`}>{gradeLetter}</span>
+                </div>
                 <div>
                   <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
                     {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
