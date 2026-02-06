@@ -1,19 +1,22 @@
 import type { GameStats, Game, GameResult, PlayerWeekStats } from '@/types/player';
 import { calculatePER, parseMinutes } from './per';
-import idMap from './nba-player-id-map.json';
+import idMapData from './nba-player-id-map.json';
+const idMap = idMapData as Record<string, number>;
 
 const NBA_HEADSHOT_BASE = 'https://cdn.nba.com/headshots/nba/latest/1040x760';
 const NBA_PROFILE_BASE = 'https://www.nba.com/player';
 
+export function getNbaPlayerId(playerId: number): number {
+  return idMap[String(playerId)] ?? playerId;
+}
+
 export function getPlayerImageUrl(playerId: number): string {
-  const nbaId = idMap[String(playerId)];
-  const id = nbaId != null ? nbaId : playerId;
+  const id = getNbaPlayerId(playerId);
   return `${NBA_HEADSHOT_BASE}/${id}.png`;
 }
 
 export function getPlayerProfileUrl(playerId: number): string {
-  const nbaId = idMap[String(playerId)];
-  const id = nbaId != null ? nbaId : playerId;
+  const id = getNbaPlayerId(playerId);
   return `${NBA_PROFILE_BASE}/${id}`;
 }
 

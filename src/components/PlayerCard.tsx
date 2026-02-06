@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import type { PlayerWeekStats } from '@/types/player';
 import { getTeamColors } from '@/lib/nba-team-colors';
+import { getNbaPlayerId } from '@/lib/utils';
 import NoteCardBorder from '@/components/NoteCardBorder';
 
 interface PlayerCardProps {
@@ -90,6 +91,11 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
 
   return (
     <div className="relative rounded-lg bg-background py-6 sm:py-8 noise-overlay">
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mb-2 text-xs text-foreground-muted">
+          BDL: {player.player.id} · NBA: {getNbaPlayerId(player.player.id)}
+        </div>
+      )}
       {isRankingMode ? (
         <>
           <div className="relative mx-auto h-[300px] w-full min-w-[300px] max-w-[300px] sm:mx-0 sm:max-w-none">
