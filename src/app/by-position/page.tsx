@@ -111,10 +111,9 @@ export default function ByPositionPage({
       <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
         <div className="mb-10 flex items-center justify-between sm:mb-12">
           <div>
-            <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
-              By Position
+            <h1 className="font-serif text-[3.375rem] font-extrabold text-foreground sm:text-[4.5rem]">
+              <span className="highlight-title">By Position</span>
             </h1>
-            <div className="mt-2 h-1 w-16 bg-accent" aria-hidden />
             <p className="mt-4 max-w-xl text-foreground-muted">
               Best guard, forward, and center this week (by PER). Same filters apply: at least {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, {DEFAULT_MIN_MINUTES} minutes.
             </p>

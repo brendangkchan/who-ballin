@@ -87,28 +87,30 @@ export default function Home({
       <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
         <div className="mb-10 flex items-center justify-between sm:mb-12">
           <div>
-            <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
-              Who Ballin
+            <h1 className="font-serif text-[3.375rem] font-extrabold text-foreground sm:text-[4.5rem]">
+              <span className="highlight-title">Who Been Ballin?</span>
             </h1>
-            <div className="mt-2 h-1 w-16 bg-accent" aria-hidden />
-            <p className="mt-4 max-w-xl text-foreground-muted">
-              Players with at least {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, and {DEFAULT_MIN_MINUTES} minutes this week, ranked by Player Efficiency Rating (PER).
+            <p className="mt-4 max-w-md text-foreground-muted">
+              These dudes been ballin' this <strong>past week</strong>. These are the top 10 guys ranked by offensive production using <a href="https://www.espn.com/nba/columns/story?columnist=hollinger_john&id=2850240" target="_blank" rel="noopener noreferrer" className="text-accent-navy font-bold hover:underline">PER</a> ("box score on steroids") filtering out the outliers.
             </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/by-position"
-              className="text-sm font-medium text-foreground-muted hover:text-foreground"
-            >
-              By Position
-            </Link>
-            <RefreshButtonWrapper />
+            <p className="max-w-md mt-4 text-xs text-foreground-muted">
+              Minimum {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, and {DEFAULT_MIN_MINUTES} min this week on teams that won more than lost.
+            </p>
           </div>
         </div>
         {process.env.NODE_ENV === 'development' && (
           <Suspense fallback={null}>
             <div className="mb-6">
               <FilterBar />
+            </div>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/by-position"
+                className="text-sm font-medium text-foreground-muted hover:text-foreground"
+              >
+                By Position
+              </Link>
+              <RefreshButtonWrapper />
             </div>
           </Suspense>
         )}

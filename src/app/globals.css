@@ -6,7 +6,9 @@
   --foreground: #1a1a1a;
   --foreground-muted: #525252;
   --accent: #D4A574;
+  --accent-navy: #1e4976;
   --card-bg: #ffffff;
+  --card-off-white: #F7F5F2;
   --border: #e5e5e5;
   --canvas: #D0BFC3;
   --panel-tint: #D8E0D5;
@@ -18,13 +20,30 @@
   --color-foreground: var(--foreground);
   --color-foreground-muted: var(--foreground-muted);
   --color-accent: var(--accent);
+  --color-accent-navy: var(--accent-navy);
   --color-card: var(--card-bg);
+  --color-card-off-white: var(--card-off-white);
   --color-border: var(--border);
   --color-canvas: var(--canvas);
   --color-panel-tint: var(--panel-tint);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-serif);
+}
+
+.highlight-title {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(
+    to bottom,
+    transparent 25%,
+    rgba(212, 165, 116, 0.55) 25%,
+    rgba(212, 165, 116, 0.55) 75%,
+    transparent 75%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 80%;
+  background-position: 0 15%;
 }
 
 .noise-overlay::before {
