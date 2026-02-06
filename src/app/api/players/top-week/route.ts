@@ -215,11 +215,14 @@ export async function GET(request: NextRequest) {
     // Step 8: Sort by PER
     filtered.sort((a, b) => b.per - a.per);
 
+    // Step 9: Limit to top 10
+    const players = filtered.slice(0, 10);
+
     debugInfo.processingTime = Date.now() - startTime;
-    console.debug('[top-week] done:', filtered.length, 'players in', debugInfo.processingTime, 'ms');
+    console.debug('[top-week] done:', players.length, 'players in', debugInfo.processingTime, 'ms');
 
     const response = {
-      players: filtered,
+      players,
       ...(process.env.NODE_ENV === 'development' && { debug: debugInfo }),
     };
 

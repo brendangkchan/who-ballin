@@ -3,7 +3,6 @@
 - script to populate missing id's using search by name
 
 TODO
-- svg border
 - report card for team by win % grade letter
 - add blurb link to API
 - change limit to 10
