@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "build-map": "tsx scripts/fetch-nba-player-ids.ts",
+    "fill-map": "tsx scripts/fill-missing-nba-ids.ts",
+    "apply-manual-ids": "tsx scripts/apply-manual-nba-ids.ts",
     "revalidate": "node scripts/revalidate.mjs",
     "test": "vitest run",
     "test:watch": "vitest"

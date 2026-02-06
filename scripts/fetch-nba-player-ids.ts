@@ -4,7 +4,7 @@
  * (Loads BALLDONTLIE_API_KEY from .env.local if present.)
  *
  * Uses checkpoint/resume: if rate limited (429), progress is saved; run again to continue.
- * Rate limit: 12 req/min (5s between requests).
+ * Rate limit: 50 req/min (~1.2s between requests).
  */
 
 import * as fs from 'fs';
@@ -58,7 +58,7 @@ async function main() {
     referencePath: REFERENCE_PATH,
     outputPath: OUTPUT_PATH,
     checkpointPath: CHECKPOINT_PATH,
-    delayMs: 5000,
+    delayMs: 1200,
     retryDelayMs: 8000,
     maxRetries: 2,
     onProgress: (pageCount, totalPlayers) =>

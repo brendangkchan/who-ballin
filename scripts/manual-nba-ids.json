@@ -1,0 +1,2576 @@
+[
+  {
+    "bdl_id": 149,
+    "first_name": "Keenan",
+    "last_name": "Evans",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 342,
+    "first_name": "Nene",
+    "last_name": "",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 382,
+    "first_name": "Billy",
+    "last_name": "Preston",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 722,
+    "first_name": "Cliff",
+    "last_name": "T. Robinson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1204,
+    "first_name": "Charles",
+    "last_name": "R. Jones",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1546,
+    "first_name": "Peter",
+    "last_name": "John Ramos",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1569,
+    "first_name": "Tim",
+    "last_name": "Pickett",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1658,
+    "first_name": "Sean",
+    "last_name": "Banks",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1750,
+    "first_name": "Juan",
+    "last_name": "Carlos Navarro",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1776,
+    "first_name": "Brandon",
+    "last_name": "Wallace",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1789,
+    "first_name": "Adam",
+    "last_name": "Haluska",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 2097,
+    "first_name": "Patric",
+    "last_name": "Young",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 2108,
+    "first_name": "Ronald",
+    "last_name": "Roberts Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 2116,
+    "first_name": "James",
+    "last_name": "Michael McAdoo",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 2200,
+    "first_name": "Mike",
+    "last_name": "Young",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 2214,
+    "first_name": "Yakuba",
+    "last_name": "Ouattara",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 2229,
+    "first_name": "Walter",
+    "last_name": "Lemon Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 2300,
+    "first_name": "Micheal",
+    "last_name": "Ray Richardson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 2866,
+    "first_name": "Hot",
+    "last_name": "Rod,Williams",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 3077,
+    "first_name": "Joe",
+    "last_name": "Barry,Carroll",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 666529,
+    "first_name": "Jon",
+    "last_name": "Davis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 666640,
+    "first_name": "Amir",
+    "last_name": "Hinton",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 666647,
+    "first_name": "Daulton",
+    "last_name": "Hommes",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 666716,
+    "first_name": "Dedric",
+    "last_name": "Lawson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 666757,
+    "first_name": "Luke",
+    "last_name": "Maye",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 666828,
+    "first_name": "James",
+    "last_name": "Palmer Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 666840,
+    "first_name": "Lamar",
+    "last_name": "Peters",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 666892,
+    "first_name": "Simisola",
+    "last_name": "Shittu",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 666973,
+    "first_name": "Todd",
+    "last_name": "Withers",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1358055,
+    "first_name": "Anzejs",
+    "last_name": "Pasecniks",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1573276,
+    "first_name": "Levi",
+    "last_name": "Randolph",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 2270852,
+    "first_name": "Sir'Dominic",
+    "last_name": "Pointer",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 3547294,
+    "first_name": "Kenyon",
+    "last_name": "Martin Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196798,
+    "first_name": "Doron",
+    "last_name": "Sheffer",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196799,
+    "first_name": "Andrei",
+    "last_name": "Fetisov",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196800,
+    "first_name": "Rashard",
+    "last_name": "Griffith",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196801,
+    "first_name": "Aurelijius",
+    "last_name": "Zukauskas",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196802,
+    "first_name": "Abdul",
+    "last_name": "Shamsid-Deen",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196803,
+    "first_name": "Augusto",
+    "last_name": "Binelli",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196804,
+    "first_name": "Ron",
+    "last_name": "Ellis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196805,
+    "first_name": "Marcelo",
+    "last_name": "Nicola",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196806,
+    "first_name": "Alain",
+    "last_name": "Digbeau",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196807,
+    "first_name": "Ben",
+    "last_name": "Pepper",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196808,
+    "first_name": "Roberto",
+    "last_name": "Duenas",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196809,
+    "first_name": "George",
+    "last_name": "Banks",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196810,
+    "first_name": "Andrew",
+    "last_name": "Betts",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196811,
+    "first_name": "Venson",
+    "last_name": "Hamilton",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196812,
+    "first_name": "DeeAndre",
+    "last_name": "Hulett",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196813,
+    "first_name": "Josip",
+    "last_name": "Sesar",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196814,
+    "first_name": "Robertas",
+    "last_name": "Javtokas",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196815,
+    "first_name": "Federico",
+    "last_name": "Kammerichs",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196816,
+    "first_name": "Mladen",
+    "last_name": "Sekularac",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196817,
+    "first_name": "Milos",
+    "last_name": "Vujanic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196818,
+    "first_name": "Peter",
+    "last_name": "Fehse",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196821,
+    "first_name": "Sofoklis",
+    "last_name": "Schortsanitis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196822,
+    "first_name": "Szymon",
+    "last_name": "Szewczyk",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196823,
+    "first_name": "Mario",
+    "last_name": "Austin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196824,
+    "first_name": "Sani",
+    "last_name": "Becirovic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196825,
+    "first_name": "Paccelis",
+    "last_name": "Morlende",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196826,
+    "first_name": "Remon",
+    "last_name": "Van de Hare",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196827,
+    "first_name": "Nedzad",
+    "last_name": "Sinanovic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196828,
+    "first_name": "Xue",
+    "last_name": "Yuyang",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196832,
+    "first_name": "Albert",
+    "last_name": "Miralles",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196833,
+    "first_name": "Viktor",
+    "last_name": "Sanikidze",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196835,
+    "first_name": "Sergei",
+    "last_name": "Lishouk",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196836,
+    "first_name": "Christian",
+    "last_name": "Drejer",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196837,
+    "first_name": "Sergei",
+    "last_name": "Karaulov",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196839,
+    "first_name": "Fran",
+    "last_name": "Vazquez",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196841,
+    "first_name": "Erazem",
+    "last_name": "Lorbek",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196842,
+    "first_name": "Axel",
+    "last_name": "Hervelle",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196843,
+    "first_name": "Cenk",
+    "last_name": "Akyol",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196850,
+    "first_name": "Lior",
+    "last_name": "Eliyahu",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196852,
+    "first_name": "Vladimir",
+    "last_name": "Veremeenko",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196853,
+    "first_name": "Yotam",
+    "last_name": "Halperin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196854,
+    "first_name": "Ejike",
+    "last_name": "Ugboaja",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196855,
+    "first_name": "Edin",
+    "last_name": "Bavcic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196862,
+    "first_name": "Petteri",
+    "last_name": "Koponen",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196863,
+    "first_name": "Stanko",
+    "last_name": "Barac",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196865,
+    "first_name": "Renaldas",
+    "last_name": "Seibutis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196866,
+    "first_name": "Brad",
+    "last_name": "Newley",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196867,
+    "first_name": "Giorgos",
+    "last_name": "Printezis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196868,
+    "first_name": "Milovan",
+    "last_name": "Rakovic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196882,
+    "first_name": "Ante",
+    "last_name": "Tomic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196884,
+    "first_name": "DeVon",
+    "last_name": "Hardin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196885,
+    "first_name": "Tadija",
+    "last_name": "Dragicevic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196886,
+    "first_name": "Maarty",
+    "last_name": "Leunen",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196897,
+    "first_name": "Sergio",
+    "last_name": "Llull",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196900,
+    "first_name": "Sergiy",
+    "last_name": "Gladyr",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196902,
+    "first_name": "Emir",
+    "last_name": "Preldzic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196903,
+    "first_name": "Chinemelu",
+    "last_name": "Elonu",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196904,
+    "first_name": "Henk",
+    "last_name": "Norel",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196907,
+    "first_name": "Latavious",
+    "last_name": "Williams",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196920,
+    "first_name": "Paulao",
+    "last_name": "Prestes",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196921,
+    "first_name": "Dwayne",
+    "last_name": "Collins",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196923,
+    "first_name": "Chukwudiebere",
+    "last_name": "Maduabum",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196942,
+    "first_name": "MIlan",
+    "last_name": "Macvan",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196944,
+    "first_name": "Adam",
+    "last_name": "Hanga",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196945,
+    "first_name": "Jon",
+    "last_name": "Diebler",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196965,
+    "first_name": "Izzet",
+    "last_name": "Turkyilmaz",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196966,
+    "first_name": "Ilkan",
+    "last_name": "Karaman",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196997,
+    "first_name": "Alex",
+    "last_name": "Oriakhi",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196998,
+    "first_name": "Bojan",
+    "last_name": "Dubljevic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4196999,
+    "first_name": "Janis",
+    "last_name": "Timma",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197032,
+    "first_name": "Nemanja",
+    "last_name": "Dangubic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197033,
+    "first_name": "Louis",
+    "last_name": "Labeyrie",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197065,
+    "first_name": "Aaron",
+    "last_name": "White",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197066,
+    "first_name": "Cady",
+    "last_name": "Lalanne",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197068,
+    "first_name": "Nikola",
+    "last_name": "Milutinov",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197069,
+    "first_name": "Arturas",
+    "last_name": "Gudaitis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197071,
+    "first_name": "Juan Pablo",
+    "last_name": "Vaulet",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197072,
+    "first_name": "Marcus",
+    "last_name": "Eriksson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197073,
+    "first_name": "Tyler",
+    "last_name": "Harvey",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197074,
+    "first_name": "Satnam",
+    "last_name": "Singh",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197075,
+    "first_name": "Daniel",
+    "last_name": "Diez",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197076,
+    "first_name": "Nikola",
+    "last_name": "Radicevic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197077,
+    "first_name": "Dimitrios",
+    "last_name": "Agravanis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197078,
+    "first_name": "Luka",
+    "last_name": "Mitrovic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197110,
+    "first_name": "Isaia",
+    "last_name": "Cordinier",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197111,
+    "first_name": "David",
+    "last_name": "Michineau",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197112,
+    "first_name": "Wang",
+    "last_name": "Zhelin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197162,
+    "first_name": "Aleksandar",
+    "last_name": "Vezenkov",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197165,
+    "first_name": "Ognen",
+    "last_name": "Jaramaz",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197166,
+    "first_name": "Alpha",
+    "last_name": "Kaba",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197192,
+    "first_name": "Jaylen",
+    "last_name": "Hands",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197230,
+    "first_name": "Issuf",
+    "last_name": "Sanon",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197231,
+    "first_name": "Vanja",
+    "last_name": "Marinkovic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197307,
+    "first_name": "Marcos",
+    "last_name": "Louzada Silva",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197384,
+    "first_name": "Yam",
+    "last_name": "Madar",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197387,
+    "first_name": "Vit",
+    "last_name": "Krejci",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 4197389,
+    "first_name": "Justinian",
+    "last_name": "Jessup",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553938,
+    "first_name": "Jordan",
+    "last_name": "Floyd",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553939,
+    "first_name": "Alan",
+    "last_name": "Griffin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553940,
+    "first_name": "Tyson",
+    "last_name": "Carter",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553944,
+    "first_name": "Matt",
+    "last_name": "Coleman",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553945,
+    "first_name": "Damien",
+    "last_name": "Jefferson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553946,
+    "first_name": "Nick",
+    "last_name": "Mayo",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553948,
+    "first_name": "Travis",
+    "last_name": "Munnings",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553949,
+    "first_name": "Tim",
+    "last_name": "Williams",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553954,
+    "first_name": "Sedrick",
+    "last_name": "Barefield",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553957,
+    "first_name": "Scottie",
+    "last_name": "Lindsey",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553968,
+    "first_name": "Joshua",
+    "last_name": "Obiesie",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553971,
+    "first_name": "Marcus",
+    "last_name": "Graves",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553972,
+    "first_name": "Ryan",
+    "last_name": "Taylor",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553973,
+    "first_name": "Kendall",
+    "last_name": "Smith",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553977,
+    "first_name": "Yoeli",
+    "last_name": "Childs",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553980,
+    "first_name": "Princepal",
+    "last_name": "Singh",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553981,
+    "first_name": "Kahlil",
+    "last_name": "Whitney",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553982,
+    "first_name": "Tres",
+    "last_name": "Tinkle",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553985,
+    "first_name": "Romaro",
+    "last_name": "Gill",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553988,
+    "first_name": "Jeff",
+    "last_name": "Dowtin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553989,
+    "first_name": "Elijah",
+    "last_name": "Pemberton",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553990,
+    "first_name": "Isaiah",
+    "last_name": "Brown",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553991,
+    "first_name": "Selom",
+    "last_name": "Mawugbe",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553996,
+    "first_name": "DJ",
+    "last_name": "Steward",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553998,
+    "first_name": "D.J.",
+    "last_name": "Stewart Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17553999,
+    "first_name": "Chaundee",
+    "last_name": "Brown",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17554003,
+    "first_name": "RJ",
+    "last_name": "Nembhard Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17554004,
+    "first_name": "AJ",
+    "last_name": "Lawson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17554007,
+    "first_name": "Colbey",
+    "last_name": "Ross",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17554008,
+    "first_name": "Justin",
+    "last_name": "Smith",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17620634,
+    "first_name": "Brandon",
+    "last_name": "McCoy",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895693,
+    "first_name": "Justin",
+    "last_name": "Turner",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895694,
+    "first_name": "Biram",
+    "last_name": "Faye",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895695,
+    "first_name": "Eric",
+    "last_name": "Demers",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895696,
+    "first_name": "Tahj",
+    "last_name": "Eaddy",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895697,
+    "first_name": "Asbjorn",
+    "last_name": "Midtgaard",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895698,
+    "first_name": "Jeremiah",
+    "last_name": "Tilmon",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895701,
+    "first_name": "D.J.",
+    "last_name": "Funderburk",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895706,
+    "first_name": "Denzel",
+    "last_name": "Mahoney",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895708,
+    "first_name": "Sehmus",
+    "last_name": "Hazer",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895709,
+    "first_name": "Tre",
+    "last_name": "Scott",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895710,
+    "first_name": "Chandler",
+    "last_name": "Vaudrin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895711,
+    "first_name": "Caleb",
+    "last_name": "Agada",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895712,
+    "first_name": "Giorgi",
+    "last_name": "Bezhanishvili",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895713,
+    "first_name": "Chudier",
+    "last_name": "Bile",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895714,
+    "first_name": "Jason",
+    "last_name": "Burnell",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895715,
+    "first_name": "Steffon",
+    "last_name": "Mitchell",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895716,
+    "first_name": "Arnas",
+    "last_name": "Velicka",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895717,
+    "first_name": "LJ",
+    "last_name": "Figueroa",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895718,
+    "first_name": "Mark",
+    "last_name": "Vital",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895719,
+    "first_name": "Sterling",
+    "last_name": "Manley",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895720,
+    "first_name": "Troy",
+    "last_name": "Baxter Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895721,
+    "first_name": "Juwan",
+    "last_name": "Durham",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895722,
+    "first_name": "Max",
+    "last_name": "Heidegger",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895723,
+    "first_name": "Justin",
+    "last_name": "Jaworski",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895724,
+    "first_name": "Ibi",
+    "last_name": "Watson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895727,
+    "first_name": "Austin",
+    "last_name": "Hollins",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895728,
+    "first_name": "Kyree",
+    "last_name": "Walker",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895729,
+    "first_name": "James",
+    "last_name": "Banks III",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895730,
+    "first_name": "Anas",
+    "last_name": "Mahmoud",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895731,
+    "first_name": "Isiaha",
+    "last_name": "Mike",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895732,
+    "first_name": "K.J.",
+    "last_name": "Lawson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895733,
+    "first_name": "Blake",
+    "last_name": "Francis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895734,
+    "first_name": "Spencer",
+    "last_name": "Littleson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895736,
+    "first_name": "Anthony",
+    "last_name": "Tarke",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895737,
+    "first_name": "Lydell",
+    "last_name": "Elmore",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895738,
+    "first_name": "David",
+    "last_name": "DiLeo",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895740,
+    "first_name": "Alpha",
+    "last_name": "Diallo",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895741,
+    "first_name": "Jon Axel",
+    "last_name": "Gudmundsson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895742,
+    "first_name": "Trey",
+    "last_name": "Kell",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895743,
+    "first_name": "Jo",
+    "last_name": "Lual-Acuil Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895744,
+    "first_name": "Emmanuel",
+    "last_name": "Nzekwesi",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895745,
+    "first_name": "Jaleen",
+    "last_name": "Smith",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895747,
+    "first_name": "Marcus",
+    "last_name": "Foster",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895748,
+    "first_name": "Jalen",
+    "last_name": "Tate",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895749,
+    "first_name": "Tyler",
+    "last_name": "Hagedorn",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895750,
+    "first_name": "Steven",
+    "last_name": "Enoch",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895751,
+    "first_name": "John",
+    "last_name": "Mooney",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895753,
+    "first_name": "DMitrik",
+    "last_name": "Trice",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895754,
+    "first_name": "Tyree",
+    "last_name": "White",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895758,
+    "first_name": "Kyle",
+    "last_name": "Fogg",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895775,
+    "first_name": "Zach",
+    "last_name": "Auguste",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895777,
+    "first_name": "Trey",
+    "last_name": "Davis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895791,
+    "first_name": "Terry",
+    "last_name": "Henderson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895793,
+    "first_name": "Cullen",
+    "last_name": "Russo",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895796,
+    "first_name": "Vitto",
+    "last_name": "Brown",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895798,
+    "first_name": "Jared",
+    "last_name": "Brownridge",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895815,
+    "first_name": "Quinton",
+    "last_name": "Rose",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895818,
+    "first_name": "Matur",
+    "last_name": "Maker",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895819,
+    "first_name": "LiAngelo",
+    "last_name": "Ball",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895821,
+    "first_name": "D.J.",
+    "last_name": "Hogg",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895834,
+    "first_name": "Nate",
+    "last_name": "Mason",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895835,
+    "first_name": "Bennie",
+    "last_name": "Boatwright",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895838,
+    "first_name": "Aubrey",
+    "last_name": "Dawkins",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895865,
+    "first_name": "Charles",
+    "last_name": "Matthews",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895875,
+    "first_name": "Aric",
+    "last_name": "Holman",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895876,
+    "first_name": "Kaleb",
+    "last_name": "Wesson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895877,
+    "first_name": "Kerwin",
+    "last_name": "Roach",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895878,
+    "first_name": "Zach",
+    "last_name": "Hankins",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895903,
+    "first_name": "Brandon",
+    "last_name": "Randolph",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895906,
+    "first_name": "Trey",
+    "last_name": "Phills",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895907,
+    "first_name": "Stephen",
+    "last_name": "Domingo",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895908,
+    "first_name": "Paul",
+    "last_name": "White",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895911,
+    "first_name": "Barry",
+    "last_name": "Brown",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895913,
+    "first_name": "Kaleb",
+    "last_name": "Johnson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895914,
+    "first_name": "Matt",
+    "last_name": "Morgan",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895956,
+    "first_name": "Tyrique",
+    "last_name": "Jones",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895963,
+    "first_name": "Paul",
+    "last_name": "Eboua",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895984,
+    "first_name": "Derrick",
+    "last_name": "Alston Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895991,
+    "first_name": "Jahlil",
+    "last_name": "Tripp",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895992,
+    "first_name": "Rayshaun",
+    "last_name": "Hammonds",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895996,
+    "first_name": "E.J.",
+    "last_name": "Montgomery",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895998,
+    "first_name": "Devonte",
+    "last_name": "Patterson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17895999,
+    "first_name": "Jordan",
+    "last_name": "Bowden",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896000,
+    "first_name": "Nathan",
+    "last_name": "Sestina",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896005,
+    "first_name": "Emmitt",
+    "last_name": "Williams",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896006,
+    "first_name": "Anthony",
+    "last_name": "Cowan Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896008,
+    "first_name": "Shakur",
+    "last_name": "Juiston",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896010,
+    "first_name": "Darnell",
+    "last_name": "Cowart",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896011,
+    "first_name": "Nate",
+    "last_name": "Renfro",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896013,
+    "first_name": "Ryan",
+    "last_name": "Woolridge",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896014,
+    "first_name": "Eugene",
+    "last_name": "German",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896015,
+    "first_name": "JJ",
+    "last_name": "Culver",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896016,
+    "first_name": "Jaire",
+    "last_name": "Grayer",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896019,
+    "first_name": "Nahziah",
+    "last_name": "Carter",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896022,
+    "first_name": "Brandon",
+    "last_name": "Boston Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896031,
+    "first_name": "Nah'Shon",
+    "last_name": "Hyland",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896054,
+    "first_name": "John",
+    "last_name": "Petty Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896068,
+    "first_name": "Juhann",
+    "last_name": "Begarin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896079,
+    "first_name": "Rokas",
+    "last_name": "Jokubaitis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896080,
+    "first_name": "EJ",
+    "last_name": "Onu",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896082,
+    "first_name": "Aamir",
+    "last_name": "Simms",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896086,
+    "first_name": "Oscar",
+    "last_name": "da Silva",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896090,
+    "first_name": "MaCio",
+    "last_name": "Teague",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896095,
+    "first_name": "Isaiah",
+    "last_name": "Miller",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896096,
+    "first_name": "Matt",
+    "last_name": "Mitchell",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896098,
+    "first_name": "Zaccheus",
+    "last_name": "Darko-Kelly",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896102,
+    "first_name": "Mitch",
+    "last_name": "Ballock",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896105,
+    "first_name": "Matt",
+    "last_name": "Coleman III",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896108,
+    "first_name": "Romeo",
+    "last_name": "Weems",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896109,
+    "first_name": "Ryan",
+    "last_name": "Daly",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896110,
+    "first_name": "Matt",
+    "last_name": "Lewis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896111,
+    "first_name": "Brandon",
+    "last_name": "Rachal",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896113,
+    "first_name": "Devontae",
+    "last_name": "Shuler",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896115,
+    "first_name": "Amar",
+    "last_name": "Sylla",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896118,
+    "first_name": "Marcus",
+    "last_name": "Zegarowski",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17896119,
+    "first_name": "Reid",
+    "last_name": "Travis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 17951082,
+    "first_name": "Trey",
+    "last_name": "Murphy",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 18030330,
+    "first_name": "Kerry",
+    "last_name": "Blackshear Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 18036823,
+    "first_name": "Balsa",
+    "last_name": "Koprivica",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 18041884,
+    "first_name": "Asante",
+    "last_name": "Gist",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 18042321,
+    "first_name": "Asante",
+    "last_name": "Gist",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 18170949,
+    "first_name": "Giorgos",
+    "last_name": "Kalaitzakis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 18677827,
+    "first_name": "Johnny",
+    "last_name": "Hamilton",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 18678048,
+    "first_name": "Balsa",
+    "last_name": "Koprivica",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 24338541,
+    "first_name": "Malik",
+    "last_name": "Ellison",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 24590098,
+    "first_name": "Justin",
+    "last_name": "Tillman",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 38017696,
+    "first_name": "Nikola",
+    "last_name": "Jovic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 38017725,
+    "first_name": "Moussa",
+    "last_name": "Diabate",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 38017733,
+    "first_name": "A.J.",
+    "last_name": "Green",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46389613,
+    "first_name": "Butch",
+    "last_name": "Van",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46389679,
+    "first_name": "George",
+    "last_name": "A.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46390225,
+    "first_name": "Bear,",
+    "last_name": "The",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46390754,
+    "first_name": "Elmer",
+    "last_name": "R.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46391332,
+    "first_name": "John",
+    "last_name": "W.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46391378,
+    "first_name": "Whitey",
+    "last_name": "Von",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46395054,
+    "first_name": "Bobby",
+    "last_name": "Watson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46399705,
+    "first_name": "George",
+    "last_name": "H.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46402260,
+    "first_name": "Dick",
+    "last_name": "Van",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46402270,
+    "first_name": "Tom",
+    "last_name": "Van",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46404376,
+    "first_name": "Norm",
+    "last_name": "Van",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46406979,
+    "first_name": "Double",
+    "last_name": "D",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 46409553,
+    "first_name": "Ted,",
+    "last_name": "Hound",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 47738533,
+    "first_name": "Jeenathan",
+    "last_name": "Williams",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 56677863,
+    "first_name": "Azuolas",
+    "last_name": "Tubelis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 56677865,
+    "first_name": "Charles",
+    "last_name": "Bediako",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 56677870,
+    "first_name": "Sir'Jabari",
+    "last_name": "Rice",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 56677872,
+    "first_name": "Craig",
+    "last_name": "Porter",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 64269023,
+    "first_name": "Trey",
+    "last_name": "Jemison",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1016082149,
+    "first_name": "Taevion",
+    "last_name": "Kinsey",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028025235,
+    "first_name": "Carlton",
+    "last_name": "Carrington",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028025498,
+    "first_name": "Pacome",
+    "last_name": "Dadiet",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028028379,
+    "first_name": "Tidjane",
+    "last_name": "Salaun",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028028405,
+    "first_name": "Alexandre",
+    "last_name": "Sarr",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028028932,
+    "first_name": "Nikola",
+    "last_name": "Topic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028035632,
+    "first_name": "Nikola",
+    "last_name": "Durisic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028037710,
+    "first_name": "Juan",
+    "last_name": "Nunez",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028038474,
+    "first_name": "K.J.",
+    "last_name": "Simpson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028044409,
+    "first_name": "Melvin",
+    "last_name": "Ajinca",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028214958,
+    "first_name": "Blake",
+    "last_name": "Hinson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028244064,
+    "first_name": "Marcus",
+    "last_name": "Domask",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028245237,
+    "first_name": "David",
+    "last_name": "Jones",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028245777,
+    "first_name": "Karlo",
+    "last_name": "Matkovic",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028255881,
+    "first_name": "Gabe",
+    "last_name": "McGlothan",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028256864,
+    "first_name": "Babacar",
+    "last_name": "Sane",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028256970,
+    "first_name": "Jamarion",
+    "last_name": "Sharp",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028263023,
+    "first_name": "James",
+    "last_name": "Akinjo",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028263126,
+    "first_name": "Mark",
+    "last_name": "Armstrong",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028263166,
+    "first_name": "Armando",
+    "last_name": "Bacot",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028263966,
+    "first_name": "Caleb",
+    "last_name": "Daniels",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028264254,
+    "first_name": "Boogie",
+    "last_name": "Ellis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028264291,
+    "first_name": "Aaron",
+    "last_name": "Estrada",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028264354,
+    "first_name": "Max",
+    "last_name": "Fiedler",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028265485,
+    "first_name": "Miller",
+    "last_name": "Kopp",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028265891,
+    "first_name": "Javante",
+    "last_name": "McCoy",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028266060,
+    "first_name": "Judah",
+    "last_name": "Mintz",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028266733,
+    "first_name": "Will",
+    "last_name": "Richardson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028266882,
+    "first_name": "Cormac",
+    "last_name": "Ryan",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028267244,
+    "first_name": "Erik",
+    "last_name": "Stevenson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028267489,
+    "first_name": "Jordan",
+    "last_name": "Tucker",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028267940,
+    "first_name": "Moses",
+    "last_name": "Wood",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028267983,
+    "first_name": "Cui",
+    "last_name": "Yongxi",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028268560,
+    "first_name": "Darius",
+    "last_name": "Brown",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028269491,
+    "first_name": "Taylor",
+    "last_name": "Funk",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028271147,
+    "first_name": "Alex",
+    "last_name": "Morales",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028271224,
+    "first_name": "Nick",
+    "last_name": "Muszynski",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028272676,
+    "first_name": "Hason",
+    "last_name": "Ward",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1028272702,
+    "first_name": "Warren",
+    "last_name": "Washington",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1029959785,
+    "first_name": "Boo",
+    "last_name": "Buie III",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057260888,
+    "first_name": "Airious",
+    "last_name": "Bailey",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057266813,
+    "first_name": "Egor",
+    "last_name": "Demin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057275262,
+    "first_name": "Nolan",
+    "last_name": "Traoré",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057275769,
+    "first_name": "Hansen",
+    "last_name": "Yang",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057279105,
+    "first_name": "Yanic Konan",
+    "last_name": "Niederhauser",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057394921,
+    "first_name": "Bogoljub",
+    "last_name": "Marković",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057395396,
+    "first_name": "Saliou",
+    "last_name": "Niang",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057396605,
+    "first_name": "Alex",
+    "last_name": "Toohey",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057844738,
+    "first_name": "Zack",
+    "last_name": "Austin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057845114,
+    "first_name": "Garrison",
+    "last_name": "Brooks",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057845216,
+    "first_name": "Tyler",
+    "last_name": "Burton",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057845228,
+    "first_name": "Lamont",
+    "last_name": "Butler",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057845405,
+    "first_name": "Matthew",
+    "last_name": "Cleveland",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057845539,
+    "first_name": "Steven",
+    "last_name": "Crowl",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057845569,
+    "first_name": "Dain",
+    "last_name": "Dainja",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057845629,
+    "first_name": "R.J.",
+    "last_name": "Davis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057845724,
+    "first_name": "Eric",
+    "last_name": "Dixon",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057845931,
+    "first_name": "Zeng",
+    "last_name": "Fanbo",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057846106,
+    "first_name": "Dawson",
+    "last_name": "Garcia",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057846172,
+    "first_name": "Keshon",
+    "last_name": "Gilbert",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057846700,
+    "first_name": "CJ",
+    "last_name": "Huntley",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057846878,
+    "first_name": "Kobe",
+    "last_name": "Johnson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057846964,
+    "first_name": "Tevian",
+    "last_name": "Jones",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057847334,
+    "first_name": "Lawson",
+    "last_name": "Lovering",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057847347,
+    "first_name": "RJ",
+    "last_name": "Luis Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057847467,
+    "first_name": "Augustas",
+    "last_name": "Marčiulionis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057847482,
+    "first_name": "Cameron",
+    "last_name": "Matthews",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057847674,
+    "first_name": "Igor",
+    "last_name": "Miličić, Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057847758,
+    "first_name": "Isaih",
+    "last_name": "Moore",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057847840,
+    "first_name": "Matthew",
+    "last_name": "Murrell",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057847875,
+    "first_name": "Eli John",
+    "last_name": "Ndiaye",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057847891,
+    "first_name": "Jameer",
+    "last_name": "Nelson Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057848025,
+    "first_name": "Norchad",
+    "last_name": "Omier",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057848187,
+    "first_name": "Jonathan",
+    "last_name": "Pierre",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057848244,
+    "first_name": "John",
+    "last_name": "Poulakidas",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057848571,
+    "first_name": "Tyrese",
+    "last_name": "Samuel",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057848715,
+    "first_name": "Christian",
+    "last_name": "Shumate",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057849072,
+    "first_name": "Saint",
+    "last_name": "Thomas",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057849497,
+    "first_name": "Brice",
+    "last_name": "Williams",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057969148,
+    "first_name": "Ja'Vier",
+    "last_name": "Francis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057970707,
+    "first_name": "Chance",
+    "last_name": "McMillian",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1057970845,
+    "first_name": "Jacksen",
+    "last_name": "Moni",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1058092439,
+    "first_name": "Akoldah",
+    "last_name": "Gak",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1058094827,
+    "first_name": "DJ",
+    "last_name": "Rodman",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1058451021,
+    "first_name": "Andrew",
+    "last_name": "Carr",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1058697789,
+    "first_name": "Johnell",
+    "last_name": "Davis",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1058917502,
+    "first_name": "Max",
+    "last_name": "Abmas",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1058920636,
+    "first_name": "Trhae",
+    "last_name": "Mitchell",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1058921044,
+    "first_name": "Sean",
+    "last_name": "Pedulla",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059021935,
+    "first_name": "Terrence",
+    "last_name": "Hargrove Jr.",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059021996,
+    "first_name": "Coleman",
+    "last_name": "Hawkins",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059058141,
+    "first_name": "Chase",
+    "last_name": "Hunter",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059059437,
+    "first_name": "Josh",
+    "last_name": "Oduro",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059253855,
+    "first_name": "Gabe",
+    "last_name": "Madsen",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059276748,
+    "first_name": "Jaden",
+    "last_name": "Akins",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059276973,
+    "first_name": "Daniel",
+    "last_name": "Batcho",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059279604,
+    "first_name": "Mitchell",
+    "last_name": "Mascari",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059510388,
+    "first_name": "Viktor",
+    "last_name": "Lakhin",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059542426,
+    "first_name": "Kadary",
+    "last_name": "Richmond",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059635020,
+    "first_name": "Payton",
+    "last_name": "Sandfort",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059635242,
+    "first_name": "Deivon",
+    "last_name": "Smith",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059749510,
+    "first_name": "Pedro",
+    "last_name": "Bradshaw",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059750273,
+    "first_name": "Sean",
+    "last_name": "East II",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059753117,
+    "first_name": "Steve",
+    "last_name": "Settle III",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059753274,
+    "first_name": "Malachi",
+    "last_name": "Smith",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059872205,
+    "first_name": "Jonas",
+    "last_name": "Aidoo",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059875475,
+    "first_name": "Grant",
+    "last_name": "Nelson",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059875969,
+    "first_name": "Erik",
+    "last_name": "Reynolds II",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059990598,
+    "first_name": "Cameron",
+    "last_name": "Brown",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1059992972,
+    "first_name": "Bez",
+    "last_name": "Mbeng",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1060015084,
+    "first_name": "Jeremiah",
+    "last_name": "Tilmon",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1060015883,
+    "first_name": "Adama",
+    "last_name": "Bal",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1060110806,
+    "first_name": "Nathan",
+    "last_name": "Mariano",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1060111739,
+    "first_name": "Julian",
+    "last_name": "Reese",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1060112014,
+    "first_name": "Aaron",
+    "last_name": "Scott",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1060124286,
+    "first_name": "Matt",
+    "last_name": "Cross",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1060125450,
+    "first_name": "Tyrese",
+    "last_name": "Hunter",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1060126250,
+    "first_name": "Zeke",
+    "last_name": "Mayo",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1060231727,
+    "first_name": "Hunter",
+    "last_name": "Cattoor",
+    "nba_id": null
+  },
+  {
+    "bdl_id": 1067112247,
+    "first_name": "Kyle",
+    "last_name": "Mangas",
+    "nba_id": null
+  }
+]

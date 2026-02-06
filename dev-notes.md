@@ -4,7 +4,6 @@
 
 TODO
 - manual id fill out
-- env vars in vercel
 - move game note into stat section
 
 mobile

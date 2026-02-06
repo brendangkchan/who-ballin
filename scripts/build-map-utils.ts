@@ -266,7 +266,7 @@ export async function runBuildMap(
     if (nextCursor === null) break;
   }
 
-  deleteCheckpoint(checkpointPath, fsModule);
+  // Keep checkpoint so fill-map can use the BDL player list (see scripts/fill-missing-nba-ids.ts).
 
   const { map, unmatched } = buildIdMap(players, reference);
   fsModule.writeFileSync(
