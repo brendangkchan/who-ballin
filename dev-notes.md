@@ -4,7 +4,6 @@
 
 TODO
 - report card for team by win % grade letter
-- add blurb link to API
 - move game note into stat section
 - manual id fill out
 

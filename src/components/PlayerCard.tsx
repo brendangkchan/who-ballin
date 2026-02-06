@@ -20,6 +20,38 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
 
   const isRankingMode = rank != null && label == null;
 
+  const rankingStatsContent = (
+    <>
+      <div className="text-xs text-foreground-muted">averaged</div>
+      <div className="flex gap-x-6 gap-y-2">
+        <Stat label="pts" value={player.pts.toFixed(1)} size="lg" />
+        <Stat label="reb" value={player.reb.toFixed(1)} size="lg" />
+        <Stat label="ast" value={player.ast.toFixed(1)} size="lg" />
+      </div>
+      <div className="mt-1 flex flex-wrap items-baseline gap-x-1 gap-y-1">
+        <span>
+          <span className="ml-4 text-sm text-foreground-muted">on </span>
+          <span className="text-xl font-bold text-accent">{player.ts.toFixed(1)}%</span>
+          <span className="ml-1 text-sm text-foreground-muted">TS</span>
+        </span>
+        <span className="text-sm text-foreground-muted">
+          and was
+          <span
+            className={
+              "ml-1 " +
+              (player.plusMinus > 0
+                ? "font-bold text-emerald-700 dark:text-emerald-500"
+                : "font-bold")
+            }
+          >
+            {player.plusMinus > 0 ? `+${player.plusMinus.toFixed(0)}` : player.plusMinus.toFixed(0)}
+          </span>
+          {" "}in {Math.round(player.totalMinutes)} minutes
+        </span>
+      </div>
+    </>
+  );
+
   return (
     <div className="relative rounded-lg bg-background py-6 sm:py-8 noise-overlay">
       {isRankingMode ? (
@@ -63,36 +95,13 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
               >
                 {teamName}
               </div>
-              <div className="mt-8 pl-24">
-                <div className="text-xs text-foreground-muted">averaged</div>
-                <div className="flex gap-x-6 gap-y-2">
-                  <Stat label="pts" value={player.pts.toFixed(1)} size="lg" />
-                  <Stat label="reb" value={player.reb.toFixed(1)} size="lg" />
-                  <Stat label="ast" value={player.ast.toFixed(1)} size="lg" />
-                </div>
-                <div className="mt-1 flex flex-wrap items-baseline gap-x-1 gap-y-1">
-                  <span>
-                    <span className="ml-4 text-sm text-foreground-muted">on </span>
-                    <span className="text-xl font-bold text-accent">{player.ts.toFixed(1)}%</span>
-                    <span className="ml-1 text-sm text-foreground-muted">TS</span>
-                  </span>
-                  <span className="text-sm text-foreground-muted">
-                    and was
-                    <span
-                      className={
-                        "ml-1 " +
-                        (player.plusMinus > 0
-                          ? "font-bold text-emerald-700 dark:text-emerald-500"
-                          : "font-bold")
-                      }
-                    >
-                      {player.plusMinus > 0 ? `+${player.plusMinus.toFixed(0)}` : player.plusMinus.toFixed(0)}
-                    </span>
-                    {" "}in {Math.round(player.totalMinutes)} minutes
-                  </span>
-                </div>
+              <div className="hidden sm:block mt-8 pl-24">
+                {rankingStatsContent}
               </div>
             </div>
+          </div>
+          <div className="block sm:hidden mt-6 pl-2 text-left">
+            {rankingStatsContent}
           </div>
           <div className="note-card mt-20">
             <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
