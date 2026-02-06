@@ -154,6 +154,7 @@ export async function GET(request: NextRequest) {
       debugInfo.processingTime = Date.now() - startTime;
       return NextResponse.json({
         players: [],
+        generatedAt: new Date().toISOString(),
         ...(process.env.NODE_ENV === 'development' && { debug: debugInfo }),
       });
     }
@@ -223,6 +224,7 @@ export async function GET(request: NextRequest) {
 
     const response = {
       players,
+      generatedAt: new Date().toISOString(),
       ...(process.env.NODE_ENV === 'development' && { debug: debugInfo }),
     };
 

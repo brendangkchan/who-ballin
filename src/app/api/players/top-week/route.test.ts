@@ -73,6 +73,10 @@ describe('GET /api/players/top-week', () => {
     const data = await res.json();
     expect(res.status).toBe(200);
     expect(data.players).toEqual([]);
+    expect(data.generatedAt).toBeDefined();
+    expect(typeof data.generatedAt).toBe('string');
+    expect(data.generatedAt.length).toBeGreaterThan(0);
+    expect(Number.isNaN(new Date(data.generatedAt).getTime())).toBe(false);
   });
 
   it('parses filter query params and includes them in debug', async () => {
@@ -130,6 +134,10 @@ describe('GET /api/players/top-week', () => {
     expect(data.players[0].gameResults).toHaveLength(1);
     expect(data.players[0].gameResults[0].result).toBe('W');
     expect(data.players[0].gameResults[0].opponent.name).toBe('Celtics');
+    expect(data.generatedAt).toBeDefined();
+    expect(typeof data.generatedAt).toBe('string');
+    expect(data.generatedAt.length).toBeGreaterThan(0);
+    expect(Number.isNaN(new Date(data.generatedAt).getTime())).toBe(false);
   });
 
   it('uses fallback date range when no games in primary range', async () => {

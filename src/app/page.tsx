@@ -5,6 +5,7 @@ import RefreshButtonWrapper from '@/components/RefreshButtonWrapper';
 import FilterBar from '@/components/FilterBar';
 import DebugPanel from '@/components/DebugPanel';
 import { parseFilters, DEFAULT_MIN_GAMES, DEFAULT_MIN_PTS, DEFAULT_MIN_MINUTES } from '@/lib/filters';
+import { formatLastUpdated } from '@/lib/utils';
 import type { PlayerWeekStats, DebugInfo } from '@/types/player';
 import type { PlayerFilters } from '@/lib/filters';
 
@@ -25,63 +26,46 @@ async function getTopPlayers(filters: PlayerFilters) {
   return res.json() as Promise<{
     players: PlayerWeekStats[];
     debug?: DebugInfo;
+    generatedAt?: string;
   }>;
 }
 
 function PlayersList({
-  searchParams,
+  players,
+  debug,
 }: {
-  searchParams: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
+  players: PlayerWeekStats[];
+  debug: DebugInfo | undefined;
 }) {
   return (
-    <Suspense
-      fallback={
+    <>
+      {players.length === 0 ? (
         <div className="flex items-center justify-center py-12">
-          <p className="text-foreground-muted">Loading players...</p>
+          <p className="text-foreground-muted">No games found in the last week.</p>
         </div>
-      }
-    >
-      <PlayersContent searchParams={searchParams} />
-    </Suspense>
+      ) : (
+        <>
+          <div className="space-y-0">
+            {players.map((player, index) => (
+              <PlayerCard key={player.player.id} player={player} rank={index + 1} />
+            ))}
+          </div>
+          {debug && <DebugPanel debugInfo={debug} />}
+        </>
+      )}
+    </>
   );
 }
 
-async function PlayersContent({
+export default async function Home({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
 }) {
   const resolved = searchParams instanceof Promise ? await searchParams : searchParams ?? {};
   const filters = parseFilters(resolved);
-  const { players, debug } = await getTopPlayers(filters);
+  const { players, debug, generatedAt } = await getTopPlayers(filters);
 
-  if (players.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <p className="text-foreground-muted">
-          No games found in the last week.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <div className="space-y-0">
-        {players.map((player, index) => (
-          <PlayerCard key={player.player.id} player={player} rank={index + 1} />
-        ))}
-      </div>
-      {debug && <DebugPanel debugInfo={debug} />}
-    </>
-  );
-}
-
-export default function Home({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>;
-}) {
   return (
     <div className="min-h-screen bg-background font-sans">
       <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
@@ -93,7 +77,15 @@ export default function Home({
             <p className="mt-4 max-w-md text-foreground-muted text-[clamp(0.875rem,0.5vw+0.8rem,1rem)]">
               These dudes been ballin' this <strong>past week</strong>. These are the top 10 guys ranked by offensive production using <a href="https://www.espn.com/nba/columns/story?columnist=hollinger_john&id=2850240" target="_blank" rel="noopener noreferrer" className="text-accent-navy font-bold hover:underline">PER</a> ("box score on steroids") filtering out the outliers.
             </p>
-            <p className="max-w-md mt-4 text-foreground-muted text-[clamp(0.6875rem,0.3vw+0.65rem,0.75rem)]">
+            {generatedAt && (
+              <p className="max-w-md mt-4 text-foreground-muted text-[clamp(0.6875rem,0.3vw+0.65rem,0.75rem)]">
+                Updated daily. Last updated{' '}
+                <span className="font-serif font-bold text-[clamp(0.75rem,0.4vw+0.7rem,0.9rem)]">
+                  {formatLastUpdated(generatedAt)}.
+                </span>
+              </p>
+            )}
+            <p className="max-w-md mt-2 text-foreground-muted text-[clamp(0.6875rem,0.3vw+0.65rem,0.75rem)]">
               Minimum {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, and {DEFAULT_MIN_MINUTES} min this week on teams that won more than lost. Powered by{' '}
               <a href="https://www.balldontlie.io" target="_blank" rel="noopener noreferrer" className="text-accent-navy hover:underline">
                 balldontlie.io
@@ -118,7 +110,7 @@ export default function Home({
             </div>
           </Suspense>
         )}
-        <PlayersList searchParams={searchParams} />
+        <PlayersList players={players} debug={debug} />
       </main>
     </div>
   );

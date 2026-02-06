@@ -3,6 +3,7 @@ import {
   calculateGameResult,
   aggregatePlayerStats,
   calculateTrueShooting,
+  formatLastUpdated,
 } from './utils';
 import type { Game, GameStats } from '@/types/player';
 
@@ -232,5 +233,32 @@ describe('calculateTrueShooting', () => {
     expect(ts).toBeLessThan(100);
     const expected = (30 / (2 * (20 + 0.44 * 10))) * 100;
     expect(ts).toBeCloseTo(expected, 2);
+  });
+});
+
+describe('formatLastUpdated', () => {
+  const ref = new Date('2026-02-06T12:00:00Z');
+
+  it('returns "today" when date is same calendar day as reference', () => {
+    expect(formatLastUpdated('2026-02-06T12:00:00Z', ref)).toBe('today');
+  });
+
+  it('returns "yesterday" when date is previous calendar day', () => {
+    // Use noon UTC so the date is unambiguously "yesterday" in all timezones
+    expect(formatLastUpdated('2026-02-05T12:00:00Z', ref)).toBe('yesterday');
+  });
+
+  it('returns "N days ago" for older dates', () => {
+    expect(formatLastUpdated('2026-02-04T12:00:00Z', ref)).toBe('2 days ago');
+    expect(formatLastUpdated('2026-02-03T12:00:00Z', ref)).toBe('3 days ago');
+    expect(formatLastUpdated('2026-01-31T12:00:00Z', ref)).toBe('6 days ago');
+  });
+
+  it('returns "unknown" for invalid or empty input', () => {
+    expect(formatLastUpdated('', ref)).toBe('unknown');
+    expect(formatLastUpdated('   ', ref)).toBe('unknown');
+    expect(formatLastUpdated('not-a-date', ref)).toBe('unknown');
+    expect(formatLastUpdated(null as unknown as string, ref)).toBe('unknown');
+    expect(formatLastUpdated(undefined as unknown as string, ref)).toBe('unknown');
   });
 });

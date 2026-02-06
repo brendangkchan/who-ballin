@@ -1,3 +1,4 @@
+import { differenceInDays, startOfDay } from 'date-fns';
 import type { GameStats, Game, GameResult, PlayerWeekStats } from '@/types/player';
 import { calculatePER, parseMinutes } from './per';
 import idMapData from './nba-player-id-map.json';
@@ -5,6 +6,24 @@ const idMap = idMapData as Record<string, number>;
 
 const NBA_HEADSHOT_BASE = 'https://cdn.nba.com/headshots/nba/latest/1040x760';
 const NBA_PROFILE_BASE = 'https://www.nba.com/player';
+
+/**
+ * Returns "today", "yesterday", or "N days ago" for an ISO date string.
+ * @param isoString - ISO 8601 date string (e.g. from API generatedAt)
+ * @param now - Optional reference time for testing; defaults to current date
+ */
+export function formatLastUpdated(isoString: string, now?: Date): string {
+  if (isoString == null || String(isoString).trim() === '') return 'unknown';
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return 'unknown';
+  const ref = now ?? new Date();
+  const refStart = startOfDay(ref);
+  const dateStart = startOfDay(date);
+  const days = differenceInDays(refStart, dateStart);
+  if (days === 0) return 'today';
+  if (days === 1) return 'yesterday';
+  return `${days} days ago`;
+}
 
 export function getNbaPlayerId(playerId: number): number {
   return idMap[String(playerId)] ?? playerId;
