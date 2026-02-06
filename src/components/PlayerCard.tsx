@@ -37,7 +37,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const losses = player.gameResults.filter((g) => g.result === 'L');
   const { letter: gradeLetter, colorClass: gradeColorClass } = getTeamGrade(wins.length, losses.length);
 
-  const isRankingMode = rank != null && label == null;
+  const useRankingLayout = rank != null || label != null;
 
   const rankingStatsContent = (
     <>
@@ -57,10 +57,10 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           and was
           <span
             className={
-              "ml-1 " +
+              "ml-1 font-bold text-[clamp(1rem,2vw+0.75rem,1.25rem)] " +
               (player.plusMinus > 0
-                ? "font-bold text-emerald-700 dark:text-emerald-500"
-                : "font-bold")
+                ? "text-emerald-700 dark:text-emerald-500"
+                : "")
             }
           >
             {player.plusMinus > 0 ? `+${player.plusMinus.toFixed(0)}` : player.plusMinus.toFixed(0)}
@@ -96,8 +96,13 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           BDL: {player.player.id} · NBA: {getNbaPlayerId(player.player.id)}
         </div>
       )}
-      {isRankingMode ? (
+      {useRankingLayout ? (
         <>
+          {label != null && rank == null && (
+            <div className="mb-4 rounded-none bg-foreground px-3 py-2 font-sans text-xl font-medium text-background">
+              {label}
+            </div>
+          )}
           <div className="relative mx-auto h-[300px] w-full min-w-[300px] max-w-[300px] sm:mx-0 sm:max-w-none">
             <a
               href={player.profileUrl}
@@ -113,17 +118,19 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 className="object-cover grayscale"
               />
             </a>
-            <div
-              className="absolute bottom-2 left-2 flex aspect-square min-w-[4.5rem] min-h-[4.5rem] items-center justify-center rounded-full p-2 sm:min-w-[5rem] sm:min-h-[5rem] sm:p-2.5"
-              style={teamColors ? { backgroundColor: teamColors.primary } : { backgroundColor: '#666' }}
-            >
-              <span
-                className="font-serif text-[2.24rem] font-extrabold leading-none text-white sm:text-[2.72rem]"
-                style={{ transform: 'translateY(0.06em)' }}
+            {rank != null && (
+              <div
+                className="absolute bottom-2 left-2 flex aspect-square min-w-[4.5rem] min-h-[4.5rem] items-center justify-center rounded-full p-2 sm:min-w-[5rem] sm:min-h-[5rem] sm:p-2.5"
+                style={teamColors ? { backgroundColor: teamColors.primary } : { backgroundColor: '#666' }}
               >
-                #{rank}
-              </span>
-            </div>
+                <span
+                  className="font-serif text-[2.24rem] font-extrabold leading-none text-white sm:text-[2.72rem]"
+                  style={{ transform: 'translateY(0.06em)' }}
+                >
+                  #{rank}
+                </span>
+              </div>
+            )}
             <div className="absolute left-[240px] right-4 top-4 hidden flex-col gap-1 text-left sm:flex">
               {rankingNameBlock}
               {rankingTeamBlock('pl-8')}
