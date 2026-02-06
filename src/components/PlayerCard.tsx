@@ -52,11 +52,29 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
     </>
   );
 
+  const rankingNameBlock = (
+    <div
+      className="font-serif text-[3.375rem] font-extrabold leading-[0.80] sm:text-[4.5rem]"
+      style={teamColors ? { color: teamColors.primary } : undefined}
+    >
+      {fullName}
+    </div>
+  );
+
+  const rankingTeamBlock = (teamPlClass: string) => (
+    <div
+      className={`font-sans text-sm font-normal sm:text-base italic ${teamPlClass}`.trim()}
+      style={teamColors ? { color: teamColors.primary } : { color: 'var(--foreground-muted)' }}
+    >
+      {teamName}
+    </div>
+  );
+
   return (
     <div className="relative rounded-lg bg-background py-6 sm:py-8 noise-overlay">
       {isRankingMode ? (
         <>
-          <div className="relative h-[300px] min-w-[300px] w-full">
+          <div className="relative mx-auto h-[300px] w-full min-w-[300px] max-w-[300px] sm:mx-0 sm:max-w-none">
             <a
               href={player.profileUrl}
               target="_blank"
@@ -82,22 +100,18 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 #{rank}
               </span>
             </div>
-            <div className="absolute left-[240px] right-4 top-4 flex flex-col gap-1 text-left">
-              <div
-                className="font-serif text-[3.375rem] font-extrabold leading-[0.80] sm:text-[4.5rem]"
-                style={teamColors ? { color: teamColors.primary } : undefined}
-              >
-                {fullName}
-              </div>
-              <div
-                className="pl-8 font-sans text-sm font-normal sm:text-base italic"
-                style={teamColors ? { color: teamColors.primary } : { color: 'var(--foreground-muted)' }}
-              >
-                {teamName}
-              </div>
-              <div className="hidden sm:block mt-8 pl-24">
+            <div className="absolute left-[240px] right-4 top-4 hidden flex-col gap-1 text-left sm:flex">
+              {rankingNameBlock}
+              {rankingTeamBlock('pl-8')}
+              <div className="mt-8 pl-24">
                 {rankingStatsContent}
               </div>
+            </div>
+          </div>
+          <div className="block pl-2 text-left sm:hidden">
+            <div className="mt-3 flex flex-col gap-1">
+              {rankingNameBlock}
+              {rankingTeamBlock('')}
             </div>
           </div>
           <div className="block sm:hidden mt-6 pl-2 text-left">
