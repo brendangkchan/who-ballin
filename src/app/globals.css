@@ -64,9 +64,6 @@
 
 body {
   background-color: var(--background);
-  /* Dot grid – obvious for testing (reduce opacity/size for production) */
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.35) 1.5px, transparent 1.5px);
-  background-size: 16px 16px;
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }

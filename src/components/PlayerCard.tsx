@@ -138,7 +138,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           <div className="note-card mt-8 sm:mt-12">
             <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
               <div className="col-span-2 mb-2 flex items-baseline">
-                <span className="mr-2 font-serif text-lg font-bold text-foreground">Weekly Grade: </span>
+                <span className="mr-2 font-serif text-lg font-bold text-foreground">Team Grade: </span>
                 <span className={`font-sans text-xl font-bold ${gradeColorClass}`}>{gradeLetter}</span>
               </div>
               <div>
