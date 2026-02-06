@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import type { PlayerWeekStats } from '@/types/player';
 import { getTeamColors } from '@/lib/nba-team-colors';
+import NoteCardBorder from '@/components/NoteCardBorder';
 
 interface PlayerCardProps {
   player: PlayerWeekStats;
@@ -93,27 +94,29 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
               </div>
             </div>
           </div>
-          <div className="mt-20 grid grid-cols-2 gap-4 rounded-lg bg-panel-tint/80 p-4">
-            <div>
-              <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
-                {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
-              </p>
-              <div className="space-y-1">
-                {wins.map((game, index) => (
-                  <GameResultRow key={index} game={game} />
-                ))}
+          <div className="note-card mt-20">
+            <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
+              <div>
+                <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
+                  {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
+                </p>
+                <div className="space-y-1">
+                  {wins.map((game, index) => (
+                    <GameResultRow key={index} game={game} />
+                  ))}
+                </div>
               </div>
-            </div>
-            <div>
-              <p className="mb-2 font-bold text-rose-700 dark:text-rose-600">
-                {losses.length === 1 ? '1 Loss' : `${losses.length} Losses`}
-              </p>
-              <div className="space-y-1">
-                {losses.map((game, index) => (
-                  <GameResultRow key={index} game={game} />
-                ))}
+              <div>
+                <p className="mb-2 font-bold text-rose-700 dark:text-rose-600">
+                  {losses.length === 1 ? '1 Loss' : `${losses.length} Losses`}
+                </p>
+                <div className="space-y-1">
+                  {losses.map((game, index) => (
+                    <GameResultRow key={index} game={game} />
+                  ))}
+                </div>
               </div>
-            </div>
+            </NoteCardBorder>
           </div>
         </>
       ) : (
@@ -203,27 +206,29 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 <PerStat value={player.per.toFixed(1)} />
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-4 rounded-lg bg-panel-tint/80 p-4">
-              <div>
-                <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
-                  {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
-                </p>
-                <div className="space-y-1">
-                  {wins.map((game, index) => (
-                    <GameResultRow key={index} game={game} />
-                  ))}
+            <div className="note-card mt-4">
+              <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
+                <div>
+                  <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
+                    {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
+                  </p>
+                  <div className="space-y-1">
+                    {wins.map((game, index) => (
+                      <GameResultRow key={index} game={game} />
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <p className="mb-2 font-bold text-rose-700 dark:text-rose-600">
-                  {losses.length === 1 ? '1 Loss' : `${losses.length} Losses`}
-                </p>
-                <div className="space-y-1">
-                  {losses.map((game, index) => (
-                    <GameResultRow key={index} game={game} />
-                  ))}
+                <div>
+                  <p className="mb-2 font-bold text-rose-700 dark:text-rose-600">
+                    {losses.length === 1 ? '1 Loss' : `${losses.length} Losses`}
+                  </p>
+                  <div className="space-y-1">
+                    {losses.map((game, index) => (
+                      <GameResultRow key={index} game={game} />
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </NoteCardBorder>
             </div>
           </div>
         </div>

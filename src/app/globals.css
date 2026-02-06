@@ -31,6 +31,11 @@
   --font-serif: var(--font-serif);
 }
 
+/* Note card: thick black border + cross-hatch shadow (NoteCardBorder) */
+.note-card {
+  position: relative;
+}
+
 .highlight-title {
   position: relative;
   display: inline-block;
@@ -59,8 +64,9 @@
 
 body {
   background-color: var(--background);
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
-  background-size: 20px 20px;
+  /* Dot grid – obvious for testing (reduce opacity/size for production) */
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.35) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }

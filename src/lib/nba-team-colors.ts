@@ -1,7 +1,7 @@
 import { getMainColor, getSecondaryColor } from 'nba-color';
 
 /** Returns hex as rgba with the given opacity (0-1). */
-function hexWithOpacity(hex: string, opacity: number): string {
+export function hexWithOpacity(hex: string, opacity: number): string {
   const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
   if (!m) return hex;
   const r = parseInt(m[1], 16);
