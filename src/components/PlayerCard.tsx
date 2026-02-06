@@ -20,7 +20,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const isRankingMode = rank != null && label == null;
 
   return (
-    <div className="rounded-lg bg-neutral-100 py-6 sm:py-8">
+    <div className="relative rounded-lg bg-background py-6 sm:py-8 noise-overlay">
       {isRankingMode ? (
         <>
           <div className="relative h-[300px] min-w-[300px] w-full">
@@ -65,18 +65,20 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 </div>
               </div>
               <div className="flex flex-col items-end gap-y-0.1 pr-4 text-right">
+                <span className="text-sm text-foreground-muted">averaged</span>
                 <Stat label="pts" value={player.pts.toFixed(1)} size="lg" />
                 <Stat label="reb" value={player.reb.toFixed(1)} size="lg" />
                 <Stat label="ast" value={player.ast.toFixed(1)} size="lg" />
+
+                <Stat label="TS" value={`${player.ts.toFixed(1)}%`} size="lg" />
                 <span className="text-xs italic text-foreground-muted">
                   in {Math.round(player.totalMinutes)} min
                 </span>
               </div>
             </div>
           </div>
-          <div className="mt-4 flex flex-col gap-2 rounded-lg bg-neutral-200/60 p-4 text-sm">
+          <div className="mt-4 flex flex-col gap-2 rounded-lg bg-panel-tint/80 p-4 text-sm">
             <div className="flex gap-x-6 gap-y-2">
-              <Stat label="ts%" value={`${player.ts.toFixed(1)}%`} />
               <Stat
                 label="+/-"
                 value={
@@ -88,7 +90,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
               <PerStat value={player.per.toFixed(1)} />
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-4 rounded-lg bg-neutral-200/60 p-4">
+          <div className="mt-4 grid grid-cols-2 gap-4 rounded-lg bg-panel-tint/80 p-4">
             <div>
               <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
                 {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
@@ -168,9 +170,9 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 </p>
               </div>
             </div>
-            <div className="mt-4 flex flex-col gap-2 rounded-lg bg-neutral-200/60 p-4 text-sm">
+            <div className="mt-4 flex flex-col gap-2 rounded-lg bg-panel-tint/80 p-4 text-sm">
               <div className="flex items-baseline gap-x-6 gap-y-2">
-                <Stat label="pts" value={player.pts.toFixed(1)} />
+                <Stat label="pts" value={`averaging ${player.pts.toFixed(1)}`} />
                 <Stat label="reb" value={player.reb.toFixed(1)} />
                 <Stat label="ast" value={player.ast.toFixed(1)} />
                 <span className="text-sm font-normal italic text-foreground-muted">
@@ -178,7 +180,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 </span>
               </div>
               <div className="flex gap-x-6 gap-y-2">
-                <Stat label="ts%" value={`${player.ts.toFixed(1)}%`} />
+                <Stat label="TS" value={`${player.ts.toFixed(1)}%`} />
                 <Stat
                   label="+/-"
                   value={
@@ -190,7 +192,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 <PerStat value={player.per.toFixed(1)} />
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-4 rounded-lg bg-neutral-200/60 p-4">
+            <div className="mt-4 grid grid-cols-2 gap-4 rounded-lg bg-panel-tint/80 p-4">
               <div>
                 <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
                   {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
