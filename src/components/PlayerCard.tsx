@@ -49,30 +49,32 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 #{rank}
               </span>
             </div>
-            <div className="absolute left-[240px] top-12 text-left">
-              <div
-                className="font-serif text-[3.375rem] font-extrabold leading-[0.80] sm:text-[4.5rem]"
-                style={teamColors ? { color: teamColors.primary } : undefined}
-              >
-                {fullName}
+            <div className="absolute bottom-4 left-[240px] right-4 top-12 flex flex-col justify-end gap-1 text-left">
+              <div>
+                <div
+                  className="font-serif text-[3.375rem] font-extrabold leading-[0.80] sm:text-[4.5rem]"
+                  style={teamColors ? { color: teamColors.primary } : undefined}
+                >
+                  {fullName}
+                </div>
+                <div
+                  className="mt-1 pl-8 font-sans text-sm font-normal sm:text-base italic"
+                  style={teamColors ? { color: teamColors.primary } : { color: 'var(--foreground-muted)' }}
+                >
+                  {teamName}
+                </div>
               </div>
-              <div
-                className="mt-1 pl-8 font-sans text-sm font-normal sm:text-base italic"
-                style={teamColors ? { color: teamColors.primary } : { color: 'var(--foreground-muted)' }}
-              >
-                {teamName}
+              <div className="flex flex-col items-end gap-y-0.1 pr-4 text-right">
+                <Stat label="pts" value={player.pts.toFixed(1)} size="lg" />
+                <Stat label="reb" value={player.reb.toFixed(1)} size="lg" />
+                <Stat label="ast" value={player.ast.toFixed(1)} size="lg" />
+                <span className="text-xs italic text-foreground-muted">
+                  in {Math.round(player.totalMinutes)} min
+                </span>
               </div>
             </div>
           </div>
           <div className="mt-4 flex flex-col gap-2 rounded-lg bg-neutral-200/60 p-4 text-sm">
-            <div className="flex items-baseline gap-x-6 gap-y-2">
-              <Stat label="pts" value={player.pts.toFixed(1)} />
-              <Stat label="reb" value={player.reb.toFixed(1)} />
-              <Stat label="ast" value={player.ast.toFixed(1)} />
-              <span className="text-sm font-normal italic text-foreground-muted">
-                in {Math.round(player.totalMinutes)} min
-              </span>
-            </div>
             <div className="flex gap-x-6 gap-y-2">
               <Stat label="ts%" value={`${player.ts.toFixed(1)}%`} />
               <Stat
@@ -217,11 +219,13 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, size = 'default' }: { label: string; value: string; size?: 'default' | 'lg' }) {
+  const valueClass = size === 'lg' ? 'text-3xl' : 'text-2xl';
+  const labelClass = size === 'lg' ? 'text-base' : 'text-sm';
   return (
     <div>
-      <span className="text-2xl font-bold text-foreground">{value}</span>
-      <span className="ml-1 text-sm font-normal text-foreground-muted">{label}</span>
+      <span className={`${valueClass} font-bold text-foreground`}>{value}</span>
+      <span className={`ml-1 ${labelClass} font-normal text-foreground-muted`}>{label}</span>
     </div>
   );
 }
