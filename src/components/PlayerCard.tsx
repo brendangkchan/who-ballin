@@ -322,10 +322,16 @@ function PerStat({ value }: { value: string }) {
 function GameResultRow({ game }: { game: any }) {
   const opponentName = game.opponent.name ?? game.opponent.abbreviation;
   const scoreText = `${game.playerTeamScore}-${game.opponentScore}`;
+  const comeback = game.comebackInfo;
 
   return (
     <div className="font-normal text-foreground text-[clamp(0.875rem,0.5vw+0.8rem,1rem)]">
       {opponentName}: {scoreText}
+      {comeback && (
+        <div className="text-muted-foreground text-[clamp(0.75rem,0.4vw+0.7rem,0.875rem)]">
+          (comeback from down {comeback.deficit} after {comeback.afterQuarters} quarter{comeback.afterQuarters === 1 ? "" : "s"})
+        </div>
+      )}
     </div>
   );
 }

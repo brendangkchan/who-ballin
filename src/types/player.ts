@@ -30,6 +30,15 @@ export interface Game {
   };
   home_team_score: number;
   visitor_team_score: number;
+  // Quarter scores (BDL provides for 2023+)
+  home_q1?: number;
+  home_q2?: number;
+  home_q3?: number;
+  home_q4?: number;
+  visitor_q1?: number;
+  visitor_q2?: number;
+  visitor_q3?: number;
+  visitor_q4?: number;
 }
 
 export interface GameStats {
@@ -76,6 +85,8 @@ export interface GameResult {
   opponentScore: number;
   result: "W" | "L";
   isHome: boolean;
+  /** Set when team won and overcame a qualifying deficit (e.g. down 22 after Q1) */
+  comebackInfo?: { deficit: number; afterQuarters: number } | null;
 }
 
 export interface PlayerWeekStats {
