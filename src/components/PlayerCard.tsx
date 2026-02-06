@@ -14,6 +14,8 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
     ? `${player.player.team.city} ${player.player.team.name}`
     : 'N/A';
   const teamColors = getTeamColors(player.player.team?.abbreviation);
+  const wins = player.gameResults.filter((g) => g.result === 'W');
+  const losses = player.gameResults.filter((g) => g.result === 'L');
 
   return (
     <div className="flex gap-5 rounded-lg bg-neutral-100 p-6 sm:gap-6 sm:p-8">
@@ -35,42 +37,70 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
       </div>
       <div className="flex-1">
         <div className="block">
-          {(label != null || rank != null) && (
+          {rank != null && label == null ? (
             <div
-              className="block w-full rounded py-1 pl-2 pr-4"
+              className="flex items-baseline justify-between gap-4 rounded py-1 pl-2 pr-4"
               style={
-                teamColors
+                teamColors?.gradientStartRanking
                   ? {
-                      background: `linear-gradient(90deg, ${teamColors.labelGradientStart}, transparent)`,
-                    }
+                    background: `linear-gradient(90deg, ${teamColors.gradientStartRanking}, ${teamColors.gradientEndRanking})`,
+                  }
                   : undefined
               }
             >
-              <span className="block text-lg font-bold text-foreground">
-                {label ?? (rank != null ? `#${rank}` : null)}
+              <span
+                className="font-serif text-2xl font-extrabold sm:text-3xl"
+                style={teamColors ? { color: teamColors.primary } : undefined}
+              >
+                #{rank} {fullName}
+              </span>
+              <span
+                className="font-sans text-sm font-normal sm:text-base uppercase"
+                style={teamColors ? { color: teamColors.primary } : { color: 'var(--foreground-muted)' }}
+              >
+                {player.player.team?.abbreviation ?? 'N/A'}
               </span>
             </div>
+          ) : (
+            <>
+              {(label != null || rank != null) && (
+                <div
+                  className="block w-full rounded py-1 pl-2 pr-4"
+                  style={
+                    teamColors
+                      ? {
+                        background: `linear-gradient(90deg, ${teamColors.labelGradientStart}, transparent)`,
+                      }
+                      : undefined
+                  }
+                >
+                  <span className="block text-lg font-bold text-foreground">
+                    {label ?? (rank != null ? `#${rank}` : null)}
+                  </span>
+                </div>
+              )}
+              <div
+                className={`flex items-baseline justify-between gap-4 ${label != null || rank != null ? 'mt-2' : ''}`}
+              >
+                <h3
+                  className="font-serif text-2xl font-extrabold sm:text-3xl"
+                  style={teamColors ? { color: teamColors.primary } : undefined}
+                >
+                  {fullName}
+                </h3>
+                <p
+                  className="text-xl"
+                  style={
+                    teamColors
+                      ? { color: teamColors.primary, opacity: 0.9 }
+                      : { color: 'var(--foreground-muted)' }
+                  }
+                >
+                  {teamName}
+                </p>
+              </div>
+            </>
           )}
-          <div
-            className={`flex items-baseline justify-between gap-4 ${label != null || rank != null ? 'mt-2' : ''}`}
-          >
-            <h3
-              className="font-serif text-2xl font-extrabold sm:text-3xl"
-              style={teamColors ? { color: teamColors.primary } : undefined}
-            >
-              {fullName}
-            </h3>
-            <p
-              className="text-xl italic"
-              style={
-                teamColors
-                  ? { color: teamColors.primary, opacity: 0.9 }
-                  : { color: 'var(--foreground-muted)' }
-              }
-            >
-              {teamName}
-            </p>
-          </div>
         </div>
         <div className="mt-4 flex flex-col gap-2 rounded-lg bg-neutral-200/60 p-4 text-sm">
           <div className="flex items-baseline gap-x-6 gap-y-2">
@@ -96,27 +126,23 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
         </div>
         <div className="mt-4 grid grid-cols-2 gap-4 rounded-lg bg-neutral-200/60 p-4">
           <div>
-            <p className="mb-2 font-bold text-green-700 dark:text-green-400">
-              Beat
+            <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
+              {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
             </p>
             <div className="space-y-1">
-              {player.gameResults
-                .filter((g) => g.result === 'W')
-                .map((game, index) => (
-                  <GameResultRow key={index} game={game} />
-                ))}
+              {wins.map((game, index) => (
+                <GameResultRow key={index} game={game} />
+              ))}
             </div>
           </div>
           <div>
-            <p className="mb-2 font-bold text-red-700 dark:text-red-400">
-              Lost to
+            <p className="mb-2 font-bold text-rose-700 dark:text-rose-600">
+              {losses.length === 1 ? '1 Loss' : `${losses.length} Losses`}
             </p>
             <div className="space-y-1">
-              {player.gameResults
-                .filter((g) => g.result === 'L')
-                .map((game, index) => (
-                  <GameResultRow key={index} game={game} />
-                ))}
+              {losses.map((game, index) => (
+                <GameResultRow key={index} game={game} />
+              ))}
             </div>
           </div>
         </div>

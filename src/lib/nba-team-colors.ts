@@ -15,6 +15,9 @@ export function getTeamColors(abbreviation: string | undefined): {
   secondary: string | null;
   /** Label gradient: secondary or primary at 50% opacity, fades to transparent */
   labelGradientStart: string;
+  /** Ranking header gradient: primary 25% → 5% opacity */
+  gradientStartRanking: string;
+  gradientEndRanking: string;
 } | null {
   if (!abbreviation) return null;
   try {
@@ -26,6 +29,8 @@ export function getTeamColors(abbreviation: string | undefined): {
       primary: primary.hex,
       secondary: secHex,
       labelGradientStart: hexWithOpacity(secHex ?? primary.hex, 0.5),
+      gradientStartRanking: hexWithOpacity(primary.hex, 0.25),
+      gradientEndRanking: hexWithOpacity(primary.hex, 0.05),
     };
   } catch {
     return null;
