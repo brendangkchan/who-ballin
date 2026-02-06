@@ -40,15 +40,21 @@ export async function getGamesInDateRange(
     endDate: string
 ): Promise<{ data: any[]; meta?: any }> {
     const url = `${API_BASE}/nba/v1/games?start_date=${startDate}&end_date=${endDate}&per_page=100`;
+    const start = Date.now();
     const response = await fetch(url, {
         headers: getHeaders(),
     });
+    const duration = Date.now() - start;
 
     if (!response.ok) {
+        console.debug(`[balldontlie] getGamesInDateRange failed: ${response.status} ${response.statusText} in ${duration}ms`);
         throw new Error(`Failed to fetch games: ${response.status} ${response.statusText}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    const count = data.data?.length ?? 0;
+    console.debug(`[balldontlie] getGamesInDateRange ${startDate}..${endDate}: ${count} games in ${duration}ms`);
+    return data;
 }
 
 export async function getLastCompletedGame(
@@ -56,23 +62,26 @@ export async function getLastCompletedGame(
 ): Promise<any | null> {
     try {
         const currentSeason = season || getCurrentNBASeason();
-        console.log(`[DEBUG] Looking for last completed game in season ${currentSeason}`);
+        console.debug(`[balldontlie] getLastCompletedGame: looking in season ${currentSeason}`);
 
         // Try current season first
         let url = `${API_BASE}/nba/v1/games?seasons[]=${currentSeason}&status=Final&per_page=100`;
+        const start = Date.now();
         let response = await fetch(url, {
             headers: getHeaders(),
         });
+        console.debug(`[balldontlie] getLastCompletedGame season ${currentSeason}: ${response.status} in ${Date.now() - start}ms`);
 
         if (!response.ok) {
             console.error(`Failed to fetch last game: ${response.status} ${response.statusText}`);
             // Try previous season as fallback
             const previousSeason = currentSeason - 1;
-            console.log(`[DEBUG] Trying previous season ${previousSeason}`);
+            console.debug(`[balldontlie] getLastCompletedGame: trying previous season ${previousSeason}`);
             url = `${API_BASE}/nba/v1/games?seasons[]=${previousSeason}&status=Final&per_page=100`;
             response = await fetch(url, {
                 headers: getHeaders(),
             });
+            console.debug(`[balldontlie] getLastCompletedGame season ${previousSeason}: ${response.status} in ${Date.now() - start}ms`);
 
             if (!response.ok) {
                 console.error(`Failed to fetch last game from previous season: ${response.status}`);
@@ -86,10 +95,10 @@ export async function getLastCompletedGame(
             const sortedGames = data.data.sort((a: any, b: any) => {
                 return new Date(b.date).getTime() - new Date(a.date).getTime();
             });
-            console.log(`[DEBUG] Found last completed game: ${sortedGames[0].date}`);
+            console.debug(`[balldontlie] getLastCompletedGame: found ${sortedGames[0].date}`);
             return sortedGames[0];
         }
-        console.log(`[DEBUG] No completed games found in season ${currentSeason}`);
+        console.debug(`[balldontlie] getLastCompletedGame: no completed games in season ${currentSeason}`);
         return null;
     } catch (error: any) {
         console.error('Error in getLastCompletedGame:', error);
@@ -162,15 +171,72 @@ export async function getStatsForGames(
 ): Promise<{ data: any[]; meta?: any }> {
     const queryParams = gameIds.map(id => `game_ids[]=${id}`).join('&');
     const url = `${API_BASE}/nba/v1/stats?${queryParams}&per_page=100`;
+    const start = Date.now();
     const response = await fetch(url, {
         headers: getHeaders(),
     });
+    const duration = Date.now() - start;
 
     if (!response.ok) {
+        console.debug(`[balldontlie] getStatsForGames failed: ${response.status} ${response.statusText} in ${duration}ms (${gameIds.length} games)`);
         throw new Error(`Failed to fetch stats: ${response.status} ${response.statusText}`);
     }
 
-    return response.json();
+    const data = await response.json();
+    const count = data.data?.length ?? 0;
+    console.debug(`[balldontlie] getStatsForGames: ${count} stats for ${gameIds.length} games in ${duration}ms`);
+    return data;
+}
+
+/**
+ * Fetch all stats for the given game IDs, paginating through all result pages.
+ * @param gameIds - Game IDs to fetch stats for
+ * @param beforeFetch - Optional async callback (e.g. rate limiter) to call before each request
+ */
+export async function getAllStatsForGames(
+    gameIds: number[],
+    beforeFetch?: () => Promise<void>
+): Promise<any[]> {
+    const allStats: any[] = [];
+    let cursor: number | null = null;
+    let hasMore = true;
+    const maxPages = 100; // Safety limit
+
+    let pageNum = 1;
+    while (hasMore && allStats.length / 100 < maxPages) {
+        if (beforeFetch) await beforeFetch();
+
+        const queryParams = gameIds.map(id => `game_ids[]=${id}`).join('&');
+        let url = `${API_BASE}/nba/v1/stats?${queryParams}&per_page=100`;
+        if (cursor != null) {
+            url += `&cursor=${cursor}`;
+        }
+
+        const pageStart = Date.now();
+        const response = await fetch(url, {
+            headers: getHeaders(),
+        });
+
+        if (!response.ok) {
+            console.debug(`[balldontlie] getAllStatsForGames page ${pageNum} failed: ${response.status} in ${Date.now() - pageStart}ms`);
+            throw new Error(`Failed to fetch stats: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const pageData = data.data ?? [];
+        allStats.push(...pageData);
+        console.debug(`[balldontlie] getAllStatsForGames page ${pageNum}: ${pageData.length} stats, total ${allStats.length} (${Date.now() - pageStart}ms)`);
+
+        if (pageData.length > 0 && data.meta?.next_cursor != null) {
+            cursor = data.meta.next_cursor;
+            pageNum++;
+        } else {
+            hasMore = false;
+        }
+    }
+
+    console.debug(`[balldontlie] getAllStatsForGames: ${allStats.length} total stats for ${gameIds.length} games`);
+    return allStats;
 }
 
 export async function getAllGames(
@@ -190,12 +256,14 @@ export async function getAllGames(
         }
 
         try {
+            const pageStart = Date.now();
             const response = await fetch(url, {
                 headers: getHeaders(),
             });
+            const pageDuration = Date.now() - pageStart;
 
             if (!response.ok) {
-                console.error(`Failed to fetch games page ${page}: ${response.status} ${response.statusText}`);
+                console.debug(`[balldontlie] getAllGames page ${page} failed: ${response.status} in ${pageDuration}ms`);
                 // If it's a client error (4xx), stop trying
                 if (response.status >= 400 && response.status < 500) {
                     break;
@@ -206,22 +274,11 @@ export async function getAllGames(
             }
 
             const data = await response.json();
+            const pageCount = data.data?.length || 0;
 
-            // DEBUG: Log API response
-            console.log(`[DEBUG] Games API response page ${page}:`, {
-                url,
-                dataLength: data.data?.length || 0,
-                hasMeta: !!data.meta,
-                nextCursor: data.meta?.next_cursor,
-                totalGamesSoFar: allGames.length,
-            });
+            console.debug(`[balldontlie] getAllGames page ${page}: ${pageCount} games, total ${allGames.length + pageCount}, nextCursor=${data.meta?.next_cursor ?? 'none'} (${pageDuration}ms)`);
 
             if (data.data && data.data.length > 0) {
-                // Log sample game to see structure
-                if (page === 1 && allGames.length === 0) {
-                    console.log(`[DEBUG] Sample game:`, JSON.stringify(data.data[0], null, 2));
-                }
-
                 allGames.push(...data.data);
                 // Check if there are more pages using cursor
                 if (data.meta && data.meta.next_cursor) {
@@ -231,16 +288,16 @@ export async function getAllGames(
                     hasMore = false;
                 }
             } else {
-                console.log(`[DEBUG] No games in response for page ${page}`);
+                console.debug(`[balldontlie] getAllGames page ${page}: no games in response`);
                 hasMore = false;
             }
         } catch (error: any) {
-            console.error(`Error fetching games page ${page}:`, error);
+            console.debug(`[balldontlie] getAllGames page ${page} error:`, error?.message ?? error);
             // Stop on network errors
             break;
         }
     }
 
-    console.log(`[DEBUG] getAllGames returning ${allGames.length} total games`);
+    console.debug(`[balldontlie] getAllGames: ${allGames.length} total games for ${startDate}..${endDate}`);
     return allGames;
 }

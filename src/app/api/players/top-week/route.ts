@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { subDays, format } from 'date-fns';
-import { getAllGames, getLastCompletedGame, getStatsForGames, getCurrentNBASeason } from '@/lib/balldontlie';
+import { getAllGames, getLastCompletedGame, getAllStatsForGames, getCurrentNBASeason } from '@/lib/balldontlie';
 import { aggregatePlayerStats } from '@/lib/utils';
 import { RateLimiter } from '@/lib/rateLimiter';
 import { parseFilters } from '@/lib/filters';
 import type { Game, GameStats, PlayerWeekStats, DebugInfo } from '@/types/player';
 
 export const revalidate = 3600; // Revalidate every hour
+
+const RATE_LIMIT_PER_MIN = 50;
 
 function chunkArray<T>(array: T[], size: number): T[][] {
   const chunks: T[][] = [];
@@ -27,15 +29,16 @@ async function fetchStatsBatched(
   debugInfo.batchCount = batches.length;
 
   for (let i = 0; i < batches.length; i++) {
-    await rateLimiter.waitIfNeeded();
-
     const batch = batches[i];
     const startTime = Date.now();
-    
+
     try {
-      const statsData = await getStatsForGames(batch);
+      const statsData = await getAllStatsForGames(
+        batch,
+        () => rateLimiter.waitIfNeeded()
+      );
       const duration = Date.now() - startTime;
-      
+
       debugInfo.apiCalls.push({
         endpoint: `/stats (batch ${i + 1}/${batches.length})`,
         status: 200,
@@ -43,10 +46,12 @@ async function fetchStatsBatched(
         timestamp: new Date().toISOString(),
       });
 
-      if (statsData.data) {
-        allStats.push(...(statsData.data as GameStats[]));
+      if (statsData && statsData.length > 0) {
+        allStats.push(...(statsData as GameStats[]));
       }
+      console.debug('[top-week] stats batch', i + 1, '/', batches.length, ':', (statsData?.length ?? 0), 'stats, total', allStats.length, 'in', duration, 'ms');
     } catch (error: any) {
+      console.debug('[top-week] stats batch', i + 1, 'error:', error?.message ?? error);
       const duration = Date.now() - startTime;
       debugInfo.apiCalls.push({
         endpoint: `/stats (batch ${i + 1}/${batches.length})`,
@@ -80,9 +85,19 @@ export async function GET(request: NextRequest) {
   };
 
   try {
+    console.debug('[top-week] GET request started');
     const filters = parseFilters(request.nextUrl.searchParams);
+    const rateLimiter = new RateLimiter({ maxRequests: RATE_LIMIT_PER_MIN, windowMs: 60000 });
+    console.debug('[top-week] filters:', filters);
+
     debugInfo.warnings.push(
       `Filters: minGames=${filters.minGames}, minPts=${filters.minPts}, minMinutes=${filters.minMinutes}`
+    );
+    debugInfo.warnings.push(
+      `API: rateLimit=${RATE_LIMIT_PER_MIN}/min, all games in last 7 days`
+    );
+    debugInfo.warnings.push(
+      'Qualifying: exclude lost>50% games, exclude negative +/- unless won all'
     );
 
     // Track API calls
@@ -101,9 +116,10 @@ export async function GET(request: NextRequest) {
     const startDate = subDays(endDate, 7);
     const startDateStr = format(startDate, 'yyyy-MM-dd');
     const endDateStr = format(endDate, 'yyyy-MM-dd');
-    
+
     debugInfo.dateRange.start = startDateStr;
     debugInfo.dateRange.end = endDateStr;
+    console.debug('[top-week] date range:', startDateStr, '..', endDateStr);
 
     // Add NBA season info to debug
     const nbaSeason = getCurrentNBASeason();
@@ -114,12 +130,13 @@ export async function GET(request: NextRequest) {
     // Step 2: Fetch games from last week
     let gamesCallStart = Date.now();
     let games: Game[] = [];
-    
+
     try {
       games = await getAllGames(startDateStr, endDateStr);
       const gamesCallDuration = Date.now() - gamesCallStart;
       trackApiCall('/games', 200, gamesCallDuration);
-      
+      console.debug('[top-week] games fetch:', games.length, 'games in', gamesCallDuration, 'ms');
+
       // DEBUG: Log what we got
       debugInfo.warnings.push(
         `Fetched ${games.length} total games from API (before filtering)`
@@ -147,12 +164,11 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    // Filter to completed games only, limit to 110
+    // Filter to completed games only (all games in last 7 days)
     const beforeFilter = games.length;
-    games = games
-      .filter(g => g.status === 'Final')
-      .slice(0, 110);
-    
+    games = games.filter(g => g.status === 'Final');
+    console.debug('[top-week] games filter: ', beforeFilter, '->', games.length, '(Final only)');
+
     // DEBUG: Log filtering results
     if (beforeFilter > 0 && games.length === 0) {
       debugInfo.warnings.push(
@@ -168,6 +184,7 @@ export async function GET(request: NextRequest) {
 
     // If no games found, try fallback
     if (games.length === 0) {
+      console.debug('[top-week] no games, trying fallback');
       debugInfo.warnings.push('No games found in last 7 days, trying fallback');
       debugInfo.dateRange.usedFallback = true;
 
@@ -183,10 +200,9 @@ export async function GET(request: NextRequest) {
           debugInfo.dateRange.end = fallbackEndStr;
 
           games = await getAllGames(fallbackStartStr, fallbackEndStr);
-          games = games
-            .filter(g => g.status === 'Final')
-            .slice(0, 110);
-          
+          games = games.filter(g => g.status === 'Final');
+          console.debug('[top-week] fallback games:', games.length);
+
           debugInfo.gamesProcessed = games.length;
           trackApiCall('/games (fallback)', 200, Date.now() - gamesCallStart);
         }
@@ -203,10 +219,10 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Step 3: Fetch stats with batching
+    // Step 3: Fetch stats with batching (all games)
     const gameIds = games.map(g => g.id);
-    const rateLimiter = new RateLimiter();
-    const batchSize = 50; // Start with 50, adjust if needed
+    const batchSize = 50;
+    console.debug('[top-week] fetching stats:', gameIds.length, 'games in', Math.ceil(gameIds.length / batchSize), 'batches');
 
     const allStats = await fetchStatsBatched(
       gameIds,
@@ -217,6 +233,7 @@ export async function GET(request: NextRequest) {
 
     debugInfo.statsProcessed = allStats.length;
     debugInfo.rateLimitDelays = rateLimiter.getTotalWaitTime();
+    console.debug('[top-week] stats fetch complete:', allStats.length, 'stats,', rateLimiter.getTotalWaitTime(), 'ms rate limit delays');
 
     // Step 4: Group stats by player
     const playerStatsMap = new Map<number, GameStats[]>();
@@ -229,6 +246,7 @@ export async function GET(request: NextRequest) {
     }
 
     debugInfo.playersFound = playerStatsMap.size;
+    console.debug('[top-week] grouped by player:', playerStatsMap.size, 'players');
 
     // Step 5: Calculate aggregated stats per player
     const playerWeekStats: PlayerWeekStats[] = [];
@@ -244,19 +262,38 @@ export async function GET(request: NextRequest) {
         );
       }
     }
+    console.debug('[top-week] aggregated:', playerWeekStats.length, 'players');
 
     // Step 6: Filter by min games, min points, min minutes
-    const filtered = playerWeekStats.filter(
+    let filtered = playerWeekStats.filter(
       p =>
         p.games >= filters.minGames &&
         p.totalPts >= filters.minPts &&
         p.totalMinutes >= filters.minMinutes
     );
+    console.debug('[top-week] filter minGames/minPts/minMinutes:', playerWeekStats.length, '->', filtered.length);
 
-    // Step 7: Sort by PER
+    // Step 7: Qualifying filters: exclude players who lost >50% of games,
+    // and exclude negative +/- unless they won all games
+    const beforeQualifying = filtered.length;
+    filtered = filtered.filter(p => {
+      const wins = p.gameResults.filter(r => r.result === 'W').length;
+      const losses = p.gameResults.filter(r => r.result === 'L').length;
+      const lostMoreThanHalf = losses > p.games / 2;
+      const negativePlusMinus = p.plusMinus < 0;
+      const wonAllGames = wins === p.games;
+
+      if (lostMoreThanHalf) return false;
+      if (negativePlusMinus && !wonAllGames) return false;
+      return true;
+    });
+    console.debug('[top-week] qualifying filters (win % / +/-):', beforeQualifying, '->', filtered.length);
+
+    // Step 8: Sort by PER
     filtered.sort((a, b) => b.per - a.per);
 
     debugInfo.processingTime = Date.now() - startTime;
+    console.debug('[top-week] done:', filtered.length, 'players in', debugInfo.processingTime, 'ms');
 
     const response = {
       players: filtered,
@@ -281,9 +318,9 @@ export async function GET(request: NextRequest) {
       {
         error: 'Failed to fetch top players',
         message: errorMessage,
-        ...(process.env.NODE_ENV === 'development' && { 
+        ...(process.env.NODE_ENV === 'development' && {
           debug: debugInfo,
-          stack: errorStack 
+          stack: errorStack
         }),
       },
       { status: 500 }

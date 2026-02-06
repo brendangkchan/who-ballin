@@ -1,8 +1,21 @@
+export interface RateLimiterOptions {
+  maxRequests?: number;
+  windowMs?: number;
+}
+
+const DEFAULT_MAX_REQUESTS = 5;
+const DEFAULT_WINDOW_MS = 60000; // 1 minute
+
 export class RateLimiter {
   private requests: number[] = [];
-  private readonly maxRequests = 5;
-  private readonly windowMs = 60000; // 1 minute
+  private readonly maxRequests: number;
+  private readonly windowMs: number;
   private totalWaitTime = 0; // Track for debug
+
+  constructor(options?: RateLimiterOptions) {
+    this.maxRequests = options?.maxRequests ?? DEFAULT_MAX_REQUESTS;
+    this.windowMs = options?.windowMs ?? DEFAULT_WINDOW_MS;
+  }
 
   async waitIfNeeded(): Promise<void> {
     const now = Date.now();
