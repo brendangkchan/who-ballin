@@ -49,48 +49,51 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 #{rank}
               </span>
             </div>
-            <div className="absolute bottom-4 left-[240px] right-4 top-12 flex flex-col justify-end gap-1 text-left">
-              <div>
-                <div
-                  className="font-serif text-[3.375rem] font-extrabold leading-[0.80] sm:text-[4.5rem]"
-                  style={teamColors ? { color: teamColors.primary } : undefined}
-                >
-                  {fullName}
-                </div>
-                <div
-                  className="mt-1 pl-8 font-sans text-sm font-normal sm:text-base italic"
-                  style={teamColors ? { color: teamColors.primary } : { color: 'var(--foreground-muted)' }}
-                >
-                  {teamName}
-                </div>
+            <div className="absolute left-[240px] right-4 top-4 flex flex-col gap-1 text-left">
+              <div
+                className="font-serif text-[3.375rem] font-extrabold leading-[0.80] sm:text-[4.5rem]"
+                style={teamColors ? { color: teamColors.primary } : undefined}
+              >
+                {fullName}
               </div>
-              <div className="flex flex-col items-end gap-y-0.1 pr-4 text-right">
-                <span className="text-sm text-foreground-muted">averaged</span>
-                <Stat label="pts" value={player.pts.toFixed(1)} size="lg" />
-                <Stat label="reb" value={player.reb.toFixed(1)} size="lg" />
-                <Stat label="ast" value={player.ast.toFixed(1)} size="lg" />
-
-                <Stat label="TS" value={`${player.ts.toFixed(1)}%`} size="lg" />
-                <span className="text-xs italic text-foreground-muted">
-                  in {Math.round(player.totalMinutes)} min
-                </span>
+              <div
+                className="pl-8 font-sans text-sm font-normal sm:text-base italic"
+                style={teamColors ? { color: teamColors.primary } : { color: 'var(--foreground-muted)' }}
+              >
+                {teamName}
+              </div>
+              <div className="mt-8 pl-24">
+                <div className="text-xs text-foreground-muted">averaged</div>
+                <div className="flex gap-x-6 gap-y-2">
+                  <Stat label="pts" value={player.pts.toFixed(1)} size="lg" />
+                  <Stat label="reb" value={player.reb.toFixed(1)} size="lg" />
+                  <Stat label="ast" value={player.ast.toFixed(1)} size="lg" />
+                </div>
+                <div className="mt-1 flex flex-wrap items-baseline gap-x-1 gap-y-1">
+                  <span>
+                    <span className="ml-4 text-sm text-foreground-muted">on </span>
+                    <span className="text-xl font-bold text-accent">{player.ts.toFixed(1)}%</span>
+                    <span className="ml-1 text-sm text-foreground-muted">TS</span>
+                  </span>
+                  <span className="text-sm text-foreground-muted">
+                    and was
+                    <span
+                      className={
+                        "ml-1 " +
+                        (player.plusMinus > 0
+                          ? "font-bold text-emerald-700 dark:text-emerald-500"
+                          : "font-bold")
+                      }
+                    >
+                      {player.plusMinus > 0 ? `+${player.plusMinus.toFixed(0)}` : player.plusMinus.toFixed(0)}
+                    </span>
+                    {" "}in {Math.round(player.totalMinutes)} minutes
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-          <div className="mt-4 flex flex-col gap-2 rounded-lg bg-panel-tint/80 p-4 text-sm">
-            <div className="flex gap-x-6 gap-y-2">
-              <Stat
-                label="+/-"
-                value={
-                  player.plusMinus > 0
-                    ? `+${player.plusMinus.toFixed(1)}`
-                    : player.plusMinus.toFixed(1)
-                }
-              />
-              <PerStat value={player.per.toFixed(1)} />
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-4 rounded-lg bg-panel-tint/80 p-4">
+          <div className="mt-20 grid grid-cols-2 gap-4 rounded-lg bg-panel-tint/80 p-4">
             <div>
               <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
                 {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
@@ -175,12 +178,20 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 <Stat label="pts" value={`averaging ${player.pts.toFixed(1)}`} />
                 <Stat label="reb" value={player.reb.toFixed(1)} />
                 <Stat label="ast" value={player.ast.toFixed(1)} />
-                <span className="text-sm font-normal italic text-foreground-muted">
-                  in {Math.round(player.totalMinutes)} min
-                </span>
+                <div className="flex items-baseline">
+                  <span className="text-xs font-normal text-foreground-muted">and was </span>
+                  <Stat
+                    label={`in ${Math.round(player.totalMinutes)} min`}
+                    value={player.plusMinus > 0 ? `+${player.plusMinus.toFixed(0)}` : player.plusMinus.toFixed(0)}
+                  />
+                </div>
               </div>
               <div className="flex gap-x-6 gap-y-2">
-                <Stat label="TS" value={`${player.ts.toFixed(1)}%`} />
+                <div className="flex items-baseline">
+                  <span className="text-sm text-foreground-muted">on </span>
+                  <span className="ml-1 text-xl font-bold text-accent">{player.ts.toFixed(1)}%</span>
+                  <span className="ml-1 text-sm text-foreground-muted">TS</span>
+                </div>
                 <Stat
                   label="+/-"
                   value={
