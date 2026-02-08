@@ -7,6 +7,7 @@
   --foreground-muted: #525252;
   --accent: #D4A574;
   --accent-navy: #1e4976;
+  --positive: #15803d;
   --card-bg: #ffffff;
   --card-off-white: #F7F5F2;
   --border: #e5e5e5;
@@ -21,6 +22,7 @@
   --color-foreground-muted: var(--foreground-muted);
   --color-accent: var(--accent);
   --color-accent-navy: var(--accent-navy);
+  --color-positive: var(--positive);
   --color-card: var(--card-bg);
   --color-card-off-white: var(--card-off-white);
   --color-border: var(--border);

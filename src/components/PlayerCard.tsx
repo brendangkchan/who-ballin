@@ -19,8 +19,8 @@ function getTeamGrade(
     return { letter: '—', colorClass: 'text-foreground-muted' };
   }
   const pct = (winsCount / total) * 100;
-  if (pct >= 100) return { letter: 'A+', colorClass: 'text-emerald-700 dark:text-emerald-600' };
-  if (pct >= 70) return { letter: 'A', colorClass: 'text-emerald-700 dark:text-emerald-600' };
+  if (pct >= 100) return { letter: 'A+', colorClass: 'text-positive' };
+  if (pct >= 70) return { letter: 'A', colorClass: 'text-positive' };
   if (pct >= 60) return { letter: 'B', colorClass: 'text-amber-600 dark:text-amber-500' };
   if (pct >= 50) return { letter: 'C', colorClass: 'text-amber-600 dark:text-amber-500' };
   if (pct >= 40) return { letter: 'D', colorClass: 'text-rose-700 dark:text-rose-600' };
@@ -52,31 +52,31 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const showMakingPlays = astDelta != null && astDelta > 2;
 
   const badgeContent = showHotHand || showTsHotHand || showMakingPlays ? (
-    <div className="mt-4 text-[clamp(0.75rem,0.35vw+0.7rem,0.82rem)]">
-      <div className="text-foreground-muted uppercase tracking-[0.18em] text-[0.6rem]">
-        Week vs Season
+    <div className="mt-4 inline-block bg-accent/20 px-3 py-2 text-[clamp(0.75rem,0.35vw+0.7rem,0.82rem)]">
+      <div className="text-foreground-muted uppercase tracking-[0.2em] text-[0.6rem]">
+        Highlights
       </div>
       <div className="mt-2 grid gap-1.5">
         {showHotHand && (
-          <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-2 py-0.5 text-[0.68rem]">
+          <div className="flex items-baseline gap-2">
             <span className="font-semibold text-foreground">Getting Buckets</span>
-            <span className="font-semibold text-emerald-700 dark:text-emerald-500">
+            <span className="font-semibold text-positive">
               ▲ {hotHandDelta?.toFixed(1)} pts
             </span>
           </div>
         )}
         {showTsHotHand && (
-          <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-2 py-0.5 text-[0.68rem]">
+          <div className="flex items-baseline gap-2">
             <span className="font-semibold text-foreground">Hot Hand</span>
-            <span className="font-semibold text-emerald-700 dark:text-emerald-500">
+            <span className="font-semibold text-positive">
               ▲ {tsDelta?.toFixed(1)}% TS
             </span>
           </div>
         )}
         {showMakingPlays && (
-          <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-2 py-0.5 text-[0.68rem]">
+          <div className="flex items-baseline gap-2">
             <span className="font-semibold text-foreground">Making Plays</span>
-            <span className="font-semibold text-emerald-700 dark:text-emerald-500">
+            <span className="font-semibold text-positive">
               ▲ {astDelta?.toFixed(1)} ast
             </span>
           </div>
@@ -105,7 +105,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
             className={
               "ml-1 font-bold text-[clamp(1rem,2vw+0.75rem,1.25rem)] " +
               (player.plusMinus > 0
-                ? "text-emerald-700 dark:text-emerald-500"
+                ? "text-positive"
                 : "")
             }
           >
@@ -202,7 +202,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 <span className={`font-sans text-xl font-bold ${gradeColorClass}`}>{gradeLetter}</span>
               </div>
               <div>
-                <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
+                <p className="mb-2 font-bold text-positive">
                   {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
                 </p>
                 <div className="space-y-1">
@@ -319,7 +319,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                   <span className={`font-sans text-lg font-bold ${gradeColorClass}`}>{gradeLetter}</span>
                 </div>
                 <div>
-                  <p className="mb-2 font-bold text-emerald-700 dark:text-emerald-600">
+                  <p className="mb-2 font-bold text-positive">
                     {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
                   </p>
                   <div className="space-y-1">
