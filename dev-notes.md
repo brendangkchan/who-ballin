@@ -3,7 +3,7 @@
 - script to populate missing id's using search by name
 
 TODO
-- manual id fill out
+- best game this week
 - move game note into stat section
 
 mobile

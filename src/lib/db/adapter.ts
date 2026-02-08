@@ -1,0 +1,283 @@
+import { and, eq, gte, inArray, max, sql } from 'drizzle-orm';
+import type { NeonHttpDatabase } from 'drizzle-orm/neon-http';
+import {
+  games,
+  playerGameStats,
+  playerSeasonTotals,
+  syncState,
+  type GameRow,
+  type PlayerGameStatRow,
+} from './schema';
+
+export type DbAdapter = {
+  upsertGames: (rows: GameRow[]) => Promise<number>;
+  upsertPlayerGameStats: (rows: PlayerGameStatRow[]) => Promise<number>;
+  getMaxSeasonInRecentGames: (sinceDate: Date) => Promise<number | null>;
+  getLastGameDateForSeason: (season: number) => Promise<Date | null>;
+  updateSeasonTotalsForPlayers: (season: number, playerIds: number[]) => Promise<number>;
+  rebuildSeasonTotals: (season: number) => Promise<number>;
+  getSyncState: (key: string) => Promise<unknown | null>;
+  upsertSyncState: (key: string, value: unknown) => Promise<void>;
+};
+
+export function createDbAdapter(db: NeonHttpDatabase<Record<string, never>>): DbAdapter {
+  return {
+    async upsertGames(rows) {
+      if (rows.length === 0) return 0;
+      await db
+        .insert(games)
+        .values(rows)
+        .onConflictDoUpdate({
+          target: games.id,
+          set: {
+            date: sql`excluded.date`,
+            season: sql`excluded.season`,
+            status: sql`excluded.status`,
+            homeTeamId: sql`excluded.home_team_id`,
+            visitorTeamId: sql`excluded.visitor_team_id`,
+            homeTeamScore: sql`excluded.home_team_score`,
+            visitorTeamScore: sql`excluded.visitor_team_score`,
+          },
+        });
+      return rows.length;
+    },
+    async upsertPlayerGameStats(rows) {
+      if (rows.length === 0) return 0;
+      await db
+        .insert(playerGameStats)
+        .values(rows)
+        .onConflictDoUpdate({
+          target: playerGameStats.id,
+          set: {
+            gameId: sql`excluded.game_id`,
+            season: sql`excluded.season`,
+            gameDate: sql`excluded.game_date`,
+            playerId: sql`excluded.player_id`,
+            teamId: sql`excluded.team_id`,
+            minutes: sql`excluded.minutes`,
+            pts: sql`excluded.pts`,
+            reb: sql`excluded.reb`,
+            ast: sql`excluded.ast`,
+            oreb: sql`excluded.oreb`,
+            dreb: sql`excluded.dreb`,
+            fgm: sql`excluded.fgm`,
+            fga: sql`excluded.fga`,
+            fg3m: sql`excluded.fg3m`,
+            fg3a: sql`excluded.fg3a`,
+            ftm: sql`excluded.ftm`,
+            fta: sql`excluded.fta`,
+            stl: sql`excluded.stl`,
+            blk: sql`excluded.blk`,
+            turnover: sql`excluded.turnover`,
+            pf: sql`excluded.pf`,
+            plusMinus: sql`excluded.plus_minus`,
+          },
+        });
+      return rows.length;
+    },
+    async getMaxSeasonInRecentGames(sinceDate) {
+      const result = await db
+        .select({ value: max(games.season) })
+        .from(games)
+        .where(gte(games.date, sinceDate));
+      return result[0]?.value ?? null;
+    },
+    async getLastGameDateForSeason(season) {
+      const result = await db
+        .select({ value: max(games.date) })
+        .from(games)
+        .where(eq(games.season, season));
+      return result[0]?.value ?? null;
+    },
+    async updateSeasonTotalsForPlayers(season, playerIds) {
+      if (playerIds.length === 0) return 0;
+      const uniqueIds = Array.from(new Set(playerIds));
+
+      const rows = await db
+        .select({
+          playerId: playerGameStats.playerId,
+          season: playerGameStats.season,
+          games: sql<number>`count(*)`,
+          minutes: sql<number>`coalesce(sum(${playerGameStats.minutes}), 0)`,
+          pts: sql<number>`coalesce(sum(${playerGameStats.pts}), 0)`,
+          reb: sql<number>`coalesce(sum(${playerGameStats.reb}), 0)`,
+          ast: sql<number>`coalesce(sum(${playerGameStats.ast}), 0)`,
+          oreb: sql<number>`coalesce(sum(${playerGameStats.oreb}), 0)`,
+          dreb: sql<number>`coalesce(sum(${playerGameStats.dreb}), 0)`,
+          fgm: sql<number>`coalesce(sum(${playerGameStats.fgm}), 0)`,
+          fga: sql<number>`coalesce(sum(${playerGameStats.fga}), 0)`,
+          fg3m: sql<number>`coalesce(sum(${playerGameStats.fg3m}), 0)`,
+          fg3a: sql<number>`coalesce(sum(${playerGameStats.fg3a}), 0)`,
+          ftm: sql<number>`coalesce(sum(${playerGameStats.ftm}), 0)`,
+          fta: sql<number>`coalesce(sum(${playerGameStats.fta}), 0)`,
+          stl: sql<number>`coalesce(sum(${playerGameStats.stl}), 0)`,
+          blk: sql<number>`coalesce(sum(${playerGameStats.blk}), 0)`,
+          turnover: sql<number>`coalesce(sum(${playerGameStats.turnover}), 0)`,
+          pf: sql<number>`coalesce(sum(${playerGameStats.pf}), 0)`,
+          plusMinus: sql<number>`coalesce(sum(${playerGameStats.plusMinus}), 0)`,
+        })
+        .from(playerGameStats)
+        .where(and(eq(playerGameStats.season, season), inArray(playerGameStats.playerId, uniqueIds)))
+        .groupBy(playerGameStats.playerId, playerGameStats.season);
+
+      if (rows.length === 0) return 0;
+
+      await db
+        .insert(playerSeasonTotals)
+        .values(
+          rows.map(row => ({
+            playerId: row.playerId,
+            season: row.season,
+            games: row.games,
+            minutes: row.minutes,
+            pts: row.pts,
+            reb: row.reb,
+            ast: row.ast,
+            oreb: row.oreb,
+            dreb: row.dreb,
+            fgm: row.fgm,
+            fga: row.fga,
+            fg3m: row.fg3m,
+            fg3a: row.fg3a,
+            ftm: row.ftm,
+            fta: row.fta,
+            stl: row.stl,
+            blk: row.blk,
+            turnover: row.turnover,
+            pf: row.pf,
+            plusMinus: row.plusMinus,
+            updatedAt: new Date(),
+          }))
+        )
+        .onConflictDoUpdate({
+          target: [playerSeasonTotals.playerId, playerSeasonTotals.season],
+          set: {
+            games: sql`excluded.games`,
+            minutes: sql`excluded.minutes`,
+            pts: sql`excluded.pts`,
+            reb: sql`excluded.reb`,
+            ast: sql`excluded.ast`,
+            oreb: sql`excluded.oreb`,
+            dreb: sql`excluded.dreb`,
+            fgm: sql`excluded.fgm`,
+            fga: sql`excluded.fga`,
+            fg3m: sql`excluded.fg3m`,
+            fg3a: sql`excluded.fg3a`,
+            ftm: sql`excluded.ftm`,
+            fta: sql`excluded.fta`,
+            stl: sql`excluded.stl`,
+            blk: sql`excluded.blk`,
+            turnover: sql`excluded.turnover`,
+            pf: sql`excluded.pf`,
+            plusMinus: sql`excluded.plus_minus`,
+            updatedAt: sql`excluded.updated_at`,
+          },
+        });
+
+      return rows.length;
+    },
+    async rebuildSeasonTotals(season) {
+      const rows = await db
+        .select({
+          playerId: playerGameStats.playerId,
+          season: playerGameStats.season,
+          games: sql<number>`count(*)`,
+          minutes: sql<number>`coalesce(sum(${playerGameStats.minutes}), 0)`,
+          pts: sql<number>`coalesce(sum(${playerGameStats.pts}), 0)`,
+          reb: sql<number>`coalesce(sum(${playerGameStats.reb}), 0)`,
+          ast: sql<number>`coalesce(sum(${playerGameStats.ast}), 0)`,
+          oreb: sql<number>`coalesce(sum(${playerGameStats.oreb}), 0)`,
+          dreb: sql<number>`coalesce(sum(${playerGameStats.dreb}), 0)`,
+          fgm: sql<number>`coalesce(sum(${playerGameStats.fgm}), 0)`,
+          fga: sql<number>`coalesce(sum(${playerGameStats.fga}), 0)`,
+          fg3m: sql<number>`coalesce(sum(${playerGameStats.fg3m}), 0)`,
+          fg3a: sql<number>`coalesce(sum(${playerGameStats.fg3a}), 0)`,
+          ftm: sql<number>`coalesce(sum(${playerGameStats.ftm}), 0)`,
+          fta: sql<number>`coalesce(sum(${playerGameStats.fta}), 0)`,
+          stl: sql<number>`coalesce(sum(${playerGameStats.stl}), 0)`,
+          blk: sql<number>`coalesce(sum(${playerGameStats.blk}), 0)`,
+          turnover: sql<number>`coalesce(sum(${playerGameStats.turnover}), 0)`,
+          pf: sql<number>`coalesce(sum(${playerGameStats.pf}), 0)`,
+          plusMinus: sql<number>`coalesce(sum(${playerGameStats.plusMinus}), 0)`,
+        })
+        .from(playerGameStats)
+        .where(eq(playerGameStats.season, season))
+        .groupBy(playerGameStats.playerId, playerGameStats.season);
+
+      if (rows.length === 0) return 0;
+
+      await db
+        .insert(playerSeasonTotals)
+        .values(
+          rows.map(row => ({
+            playerId: row.playerId,
+            season: row.season,
+            games: row.games,
+            minutes: row.minutes,
+            pts: row.pts,
+            reb: row.reb,
+            ast: row.ast,
+            oreb: row.oreb,
+            dreb: row.dreb,
+            fgm: row.fgm,
+            fga: row.fga,
+            fg3m: row.fg3m,
+            fg3a: row.fg3a,
+            ftm: row.ftm,
+            fta: row.fta,
+            stl: row.stl,
+            blk: row.blk,
+            turnover: row.turnover,
+            pf: row.pf,
+            plusMinus: row.plusMinus,
+            updatedAt: new Date(),
+          }))
+        )
+        .onConflictDoUpdate({
+          target: [playerSeasonTotals.playerId, playerSeasonTotals.season],
+          set: {
+            games: sql`excluded.games`,
+            minutes: sql`excluded.minutes`,
+            pts: sql`excluded.pts`,
+            reb: sql`excluded.reb`,
+            ast: sql`excluded.ast`,
+            oreb: sql`excluded.oreb`,
+            dreb: sql`excluded.dreb`,
+            fgm: sql`excluded.fgm`,
+            fga: sql`excluded.fga`,
+            fg3m: sql`excluded.fg3m`,
+            fg3a: sql`excluded.fg3a`,
+            ftm: sql`excluded.ftm`,
+            fta: sql`excluded.fta`,
+            stl: sql`excluded.stl`,
+            blk: sql`excluded.blk`,
+            turnover: sql`excluded.turnover`,
+            pf: sql`excluded.pf`,
+            plusMinus: sql`excluded.plus_minus`,
+            updatedAt: sql`excluded.updated_at`,
+          },
+        });
+
+      return rows.length;
+    },
+    async getSyncState(key) {
+      const result = await db
+        .select({ value: syncState.value })
+        .from(syncState)
+        .where(eq(syncState.key, key));
+      return result[0]?.value ?? null;
+    },
+    async upsertSyncState(key, value) {
+      await db
+        .insert(syncState)
+        .values({ key, value, updatedAt: new Date() })
+        .onConflictDoUpdate({
+          target: syncState.key,
+          set: {
+            value: sql`excluded.value`,
+            updatedAt: sql`excluded.updated_at`,
+          },
+        });
+    },
+  };
+}
