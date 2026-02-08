@@ -38,10 +38,56 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const { letter: gradeLetter, colorClass: gradeColorClass } = getTeamGrade(wins.length, losses.length);
 
   const useRankingLayout = rank != null || label != null;
+  const seasonPts = player.season?.perGame.pts ?? null;
+  const seasonTs = player.season?.percentages.ts ?? null;
+  const seasonAst = player.season?.perGame.ast ?? null;
+  const hotHandDelta =
+    seasonPts != null && seasonPts > 0 ? player.pts - seasonPts : null;
+  const showHotHand =
+    seasonPts != null && seasonPts > 0 && player.pts >= seasonPts * 1.25;
+  const tsDelta = seasonTs != null ? player.ts - seasonTs : null;
+  const showTsHotHand = seasonTs != null && player.ts >= seasonTs + 10;
+  const astDelta =
+    seasonAst != null && seasonAst > 0 ? player.ast - seasonAst : null;
+  const showMakingPlays = astDelta != null && astDelta > 2;
+
+  const badgeContent = showHotHand || showTsHotHand || showMakingPlays ? (
+    <div className="mt-4 text-[clamp(0.75rem,0.35vw+0.7rem,0.82rem)]">
+      <div className="text-foreground-muted uppercase tracking-[0.18em] text-[0.6rem]">
+        Week vs Season
+      </div>
+      <div className="mt-2 grid gap-1.5">
+        {showHotHand && (
+          <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-2 py-0.5 text-[0.68rem]">
+            <span className="font-semibold text-foreground">Getting Buckets</span>
+            <span className="font-semibold text-emerald-700 dark:text-emerald-500">
+              ▲ {hotHandDelta?.toFixed(1)} pts
+            </span>
+          </div>
+        )}
+        {showTsHotHand && (
+          <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-2 py-0.5 text-[0.68rem]">
+            <span className="font-semibold text-foreground">Hot Hand</span>
+            <span className="font-semibold text-emerald-700 dark:text-emerald-500">
+              ▲ {tsDelta?.toFixed(1)}% TS
+            </span>
+          </div>
+        )}
+        {showMakingPlays && (
+          <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-foreground/10 bg-foreground/5 px-2 py-0.5 text-[0.68rem]">
+            <span className="font-semibold text-foreground">Making Plays</span>
+            <span className="font-semibold text-emerald-700 dark:text-emerald-500">
+              ▲ {astDelta?.toFixed(1)} ast
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  ) : null;
 
   const rankingStatsContent = (
     <>
-      <div className="text-foreground-muted text-[clamp(0.6875rem,0.3vw+0.65rem,0.75rem)]">averaged</div>
+      <div className="text-foreground-muted uppercase tracking-[0.18em] text-[0.6rem]">averaged</div>
       <div className="flex gap-x-6 gap-y-2">
         <Stat label="pts" value={player.pts.toFixed(1)} size="lg" />
         <Stat label="reb" value={player.reb.toFixed(1)} size="lg" />
@@ -68,6 +114,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           {" "}in {Math.round(player.totalMinutes)} minutes
         </span>
       </div>
+      {badgeContent}
     </>
   );
 
@@ -263,6 +310,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 />
                 <PerStat value={player.per.toFixed(1)} />
               </div>
+              {badgeContent}
             </div>
             <div className="note-card mt-4">
               <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
