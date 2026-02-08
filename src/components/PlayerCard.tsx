@@ -50,9 +50,14 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const astDelta =
     seasonAst != null && seasonAst > 0 ? player.ast - seasonAst : null;
   const showMakingPlays = astDelta != null && astDelta > 2;
-  const showSniper = true;
+  const seasonReb = player.season?.perGame.reb ?? null;
+  const rebDelta =
+    seasonReb != null && seasonReb > 0 ? player.reb - seasonReb : null;
+  const showBoardMan = rebDelta != null && rebDelta > 2;
+  const threesPerGame = player.games > 0 ? player.totalFg3m / player.games : 0;
+  const showSniper = threesPerGame > 3;
 
-  const badgeContent = showHotHand || showTsHotHand || showMakingPlays || showSniper ? (
+  const badgeContent = showHotHand || showTsHotHand || showMakingPlays || showBoardMan || showSniper ? (
     <div className="mt-4 inline-block bg-accent/20 px-3 py-2 text-[clamp(0.75rem,0.35vw+0.7rem,0.82rem)]">
       <div className="text-foreground-muted uppercase tracking-[0.2em] text-[0.6rem]">
         Highlights
@@ -82,11 +87,19 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
             </span>
           </div>
         )}
+        {showBoardMan && (
+          <div className="flex items-baseline gap-2">
+            <span className="font-semibold text-foreground">Board Man</span>
+            <span className="font-semibold text-positive">
+              <span className="text-[0.6rem] align-baseline">▲</span> {rebDelta?.toFixed(1)} reb
+            </span>
+          </div>
+        )}
         {showSniper && (
           <div className="flex items-baseline gap-2">
             <span className="font-semibold text-foreground">Sniper</span>
             <span className="font-semibold text-positive">
-              {player.totalFg3m.toFixed(0)} 3s on {player.fg3Pct.toFixed(1)}%
+              {player.totalFg3m.toFixed(0)} 3s
             </span>
           </div>
         )}
@@ -95,9 +108,9 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   ) : null;
 
   const rankingStatsContent = (
-    <>
+    <div>
       <div className="text-foreground-muted uppercase tracking-[0.18em] text-[0.6rem]">averaged</div>
-      <div className="flex gap-x-6 gap-y-2">
+      <div className="flex gap-x-6">
         <Stat label="pts" value={player.pts.toFixed(1)} size="lg" />
         <Stat label="reb" value={player.reb.toFixed(1)} size="lg" />
         <Stat label="ast" value={player.ast.toFixed(1)} size="lg" />
@@ -123,8 +136,8 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           {" "}in {Math.round(player.totalMinutes)} minutes
         </span>
       </div>
-      <div className="sm:hidden">{badgeContent}</div>
-    </>
+      {badgeContent}
+    </div>
   );
 
   const rankingNameBlock = (
@@ -193,11 +206,6 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
               <div className="mt-8 pl-24">
                 {rankingStatsContent}
               </div>
-            </div>
-          </div>
-          <div className="mt-4 hidden sm:block" style={{ marginLeft: 240 }}>
-            <div className="pl-24">
-              {badgeContent}
             </div>
           </div>
           <div className="block pl-2 text-left sm:hidden">
