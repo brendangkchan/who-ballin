@@ -62,6 +62,35 @@ export function calculatePER(stats: GameStats[]): number {
   return Number.isFinite(per) ? per : 0;
 }
 
+export function calculatePERFromTotals(totals: {
+  pts: number;
+  reb: number;
+  ast: number;
+  stl: number;
+  blk: number;
+  tov: number;
+  fg: number;
+  fga: number;
+  ft: number;
+  fta: number;
+  pf: number;
+  minutes: number;
+}): number {
+  if (!Number.isFinite(totals.minutes) || totals.minutes <= 0) return 0;
+  const per =
+    (totals.pts * 1.0 +
+      totals.reb * 0.7 +
+      totals.ast * 0.9 +
+      totals.stl * 1.5 +
+      totals.blk * 1.2 -
+      totals.tov * 1.0 -
+      totals.pf * 0.3 +
+      (totals.fg - totals.fga) * 0.5 +
+      (totals.ft - totals.fta) * 0.3) /
+    (totals.minutes / 36);
+  return Number.isFinite(per) ? per : 0;
+}
+
 export function parseMinutes(minString: string | null | undefined): number {
   if (minString == null || typeof minString !== 'string') return 0;
   const trimmed = minString.trim();

@@ -328,6 +328,10 @@ export async function runSeasonSync(options: SyncOptions) {
         Array.from(affectedPlayerIds)
       );
     }
+    const leagueTotals = await options.db.getSeasonLeagueTotals(season);
+    if (leagueTotals) {
+      await options.db.setCachedLeagueTotals(season, leagueTotals);
+    }
   }
 
   const durationMs = Date.now() - startTime;

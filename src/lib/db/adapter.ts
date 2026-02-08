@@ -36,6 +36,60 @@ export type DbAdapter = {
     fta: number;
     plusMinus: number;
   }[]>;
+  getSeasonLeagueTotals: (season: number) => Promise<{
+    minutes: number;
+    pts: number;
+    reb: number;
+    ast: number;
+    oreb: number;
+    dreb: number;
+    stl: number;
+    blk: number;
+    turnover: number;
+    pf: number;
+    fgm: number;
+    fga: number;
+    fg3m: number;
+    fg3a: number;
+    ftm: number;
+    fta: number;
+  } | null>;
+  getCachedLeagueTotals: (season: number) => Promise<{
+    minutes: number;
+    pts: number;
+    reb: number;
+    ast: number;
+    oreb: number;
+    dreb: number;
+    stl: number;
+    blk: number;
+    turnover: number;
+    pf: number;
+    fgm: number;
+    fga: number;
+    fg3m: number;
+    fg3a: number;
+    ftm: number;
+    fta: number;
+  } | null>;
+  setCachedLeagueTotals: (season: number, totals: {
+    minutes: number;
+    pts: number;
+    reb: number;
+    ast: number;
+    oreb: number;
+    dreb: number;
+    stl: number;
+    blk: number;
+    turnover: number;
+    pf: number;
+    fgm: number;
+    fga: number;
+    fg3m: number;
+    fg3a: number;
+    ftm: number;
+    fta: number;
+  }) => Promise<void>;
   updateSeasonTotalsForPlayers: (season: number, playerIds: number[]) => Promise<number>;
   rebuildSeasonTotals: (season: number) => Promise<number>;
   getSyncState: (key: string) => Promise<unknown | null>;
@@ -139,6 +193,51 @@ export function createDbAdapter(db: NeonHttpDatabase<Record<string, never>>): Db
         })
         .from(playerSeasonTotals)
         .where(and(eq(playerSeasonTotals.season, season), inArray(playerSeasonTotals.playerId, uniqueIds)));
+    },
+    async getSeasonLeagueTotals(season) {
+      const rows = await db
+        .select({
+          minutes: sql<number>`coalesce(sum(${playerSeasonTotals.minutes}), 0)`,
+          pts: sql<number>`coalesce(sum(${playerSeasonTotals.pts}), 0)`,
+          reb: sql<number>`coalesce(sum(${playerSeasonTotals.reb}), 0)`,
+          ast: sql<number>`coalesce(sum(${playerSeasonTotals.ast}), 0)`,
+          oreb: sql<number>`coalesce(sum(${playerSeasonTotals.oreb}), 0)`,
+          dreb: sql<number>`coalesce(sum(${playerSeasonTotals.dreb}), 0)`,
+          stl: sql<number>`coalesce(sum(${playerSeasonTotals.stl}), 0)`,
+          blk: sql<number>`coalesce(sum(${playerSeasonTotals.blk}), 0)`,
+          turnover: sql<number>`coalesce(sum(${playerSeasonTotals.turnover}), 0)`,
+          pf: sql<number>`coalesce(sum(${playerSeasonTotals.pf}), 0)`,
+          fgm: sql<number>`coalesce(sum(${playerSeasonTotals.fgm}), 0)`,
+          fga: sql<number>`coalesce(sum(${playerSeasonTotals.fga}), 0)`,
+          fg3m: sql<number>`coalesce(sum(${playerSeasonTotals.fg3m}), 0)`,
+          fg3a: sql<number>`coalesce(sum(${playerSeasonTotals.fg3a}), 0)`,
+          ftm: sql<number>`coalesce(sum(${playerSeasonTotals.ftm}), 0)`,
+          fta: sql<number>`coalesce(sum(${playerSeasonTotals.fta}), 0)`,
+        })
+        .from(playerSeasonTotals)
+        .where(eq(playerSeasonTotals.season, season));
+      return rows[0] ?? null;
+    },
+    async getCachedLeagueTotals(season) {
+      const key = `league_totals:${season}`;
+      const cached = await db
+        .select({ value: syncState.value })
+        .from(syncState)
+        .where(eq(syncState.key, key));
+      return (cached[0]?.value as any) ?? null;
+    },
+    async setCachedLeagueTotals(season, totals) {
+      const key = `league_totals:${season}`;
+      await db
+        .insert(syncState)
+        .values({ key, value: totals, updatedAt: new Date() })
+        .onConflictDoUpdate({
+          target: syncState.key,
+          set: {
+            value: sql`excluded.value`,
+            updatedAt: sql`excluded.updated_at`,
+          },
+        });
     },
     async updateSeasonTotalsForPlayers(season, playerIds) {
       if (playerIds.length === 0) return 0;

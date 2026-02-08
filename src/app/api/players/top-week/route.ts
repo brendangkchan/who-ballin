@@ -9,6 +9,7 @@ import { getDb } from '@/lib/db/client';
 import { createDbAdapter } from '@/lib/db/adapter';
 import { getSeasonForSync } from '@/lib/sync/seasonSync';
 import { buildSeasonStats, buildDeltaStats, type SeasonTotalsRow } from '@/lib/season-stats';
+import { calculatePERFromTotals } from '@/lib/per';
 
 export const revalidate = 3600;
 
@@ -217,8 +218,43 @@ export async function GET(request: NextRequest) {
     });
     console.debug('[top-week] qualifying filters (win % / +/-):', beforeQualifying, '->', filtered.length);
 
-    // Step 8: Sort by PER
-    filtered.sort((a, b) => b.per - a.per);
+    // Step 8: Sort by adjusted PER (fallback to simplified)
+    try {
+      const adapter = createDbAdapter(getDb());
+      const season = await getSeasonForSync(adapter, new Date());
+      const cachedLeagueTotals = await adapter.getCachedLeagueTotals(season);
+      const leagueTotals =
+        cachedLeagueTotals ?? (await adapter.getSeasonLeagueTotals(season));
+      if (leagueTotals) {
+        if (!cachedLeagueTotals) {
+          await adapter.setCachedLeagueTotals(season, leagueTotals);
+        }
+        const leaguePer = calculatePERFromTotals({
+          pts: leagueTotals.pts,
+          reb: leagueTotals.reb,
+          ast: leagueTotals.ast,
+          stl: leagueTotals.stl,
+          blk: leagueTotals.blk,
+          tov: leagueTotals.turnover,
+          fg: leagueTotals.fgm,
+          fga: leagueTotals.fga,
+          ft: leagueTotals.ftm,
+          fta: leagueTotals.fta,
+          pf: leagueTotals.pf,
+          minutes: leagueTotals.minutes / 60,
+        });
+        const scale = leaguePer > 0 ? 15 / leaguePer : 1;
+        for (const player of filtered) {
+          player.perAdjusted = Number.isFinite(player.per * scale)
+            ? player.per * scale
+            : player.per;
+        }
+      }
+    } catch (error: any) {
+      debugInfo.warnings.push(`Failed to compute adjusted PER: ${error?.message ?? error}`);
+    }
+
+    filtered.sort((a, b) => (b.perAdjusted ?? b.per) - (a.perAdjusted ?? a.per));
 
     // Step 9: Limit to top 10
     const players = filtered.slice(0, 10);

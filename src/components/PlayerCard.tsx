@@ -162,7 +162,12 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
     <div className="relative rounded-lg bg-background py-6 sm:py-8 noise-overlay">
       {process.env.NODE_ENV === 'development' && (
         <div className="mb-2 text-xs text-foreground-muted">
-          BDL: {player.player.id} · NBA: {getNbaPlayerId(player.player.id)}
+          NBA: {getNbaPlayerId(player.player.id)}
+          {player.perAdjusted != null ? (
+            <> · PER: {player.perAdjusted.toFixed(1)}</>
+          ) : (
+            <> · PER: {player.per.toFixed(1)}</>
+          )}
         </div>
       )}
       {useRankingLayout ? (

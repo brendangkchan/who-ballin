@@ -6,6 +6,25 @@ vi.mock('next/cache', () => ({
   unstable_cache: (fn: () => Promise<unknown>) => () => fn(),
 }));
 
+vi.mock('@/lib/db/client', () => ({
+  getDb: vi.fn(() => ({})),
+}));
+
+const mockAdapter = {
+  getCachedLeagueTotals: vi.fn(async () => null),
+  getSeasonLeagueTotals: vi.fn(async () => null),
+  setCachedLeagueTotals: vi.fn(async () => undefined),
+  getSeasonTotalsForPlayers: vi.fn(async () => []),
+};
+
+vi.mock('@/lib/db/adapter', () => ({
+  createDbAdapter: vi.fn(() => mockAdapter),
+}));
+
+vi.mock('@/lib/sync/seasonSync', () => ({
+  getSeasonForSync: vi.fn(async () => 2025),
+}));
+
 vi.mock('@/lib/balldontlie', () => ({
   getAllGames: vi.fn(),
   getLastCompletedGame: vi.fn(),
@@ -60,6 +79,10 @@ describe('GET /api/players/top-week', () => {
     vi.mocked(getAllGames).mockResolvedValue([]);
     vi.mocked(getLastCompletedGame).mockResolvedValue(null);
     vi.mocked(getAllStatsForGames).mockResolvedValue([]);
+    mockAdapter.getCachedLeagueTotals.mockResolvedValue(null);
+    mockAdapter.getSeasonLeagueTotals.mockResolvedValue(null);
+    mockAdapter.setCachedLeagueTotals.mockResolvedValue(undefined);
+    mockAdapter.getSeasonTotalsForPlayers.mockResolvedValue([]);
     process.env.NODE_ENV = 'development';
   });
 
@@ -138,6 +161,47 @@ describe('GET /api/players/top-week', () => {
     expect(typeof data.generatedAt).toBe('string');
     expect(data.generatedAt.length).toBeGreaterThan(0);
     expect(Number.isNaN(new Date(data.generatedAt).getTime())).toBe(false);
+  });
+
+  it('sets adjusted PER when league totals are available', async () => {
+    const game = createGame({ id: 1, home_team_score: 110, visitor_team_score: 105 });
+    const stat = createGameStats({
+      game: { id: 1, date: '2026-01-15' },
+      player: { id: 100, first_name: 'LeBron', last_name: 'James' },
+      team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
+      pts: 25,
+      min: '35:00',
+      plus_minus: 5,
+    });
+
+    vi.mocked(getAllGames).mockResolvedValue([game]);
+    vi.mocked(getAllStatsForGames).mockResolvedValue([stat]);
+    mockAdapter.getSeasonLeagueTotals.mockResolvedValue({
+      minutes: 10000,
+      pts: 10000,
+      reb: 4000,
+      ast: 2500,
+      oreb: 1200,
+      dreb: 2800,
+      stl: 800,
+      blk: 500,
+      turnover: 1200,
+      pf: 1500,
+      fgm: 3800,
+      fga: 8000,
+      fg3m: 900,
+      fg3a: 2600,
+      ftm: 1500,
+      fta: 2000,
+    });
+
+    const req = createRequest('http://localhost/api/players/top-week?minGames=1&minPts=1&minMinutes=1');
+    const res = await GET(req);
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.players).toHaveLength(1);
+    expect(typeof data.players[0].perAdjusted).toBe('number');
   });
 
   it('uses fallback date range when no games in primary range', async () => {

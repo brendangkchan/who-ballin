@@ -115,6 +115,7 @@ export interface PlayerWeekStats {
   totalFtm: number;
   totalFta: number;
   per: number;
+  perAdjusted?: number;
   pts: number;        // simple average
   reb: number;        // simple average
   ast: number;        // simple average
