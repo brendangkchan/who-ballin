@@ -168,19 +168,78 @@ export function aggregatePlayerStats(
     throw new Error('Cannot aggregate stats for player with no games');
   }
 
+  const totals = stats.reduce(
+    (acc, s) => {
+      const fgm = (s as any).fgm ?? (s as any).fg ?? 0;
+      const fg3m = (s as any).fg3m ?? (s as any).fg3 ?? 0;
+      const ftm = (s as any).ftm ?? (s as any).ft ?? 0;
+      const tov = (s as any).turnover ?? (s as any).tov ?? 0;
+      return {
+        pts: acc.pts + s.pts,
+        reb: acc.reb + s.reb,
+        ast: acc.ast + s.ast,
+        oreb: acc.oreb + (s.oreb ?? 0),
+        dreb: acc.dreb + (s.dreb ?? 0),
+        stl: acc.stl + (s.stl ?? 0),
+        blk: acc.blk + (s.blk ?? 0),
+        tov: acc.tov + tov,
+        pf: acc.pf + (s.pf ?? 0),
+        fgm: acc.fgm + fgm,
+        fga: acc.fga + s.fga,
+        fg3m: acc.fg3m + fg3m,
+        fg3a: acc.fg3a + (s.fg3a ?? 0),
+        ftm: acc.ftm + ftm,
+        fta: acc.fta + s.fta,
+      };
+    },
+    {
+      pts: 0,
+      reb: 0,
+      ast: 0,
+      oreb: 0,
+      dreb: 0,
+      stl: 0,
+      blk: 0,
+      tov: 0,
+      pf: 0,
+      fgm: 0,
+      fga: 0,
+      fg3m: 0,
+      fg3a: 0,
+      ftm: 0,
+      fta: 0,
+    }
+  );
+
   // Simple averages
-  const avgPts = stats.reduce((sum, s) => sum + s.pts, 0) / gamesPlayed;
-  const avgReb = stats.reduce((sum, s) => sum + s.reb, 0) / gamesPlayed;
-  const avgAst = stats.reduce((sum, s) => sum + s.ast, 0) / gamesPlayed;
+  const avgPts = totals.pts / gamesPlayed;
+  const avgReb = totals.reb / gamesPlayed;
+  const avgAst = totals.ast / gamesPlayed;
+  const avgOreb = totals.oreb / gamesPlayed;
+  const avgDreb = totals.dreb / gamesPlayed;
+  const avgStl = totals.stl / gamesPlayed;
+  const avgBlk = totals.blk / gamesPlayed;
+  const avgTov = totals.tov / gamesPlayed;
+  const avgPf = totals.pf / gamesPlayed;
+  const avgFgm = totals.fgm / gamesPlayed;
+  const avgFga = totals.fga / gamesPlayed;
+  const avgFg3m = totals.fg3m / gamesPlayed;
+  const avgFg3a = totals.fg3a / gamesPlayed;
+  const avgFtm = totals.ftm / gamesPlayed;
+  const avgFta = totals.fta / gamesPlayed;
 
   // Cumulative calculations
-  const totalPts = stats.reduce((sum, s) => sum + s.pts, 0);
-  const totalFga = stats.reduce((sum, s) => sum + s.fga, 0);
-  const totalFta = stats.reduce((sum, s) => sum + s.fta, 0);
+  const totalPts = totals.pts;
+  const totalFga = totals.fga;
+  const totalFta = totals.fta;
   const ts = calculateTrueShooting(stats);
 
   const plusMinus = stats.reduce((sum, s) => sum + (s.plus_minus || 0), 0);
   const totalMinutes = stats.reduce((sum, s) => sum + parseMinutes(s.min), 0);
+  const fgPct = totalFga > 0 ? (totals.fgm / totalFga) * 100 : 0;
+  const fg3Pct = totals.fg3a > 0 ? (totals.fg3m / totals.fg3a) * 100 : 0;
+  const ftPct = totalFta > 0 ? (totals.ftm / totalFta) * 100 : 0;
+  const mpg = gamesPlayed > 0 ? totalMinutes / gamesPlayed : 0;
 
   // PER calculation (uses cumulative totals)
   const rawPer = calculatePER(stats);
@@ -210,11 +269,41 @@ export function aggregatePlayerStats(
     games: gamesPlayed,
     totalMinutes,
     totalPts,
+    totalReb: totals.reb,
+    totalAst: totals.ast,
+    totalOreb: totals.oreb,
+    totalDreb: totals.dreb,
+    totalStl: totals.stl,
+    totalBlk: totals.blk,
+    totalTov: totals.tov,
+    totalPf: totals.pf,
+    totalFgm: totals.fgm,
+    totalFga: totals.fga,
+    totalFg3m: totals.fg3m,
+    totalFg3a: totals.fg3a,
+    totalFtm: totals.ftm,
+    totalFta: totals.fta,
     per,
     pts: avgPts,
     reb: avgReb,
     ast: avgAst,
+    oreb: avgOreb,
+    dreb: avgDreb,
+    stl: avgStl,
+    blk: avgBlk,
+    tov: avgTov,
+    pf: avgPf,
+    fgm: avgFgm,
+    fga: avgFga,
+    fg3m: avgFg3m,
+    fg3a: avgFg3a,
+    ftm: avgFtm,
+    fta: avgFta,
+    mpg,
     ts,
+    fgPct,
+    fg3Pct,
+    ftPct,
     plusMinus,
     imageUrl: getPlayerImageUrl(basePlayer.id),
     profileUrl: getPlayerProfileUrl(basePlayer.id),

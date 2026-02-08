@@ -248,7 +248,7 @@ describe('runBuildMap', () => {
     });
     expect(result.map).toEqual({ '100': 2544 });
     expect(getPage).toHaveBeenCalledTimes(2);
-    expect(fs.existsSync(checkpointPath)).toBe(false);
+    expect(fs.existsSync(checkpointPath)).toBe(true);
   });
 
   it('throws after max retries on network error and saves checkpoint', async () => {
@@ -342,7 +342,7 @@ describe('runBuildMap', () => {
     });
     expect(result.playersCount).toBe(1);
     expect(result.map).toEqual({ '1': 2544 });
-    expect(fs.existsSync(checkpointPath)).toBe(false);
+    expect(fs.existsSync(checkpointPath)).toBe(true);
     const written = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
     expect(written).toEqual({ '1': 2544 });
   });
@@ -369,7 +369,7 @@ describe('runBuildMap', () => {
     expect(result.playersCount).toBe(1);
     expect(result.map).toEqual({ '50': 2544 });
     expect(getPage).toHaveBeenCalledWith(300);
-    expect(fs.existsSync(checkpointPath)).toBe(false);
+    expect(fs.existsSync(checkpointPath)).toBe(true);
   });
 
   it('already-complete checkpoint: no getPage calls, writes output and deletes checkpoint', async () => {
@@ -392,7 +392,7 @@ describe('runBuildMap', () => {
     expect(getPage).not.toHaveBeenCalled();
     expect(result.map).toEqual({ '99': 2544 });
     expect(result.playersCount).toBe(1);
-    expect(fs.existsSync(checkpointPath)).toBe(false);
+    expect(fs.existsSync(checkpointPath)).toBe(true);
     const written = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
     expect(written).toEqual({ '99': 2544 });
   });

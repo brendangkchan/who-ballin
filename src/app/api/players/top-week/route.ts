@@ -5,6 +5,10 @@ import { getAllGames, getLastCompletedGame, getAllStatsForGames, getCurrentNBASe
 import { aggregatePlayerStats } from '@/lib/utils';
 import { parseFilters } from '@/lib/filters';
 import type { Game, GameStats, PlayerWeekStats, DebugInfo } from '@/types/player';
+import { getDb } from '@/lib/db/client';
+import { createDbAdapter } from '@/lib/db/adapter';
+import { getSeasonForSync } from '@/lib/sync/seasonSync';
+import { buildSeasonStats, buildDeltaStats, type SeasonTotalsRow } from '@/lib/season-stats';
 
 export const revalidate = 3600;
 
@@ -218,6 +222,28 @@ export async function GET(request: NextRequest) {
 
     // Step 9: Limit to top 10
     const players = filtered.slice(0, 10);
+
+    // Step 10: Attach season averages and deltas
+    if (players.length > 0) {
+      try {
+        const adapter = createDbAdapter(getDb());
+        const season = await getSeasonForSync(adapter, new Date());
+        const playerIds = players.map(p => p.player.id);
+        const seasonRows = await adapter.getSeasonTotalsForPlayers(season, playerIds);
+        const byPlayerId = new Map<number, SeasonTotalsRow>();
+        for (const row of seasonRows) byPlayerId.set(row.playerId, row);
+
+        for (const player of players) {
+          const row = byPlayerId.get(player.player.id);
+          if (!row) continue;
+          const seasonStats = buildSeasonStats(row);
+          player.season = seasonStats;
+          player.delta = buildDeltaStats(player, seasonStats);
+        }
+      } catch (error: any) {
+        debugInfo.warnings.push(`Failed to load season averages: ${error?.message ?? error}`);
+      }
+    }
 
     debugInfo.processingTime = Date.now() - startTime;
     console.debug('[top-week] done:', players.length, 'players in', debugInfo.processingTime, 'ms');

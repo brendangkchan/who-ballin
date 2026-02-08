@@ -14,6 +14,28 @@ export type DbAdapter = {
   upsertPlayerGameStats: (rows: PlayerGameStatRow[]) => Promise<number>;
   getMaxSeasonInRecentGames: (sinceDate: Date) => Promise<number | null>;
   getLastGameDateForSeason: (season: number) => Promise<Date | null>;
+  getSeasonTotalsForPlayers: (season: number, playerIds: number[]) => Promise<{
+    playerId: number;
+    season: number;
+    games: number;
+    minutes: number;
+    pts: number;
+    reb: number;
+    ast: number;
+    oreb: number;
+    dreb: number;
+    stl: number;
+    blk: number;
+    turnover: number;
+    pf: number;
+    fgm: number;
+    fga: number;
+    fg3m: number;
+    fg3a: number;
+    ftm: number;
+    fta: number;
+    plusMinus: number;
+  }[]>;
   updateSeasonTotalsForPlayers: (season: number, playerIds: number[]) => Promise<number>;
   rebuildSeasonTotals: (season: number) => Promise<number>;
   getSyncState: (key: string) => Promise<unknown | null>;
@@ -88,6 +110,35 @@ export function createDbAdapter(db: NeonHttpDatabase<Record<string, never>>): Db
         .from(games)
         .where(eq(games.season, season));
       return result[0]?.value ?? null;
+    },
+    async getSeasonTotalsForPlayers(season, playerIds) {
+      if (playerIds.length === 0) return [];
+      const uniqueIds = Array.from(new Set(playerIds));
+      return db
+        .select({
+          playerId: playerSeasonTotals.playerId,
+          season: playerSeasonTotals.season,
+          games: playerSeasonTotals.games,
+          minutes: playerSeasonTotals.minutes,
+          pts: playerSeasonTotals.pts,
+          reb: playerSeasonTotals.reb,
+          ast: playerSeasonTotals.ast,
+          oreb: playerSeasonTotals.oreb,
+          dreb: playerSeasonTotals.dreb,
+          stl: playerSeasonTotals.stl,
+          blk: playerSeasonTotals.blk,
+          turnover: playerSeasonTotals.turnover,
+          pf: playerSeasonTotals.pf,
+          fgm: playerSeasonTotals.fgm,
+          fga: playerSeasonTotals.fga,
+          fg3m: playerSeasonTotals.fg3m,
+          fg3a: playerSeasonTotals.fg3a,
+          ftm: playerSeasonTotals.ftm,
+          fta: playerSeasonTotals.fta,
+          plusMinus: playerSeasonTotals.plusMinus,
+        })
+        .from(playerSeasonTotals)
+        .where(and(eq(playerSeasonTotals.season, season), inArray(playerSeasonTotals.playerId, uniqueIds)));
     },
     async updateSeasonTotalsForPlayers(season, playerIds) {
       if (playerIds.length === 0) return 0;

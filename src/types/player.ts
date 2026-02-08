@@ -59,16 +59,22 @@ export interface GameStats {
   ast: number;
   fg: number; // field goals made
   fga: number; // field goals attempted
+  fgm?: number;
   ft: number; // free throws made
   fta: number; // free throws attempted
+  ftm?: number;
   min: string; // minutes played (format: "MM:SS")
   plus_minus?: number;
   stl?: number;
   blk?: number;
   tov?: number;
+  turnover?: number;
   pf?: number;
   fg3?: number;
   fg3a?: number;
+  fg3m?: number;
+  oreb?: number;
+  dreb?: number;
 }
 
 export interface GameResult {
@@ -94,15 +100,136 @@ export interface PlayerWeekStats {
   games: number;
   totalMinutes: number;
   totalPts: number;
+  totalReb: number;
+  totalAst: number;
+  totalOreb: number;
+  totalDreb: number;
+  totalStl: number;
+  totalBlk: number;
+  totalTov: number;
+  totalPf: number;
+  totalFgm: number;
+  totalFga: number;
+  totalFg3m: number;
+  totalFg3a: number;
+  totalFtm: number;
+  totalFta: number;
   per: number;
   pts: number;        // simple average
   reb: number;        // simple average
   ast: number;        // simple average
+  oreb: number;
+  dreb: number;
+  stl: number;
+  blk: number;
+  tov: number;
+  pf: number;
+  fgm: number;
+  fga: number;
+  fg3m: number;
+  fg3a: number;
+  ftm: number;
+  fta: number;
+  mpg: number;
   ts: number;         // cumulative calculation
+  fgPct: number;
+  fg3Pct: number;
+  ftPct: number;
   plusMinus: number;  // cumulative total
   imageUrl?: string;
   profileUrl: string;
   gameResults: GameResult[];
+  season?: {
+    games: number;
+    totals: {
+      minutes: number;
+      pts: number;
+      reb: number;
+      ast: number;
+      oreb: number;
+      dreb: number;
+      stl: number;
+      blk: number;
+      tov: number;
+      pf: number;
+      fgm: number;
+      fga: number;
+      fg3m: number;
+      fg3a: number;
+      ftm: number;
+      fta: number;
+      plusMinus: number;
+    };
+    perGame: {
+      minutes: number;
+      pts: number;
+      reb: number;
+      ast: number;
+      oreb: number;
+      dreb: number;
+      stl: number;
+      blk: number;
+      tov: number;
+      pf: number;
+      fgm: number;
+      fga: number;
+      fg3m: number;
+      fg3a: number;
+      ftm: number;
+      fta: number;
+    };
+    percentages: {
+      ts: number;
+      fgPct: number;
+      fg3Pct: number;
+      ftPct: number;
+    };
+  };
+  delta?: {
+    totals: {
+      minutes: number;
+      pts: number;
+      reb: number;
+      ast: number;
+      oreb: number;
+      dreb: number;
+      stl: number;
+      blk: number;
+      tov: number;
+      pf: number;
+      fgm: number;
+      fga: number;
+      fg3m: number;
+      fg3a: number;
+      ftm: number;
+      fta: number;
+      plusMinus: number;
+    };
+    perGame: {
+      minutes: number;
+      pts: number;
+      reb: number;
+      ast: number;
+      oreb: number;
+      dreb: number;
+      stl: number;
+      blk: number;
+      tov: number;
+      pf: number;
+      fgm: number;
+      fga: number;
+      fg3m: number;
+      fg3a: number;
+      ftm: number;
+      fta: number;
+    };
+    percentages: {
+      ts: number;
+      fgPct: number;
+      fg3Pct: number;
+      ftPct: number;
+    };
+  };
 }
 
 export interface DebugInfo {
