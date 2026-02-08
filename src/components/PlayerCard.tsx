@@ -50,8 +50,9 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const astDelta =
     seasonAst != null && seasonAst > 0 ? player.ast - seasonAst : null;
   const showMakingPlays = astDelta != null && astDelta > 2;
+  const showSniper = true;
 
-  const badgeContent = showHotHand || showTsHotHand || showMakingPlays ? (
+  const badgeContent = showHotHand || showTsHotHand || showMakingPlays || showSniper ? (
     <div className="mt-4 inline-block bg-accent/20 px-3 py-2 text-[clamp(0.75rem,0.35vw+0.7rem,0.82rem)]">
       <div className="text-foreground-muted uppercase tracking-[0.2em] text-[0.6rem]">
         Highlights
@@ -61,7 +62,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           <div className="flex items-baseline gap-2">
             <span className="font-semibold text-foreground">Getting Buckets</span>
             <span className="font-semibold text-positive">
-              ▲ {hotHandDelta?.toFixed(1)} pts
+              <span className="text-[0.6rem] align-baseline">▲</span> {hotHandDelta?.toFixed(1)} pts
             </span>
           </div>
         )}
@@ -69,7 +70,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           <div className="flex items-baseline gap-2">
             <span className="font-semibold text-foreground">Hot Hand</span>
             <span className="font-semibold text-positive">
-              ▲ {tsDelta?.toFixed(1)}% TS
+              <span className="text-[0.6rem] align-baseline">▲</span> {tsDelta?.toFixed(1)}% TS
             </span>
           </div>
         )}
@@ -77,7 +78,15 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           <div className="flex items-baseline gap-2">
             <span className="font-semibold text-foreground">Making Plays</span>
             <span className="font-semibold text-positive">
-              ▲ {astDelta?.toFixed(1)} ast
+              <span className="text-[0.6rem] align-baseline">▲</span> {astDelta?.toFixed(1)} ast
+            </span>
+          </div>
+        )}
+        {showSniper && (
+          <div className="flex items-baseline gap-2">
+            <span className="font-semibold text-foreground">Sniper</span>
+            <span className="font-semibold text-positive">
+              {player.totalFg3m.toFixed(0)} 3s on {player.fg3Pct.toFixed(1)}%
             </span>
           </div>
         )}
@@ -114,7 +123,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           {" "}in {Math.round(player.totalMinutes)} minutes
         </span>
       </div>
-      {badgeContent}
+      <div className="sm:hidden">{badgeContent}</div>
     </>
   );
 
@@ -184,6 +193,11 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
               <div className="mt-8 pl-24">
                 {rankingStatsContent}
               </div>
+            </div>
+          </div>
+          <div className="mt-4 hidden sm:block" style={{ marginLeft: 240 }}>
+            <div className="pl-24">
+              {badgeContent}
             </div>
           </div>
           <div className="block pl-2 text-left sm:hidden">
