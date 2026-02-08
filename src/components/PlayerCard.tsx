@@ -136,7 +136,6 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
           {" "}in {Math.round(player.totalMinutes)} minutes
         </span>
       </div>
-      {badgeContent}
     </div>
   );
 
@@ -177,50 +176,54 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
               {label}
             </div>
           )}
-          <div className="relative mx-auto h-[300px] w-full min-w-[300px] max-w-[300px] sm:mx-0 sm:max-w-none">
-            <a
-              href={player.profileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute left-0 top-0 h-[300px] w-[300px] overflow-hidden rounded-full"
-              aria-label={`View ${fullName} on NBA.com`}
-            >
-              <Image
-                src={player.imageUrl || '/placeholder-player.svg'}
-                alt={fullName}
-                fill
-                className="object-cover grayscale"
-              />
-            </a>
-            {rank != null && (
-              <div
-                className="absolute bottom-2 left-2 flex aspect-square min-w-[4.5rem] min-h-[4.5rem] items-center justify-center rounded-full p-2 sm:min-w-[5rem] sm:min-h-[5rem] sm:p-2.5"
-                style={teamColors ? { backgroundColor: teamColors.primary } : { backgroundColor: '#666' }}
+          <div
+            className="relative"
+            style={
+              {
+                '--photo-size': '300px',
+                '--photo-gap': '0rem',
+              } as React.CSSProperties
+            }
+          >
+            <div className="relative mx-auto h-[300px] w-full max-w-[300px] sm:absolute sm:left-0 sm:top-0 sm:h-[var(--photo-size)] sm:w-[var(--photo-size)]">
+              <a
+                href={player.profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute left-0 top-0 h-[300px] w-[300px] overflow-hidden rounded-full sm:h-[var(--photo-size)] sm:w-[var(--photo-size)]"
+                aria-label={`View ${fullName} on NBA.com`}
               >
-                <span
-                  className="font-serif text-[2.24rem] font-extrabold leading-none text-white sm:text-[2.72rem]"
-                  style={{ transform: 'translateY(0.06em)' }}
+                <Image
+                  src={player.imageUrl || '/placeholder-player.svg'}
+                  alt={fullName}
+                  fill
+                  className="object-cover grayscale"
+                />
+              </a>
+              {rank != null && (
+                <div
+                  className="absolute bottom-2 left-2 flex aspect-square min-w-[4.5rem] min-h-[4.5rem] items-center justify-center rounded-full p-2 sm:min-w-[5rem] sm:min-h-[5rem] sm:p-2.5"
+                  style={teamColors ? { backgroundColor: teamColors.primary } : { backgroundColor: '#666' }}
                 >
-                  #{rank}
-                </span>
+                  <span
+                    className="font-serif text-[2.24rem] font-extrabold leading-none text-white sm:text-[2.72rem]"
+                    style={{ transform: 'translateY(0.06em)' }}
+                  >
+                    #{rank}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="text-left pl-0 sm:pl-[calc(var(--photo-size)+var(--photo-gap)-1rem)] sm:pt-6">
+              <div className="mt-8 sm:pl-0 flex flex-col gap-1 sm:mt-0 sm:-ml-5">
+                {rankingNameBlock}
+                {rankingTeamBlock('pl-8')}
               </div>
-            )}
-            <div className="absolute left-[240px] right-4 top-4 hidden flex-col gap-1 text-left sm:flex">
-              {rankingNameBlock}
-              {rankingTeamBlock('pl-8')}
-              <div className="mt-8 pl-24">
+              <div className="mt-6 pl-8 sm:pl-14">
                 {rankingStatsContent}
+                {badgeContent && <div className="mt-6">{badgeContent}</div>}
               </div>
             </div>
-          </div>
-          <div className="block pl-2 text-left sm:hidden">
-            <div className="mt-3 flex flex-col gap-1">
-              {rankingNameBlock}
-              {rankingTeamBlock('')}
-            </div>
-          </div>
-          <div className="block sm:hidden mt-6 pl-2 text-left">
-            {rankingStatsContent}
           </div>
           <div className="note-card mt-8 sm:mt-12">
             <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
