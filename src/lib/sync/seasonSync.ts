@@ -2,6 +2,7 @@ import { format, startOfDay, subDays } from 'date-fns';
 import type { DbAdapter } from '@/lib/db/adapter';
 import type { GameRow, PlayerGameStatRow } from '@/lib/db/schema';
 import { buildTeamSeasonStats } from '@/lib/team-season-stats';
+import { computePositionTsSummary, POSITION_TS_ATTEMPT_CUTOFF } from '@/lib/position-ts';
 import { createTokenBucket } from './rateLimiter';
 import { fetchWithRetry } from './fetchWithRetry';
 import { logEvent } from './logger';
@@ -339,6 +340,50 @@ export async function runSeasonSync(options: SyncOptions) {
     const seasonGames = await options.db.getGamesForSeason(season);
     const teamStats = buildTeamSeasonStats(season, seasonGames, { now });
     await options.db.upsertTeamSeasonStats(teamStats);
+  }
+
+  if (!dryRun && updatedPlayers > 0) {
+    try {
+      const rows = await options.db.getSeasonTotalsWithPositions(season);
+      if (rows.length === 0) {
+        logEvent('info', 'position_ts_skipped', { season, reason: 'no_rows' });
+      } else {
+        const summary = computePositionTsSummary(rows, POSITION_TS_ATTEMPT_CUTOFF);
+        await options.db.upsertPositionTs([
+          {
+            season,
+            positionGroup: 'guard',
+            attemptCutoff: POSITION_TS_ATTEMPT_CUTOFF,
+            avgTs: summary.averages.guard ?? null,
+            playerCount: summary.counts.guard,
+            updatedAt: new Date(),
+          },
+          {
+            season,
+            positionGroup: 'wing',
+            attemptCutoff: POSITION_TS_ATTEMPT_CUTOFF,
+            avgTs: summary.averages.forward ?? null,
+            playerCount: summary.counts.forward,
+            updatedAt: new Date(),
+          },
+          {
+            season,
+            positionGroup: 'big',
+            attemptCutoff: POSITION_TS_ATTEMPT_CUTOFF,
+            avgTs: summary.averages.center ?? null,
+            playerCount: summary.counts.center,
+            updatedAt: new Date(),
+          },
+        ]);
+        logEvent('info', 'position_ts_updated', {
+          season,
+          cutoff: POSITION_TS_ATTEMPT_CUTOFF,
+          counts: summary.counts,
+        });
+      }
+    } catch (error: any) {
+      logEvent('error', 'position_ts_failed', { message: error?.message ?? String(error) });
+    }
   }
 
   const durationMs = Date.now() - startTime;

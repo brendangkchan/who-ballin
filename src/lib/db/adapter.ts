@@ -2,17 +2,22 @@ import { and, eq, gte, inArray, max, sql } from 'drizzle-orm';
 import type { NeonHttpDatabase } from 'drizzle-orm/neon-http';
 import {
   games,
+  players,
   playerGameStats,
   playerSeasonTotals,
+  positionTs,
   syncState,
   teamSeasonStats,
   type GameRow,
   type PlayerGameStatRow,
+  type PlayerRow,
+  type PositionTsRow,
   type TeamSeasonStatsRow,
 } from './schema';
 
 export type DbAdapter = {
   upsertGames: (rows: GameRow[]) => Promise<number>;
+  upsertPlayers: (rows: PlayerRow[]) => Promise<number>;
   upsertPlayerGameStats: (rows: PlayerGameStatRow[]) => Promise<number>;
   getMaxSeasonInRecentGames: (sinceDate: Date) => Promise<number | null>;
   getLastGameDateForSeason: (season: number) => Promise<Date | null>;
@@ -94,6 +99,21 @@ export type DbAdapter = {
   }) => Promise<void>;
   updateSeasonTotalsForPlayers: (season: number, playerIds: number[]) => Promise<number>;
   rebuildSeasonTotals: (season: number) => Promise<number>;
+  getSeasonTotalsWithPositions: (season: number) => Promise<{
+    playerId: number;
+    pts: number;
+    fga: number;
+    fta: number;
+    position: string | null;
+  }[]>;
+  getPositionTsForSeason: (season: number) => Promise<{
+    season: number;
+    positionGroup: string;
+    attemptCutoff: number;
+    avgTs: number | null;
+    playerCount: number;
+  }[]>;
+  upsertPositionTs: (rows: PositionTsRow[]) => Promise<number>;
   getSyncState: (key: string) => Promise<unknown | null>;
   upsertSyncState: (key: string, value: unknown) => Promise<void>;
   getGamesForSeason: (season: number) => Promise<GameRow[]>;
@@ -117,6 +137,22 @@ export function createDbAdapter(db: NeonHttpDatabase<Record<string, never>>): Db
             visitorTeamId: sql`excluded.visitor_team_id`,
             homeTeamScore: sql`excluded.home_team_score`,
             visitorTeamScore: sql`excluded.visitor_team_score`,
+          },
+        });
+      return rows.length;
+    },
+    async upsertPlayers(rows) {
+      if (rows.length === 0) return 0;
+      await db
+        .insert(players)
+        .values(rows)
+        .onConflictDoUpdate({
+          target: players.id,
+          set: {
+            firstName: sql`excluded.first_name`,
+            lastName: sql`excluded.last_name`,
+            position: sql`excluded.position`,
+            updatedAt: sql`excluded.updated_at`,
           },
         });
       return rows.length;
@@ -412,6 +448,47 @@ export function createDbAdapter(db: NeonHttpDatabase<Record<string, never>>): Db
           },
         });
 
+      return rows.length;
+    },
+    async getSeasonTotalsWithPositions(season) {
+      return db
+        .select({
+          playerId: playerSeasonTotals.playerId,
+          pts: playerSeasonTotals.pts,
+          fga: playerSeasonTotals.fga,
+          fta: playerSeasonTotals.fta,
+          position: players.position,
+        })
+        .from(playerSeasonTotals)
+        .leftJoin(players, eq(players.id, playerSeasonTotals.playerId))
+        .where(eq(playerSeasonTotals.season, season));
+    },
+    async getPositionTsForSeason(season) {
+      return db
+        .select({
+          season: positionTs.season,
+          positionGroup: positionTs.positionGroup,
+          attemptCutoff: positionTs.attemptCutoff,
+          avgTs: positionTs.avgTs,
+          playerCount: positionTs.playerCount,
+        })
+        .from(positionTs)
+        .where(eq(positionTs.season, season));
+    },
+    async upsertPositionTs(rows) {
+      if (rows.length === 0) return 0;
+      await db
+        .insert(positionTs)
+        .values(rows)
+        .onConflictDoUpdate({
+          target: [positionTs.season, positionTs.positionGroup],
+          set: {
+            attemptCutoff: sql`excluded.attempt_cutoff`,
+            avgTs: sql`excluded.avg_ts`,
+            playerCount: sql`excluded.player_count`,
+            updatedAt: sql`excluded.updated_at`,
+          },
+        });
       return rows.length;
     },
     async getSyncState(key) {

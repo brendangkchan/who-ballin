@@ -10,7 +10,7 @@ import { createDbAdapter } from '@/lib/db/adapter';
 import { getSeasonForSync } from '@/lib/sync/seasonSync';
 import { buildSeasonStats, buildDeltaStats, type SeasonTotalsRow } from '@/lib/season-stats';
 import { calculatePERFromTotals } from '@/lib/per';
-import { calculatePositionTsAverages } from '@/lib/position-utils';
+import { computePositionTsSummary, POSITION_TS_ATTEMPT_CUTOFF } from '@/lib/position-ts';
 
 export const revalidate = 3600;
 
@@ -226,10 +226,69 @@ export async function GET(request: NextRequest) {
     });
     console.debug('[top-week] qualifying filters (win % / +/-):', beforeQualifying, '->', filtered.length);
 
-    // Step 8: Sort by adjusted PER (fallback to simplified)
+    // Step 8: Load season-based position TS averages (DB-backed)
+    const adapter = createDbAdapter(getDb());
+    const season = await getSeasonForSync(adapter, new Date());
+    let positionAverages;
+
     try {
-      const adapter = createDbAdapter(getDb());
-      const season = await getSeasonForSync(adapter, new Date());
+      const cached = await adapter.getPositionTsForSeason(season);
+      const guard = cached.find(row => row.positionGroup === 'guard');
+      const wing = cached.find(row => row.positionGroup === 'wing');
+      const big = cached.find(row => row.positionGroup === 'big');
+      const attemptCutoff =
+        guard?.attemptCutoff ?? wing?.attemptCutoff ?? big?.attemptCutoff ?? POSITION_TS_ATTEMPT_CUTOFF;
+
+      if (cached.length === 3 && [guard, wing, big].every(Boolean) && attemptCutoff === POSITION_TS_ATTEMPT_CUTOFF) {
+        positionAverages = {
+          attemptCutoff,
+          counts: {
+            guard: guard?.playerCount ?? 0,
+            forward: wing?.playerCount ?? 0,
+            center: big?.playerCount ?? 0,
+          },
+          averages: {
+            guard: guard?.avgTs ?? undefined,
+            forward: wing?.avgTs ?? undefined,
+            center: big?.avgTs ?? undefined,
+          },
+        };
+      } else {
+        const rows = await adapter.getSeasonTotalsWithPositions(season);
+        positionAverages = computePositionTsSummary(rows, POSITION_TS_ATTEMPT_CUTOFF);
+        await adapter.upsertPositionTs([
+          {
+            season,
+            positionGroup: 'guard',
+            attemptCutoff: POSITION_TS_ATTEMPT_CUTOFF,
+            avgTs: positionAverages.averages.guard ?? null,
+            playerCount: positionAverages.counts.guard,
+            updatedAt: new Date(),
+          },
+          {
+            season,
+            positionGroup: 'wing',
+            attemptCutoff: POSITION_TS_ATTEMPT_CUTOFF,
+            avgTs: positionAverages.averages.forward ?? null,
+            playerCount: positionAverages.counts.forward,
+            updatedAt: new Date(),
+          },
+          {
+            season,
+            positionGroup: 'big',
+            attemptCutoff: POSITION_TS_ATTEMPT_CUTOFF,
+            avgTs: positionAverages.averages.center ?? null,
+            playerCount: positionAverages.counts.center,
+            updatedAt: new Date(),
+          },
+        ]);
+      }
+    } catch (error: any) {
+      debugInfo.warnings.push(`Failed to load position TS averages: ${error?.message ?? error}`);
+    }
+
+    // Step 9: Sort by adjusted PER (fallback to simplified)
+    try {
       const cachedLeagueTotals = await adapter.getCachedLeagueTotals(season);
       const leagueTotals =
         cachedLeagueTotals ?? (await adapter.getSeasonLeagueTotals(season));
@@ -264,15 +323,12 @@ export async function GET(request: NextRequest) {
 
     filtered.sort((a, b) => (b.perAdjusted ?? b.per) - (a.perAdjusted ?? a.per));
 
-    // Step 9: Limit to top 10
-    const positionAverages = calculatePositionTsAverages(playerWeekStats);
+    // Step 10: Limit to top 10
     const players = filtered.slice(0, 10);
 
-    // Step 10: Attach season averages and deltas
+    // Step 11: Attach season averages and deltas
     if (players.length > 0) {
       try {
-        const adapter = createDbAdapter(getDb());
-        const season = await getSeasonForSync(adapter, new Date());
         const playerIds = players.map(p => p.player.id);
         const seasonRows = await adapter.getSeasonTotalsForPlayers(season, playerIds);
         const byPlayerId = new Map<number, SeasonTotalsRow>();

@@ -55,40 +55,6 @@ export interface PositionTsSummary {
   attemptCutoff: number;
 }
 
-export function calculatePositionTsAverages(players: PlayerWeekStats[]): PositionTsSummary {
-  const attemptCutoff = 15;
-  const totals: Record<PositionCategory, { sum: number; count: number }> = {
-    guard: { sum: 0, count: 0 },
-    forward: { sum: 0, count: 0 },
-    center: { sum: 0, count: 0 },
-  };
-
-  for (const p of players) {
-    if (!Number.isFinite(p.ts)) continue;
-    if (p.totalFga + p.totalFta <= attemptCutoff) continue;
-    const cats = getPositionCategories(p.player.position);
-    if (cats.length === 0) continue;
-    for (const cat of cats) {
-      totals[cat].sum += p.ts;
-      totals[cat].count += 1;
-    }
-  }
-
-  return {
-    attemptCutoff,
-    counts: {
-      guard: totals.guard.count,
-      forward: totals.forward.count,
-      center: totals.center.count,
-    },
-    averages: {
-      guard: totals.guard.count > 0 ? totals.guard.sum / totals.guard.count : undefined,
-      forward: totals.forward.count > 0 ? totals.forward.sum / totals.forward.count : undefined,
-      center: totals.center.count > 0 ? totals.center.sum / totals.center.count : undefined,
-    },
-  };
-}
-
 /**
  * Picks the best player (by PER) in each position category.
  * Hybrids slot into the category that opens the other (G-F/F-G → Forward, F-C/C-F → Center).

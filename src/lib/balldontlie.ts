@@ -2,23 +2,24 @@ const API_BASE = 'https://api.balldontlie.io';
 const API_KEY = process.env.BALLDONTLIE_API_KEY;
 
 /**
- * Calculate the NBA season year (balldontlie uses the season START year).
+ * Calculate the NBA season year (canonical end year).
  * NBA seasons run from October to June.
- * - Oct-Dec: Season starts this year (currentYear)
- * - Jan-Jun: Season started last year (currentYear - 1)
- * - Jul-Sep: Off-season, use last season's start year (currentYear - 1)
+ * - Oct-Dec: Season ends next year (currentYear + 1)
+ * - Jan-Jun: Season ends this year (currentYear)
+ * - Jul-Sep: Off-season, use current year (season that just ended)
  */
 export function getCurrentNBASeason(): number {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1; // 1-12
 
-    // October (10) through December (12): season starts this year
+    // October (10) through December (12): season ends next year
     if (month >= 10) {
-        return year;
+        return year + 1;
     }
-    // January (1) through September (9): season started last year
-    return year - 1;
+    // January (1) through June (6): season ends this year
+    // July (7) through September (9): off-season, use current year
+    return year;
 }
 
 function getHeaders(): HeadersInit {
@@ -60,27 +61,28 @@ export async function getLastCompletedGame(
     season?: number
 ): Promise<any | null> {
     try {
-        const currentSeason = season || getCurrentNBASeason();
-        console.debug(`[balldontlie] getLastCompletedGame: looking in season ${currentSeason}`);
+        const currentSeasonEndYear = season || getCurrentNBASeason();
+        const currentSeasonStartYear = currentSeasonEndYear - 1;
+        console.debug(`[balldontlie] getLastCompletedGame: looking in season ${currentSeasonStartYear}`);
 
         // Try current season first
-        let url = `${API_BASE}/nba/v1/games?seasons[]=${currentSeason}&status=Final&per_page=100`;
+        let url = `${API_BASE}/nba/v1/games?seasons[]=${currentSeasonStartYear}&status=Final&per_page=100`;
         const start = Date.now();
         let response = await fetch(url, {
             headers: getHeaders(),
         });
-        console.debug(`[balldontlie] getLastCompletedGame season ${currentSeason}: ${response.status} in ${Date.now() - start}ms`);
+        console.debug(`[balldontlie] getLastCompletedGame season ${currentSeasonStartYear}: ${response.status} in ${Date.now() - start}ms`);
 
         if (!response.ok) {
             console.error(`Failed to fetch last game: ${response.status} ${response.statusText}`);
             // Try previous season as fallback
-            const previousSeason = currentSeason - 1;
-            console.debug(`[balldontlie] getLastCompletedGame: trying previous season ${previousSeason}`);
-            url = `${API_BASE}/nba/v1/games?seasons[]=${previousSeason}&status=Final&per_page=100`;
+            const previousSeasonStartYear = currentSeasonStartYear - 1;
+            console.debug(`[balldontlie] getLastCompletedGame: trying previous season ${previousSeasonStartYear}`);
+            url = `${API_BASE}/nba/v1/games?seasons[]=${previousSeasonStartYear}&status=Final&per_page=100`;
             response = await fetch(url, {
                 headers: getHeaders(),
             });
-            console.debug(`[balldontlie] getLastCompletedGame season ${previousSeason}: ${response.status} in ${Date.now() - start}ms`);
+            console.debug(`[balldontlie] getLastCompletedGame season ${previousSeasonStartYear}: ${response.status} in ${Date.now() - start}ms`);
 
             if (!response.ok) {
                 console.error(`Failed to fetch last game from previous season: ${response.status}`);
@@ -97,7 +99,7 @@ export async function getLastCompletedGame(
             console.debug(`[balldontlie] getLastCompletedGame: found ${sortedGames[0].date}`);
             return sortedGames[0];
         }
-        console.debug(`[balldontlie] getLastCompletedGame: no completed games in season ${currentSeason}`);
+        console.debug(`[balldontlie] getLastCompletedGame: no completed games in season ${currentSeasonStartYear}`);
         return null;
     } catch (error: any) {
         console.error('Error in getLastCompletedGame:', error);

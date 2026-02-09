@@ -121,7 +121,7 @@ export default async function Home({
             </div>
             {positionAverages && (
               <div className="mb-6 rounded border border-foreground/10 bg-panel-tint/70 px-4 py-3 text-sm text-foreground-muted">
-                Position TS averages (all players, FGA + FTA &gt; {attemptCutoff}): Guard {averages?.guard?.toFixed(1) ?? '—'}% ({counts.guard}), Forward {averages?.forward?.toFixed(1) ?? '—'}% ({counts.forward}), Center {averages?.center?.toFixed(1) ?? '—'}% ({counts.center})
+                Position TS averages (all players, FGA + FTA &gt; {attemptCutoff}): Guard {averages?.guard?.toFixed(1) ?? '—'}% ({counts.guard}), Wing {averages?.forward?.toFixed(1) ?? '—'}% ({counts.forward}), Big {averages?.center?.toFixed(1) ?? '—'}% ({counts.center})
               </div>
             )}
             <div className="flex items-center gap-3">

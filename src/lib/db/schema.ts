@@ -91,6 +91,29 @@ export const syncState = pgTable('sync_state', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
 });
 
+export const players = pgTable('players', {
+  id: integer('id').primaryKey(),
+  firstName: text('first_name').notNull(),
+  lastName: text('last_name').notNull(),
+  position: text('position'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+});
+
+export const positionTs = pgTable(
+  'position_ts',
+  {
+    season: integer('season').notNull(),
+    positionGroup: text('position_group').notNull(),
+    attemptCutoff: integer('attempt_cutoff').notNull(),
+    avgTs: doublePrecision('avg_ts'),
+    playerCount: integer('player_count').notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  },
+  table => ({
+    pk: primaryKey({ columns: [table.season, table.positionGroup] }),
+  })
+);
+
 export const teamSeasonStats = pgTable(
   'team_season_stats',
   {
@@ -115,5 +138,7 @@ export const teamSeasonStats = pgTable(
 
 export type GameRow = typeof games.$inferInsert;
 export type PlayerGameStatRow = typeof playerGameStats.$inferInsert;
+export type PlayerRow = typeof players.$inferInsert;
 export type PlayerSeasonTotalsRow = typeof playerSeasonTotals.$inferInsert;
+export type PositionTsRow = typeof positionTs.$inferInsert;
 export type TeamSeasonStatsRow = typeof teamSeasonStats.$inferInsert;

@@ -41,6 +41,15 @@ describe('runSeasonSync', () => {
       rebuildSeasonTotals: vi.fn(async () => 0),
       getSyncState: vi.fn(async () => null),
       upsertSyncState: vi.fn(async () => undefined),
+      getSeasonLeagueTotals: vi.fn(async () => null),
+      getCachedLeagueTotals: vi.fn(async () => null),
+      setCachedLeagueTotals: vi.fn(async () => undefined),
+      getSeasonTotalsForPlayers: vi.fn(async () => []),
+      getGamesForSeason: vi.fn(async () => []),
+      upsertTeamSeasonStats: vi.fn(async () => 0),
+      getSeasonTotalsWithPositions: vi.fn(async () => []),
+      getPositionTsForSeason: vi.fn(async () => []),
+      upsertPositionTs: vi.fn(async () => 0),
     };
 
     const fetchMock = vi.fn(async (url: string) => {
@@ -102,5 +111,249 @@ describe('runSeasonSync', () => {
     expect(result.games).toBe(1);
     expect(result.stats).toBe(1);
     expect(mockDb.upsertSyncState).toHaveBeenCalled();
+  });
+
+  it('skips position TS upsert when no season totals with positions', async () => {
+    const mockDb: DbAdapter = {
+      upsertGames: vi.fn(async () => 1),
+      upsertPlayerGameStats: vi.fn(async () => 1),
+      getMaxSeasonInRecentGames: vi.fn(async () => 2026),
+      getLastGameDateForSeason: vi.fn(async () => null),
+      updateSeasonTotalsForPlayers: vi.fn(async () => 0),
+      rebuildSeasonTotals: vi.fn(async () => 0),
+      getSyncState: vi.fn(async () => null),
+      upsertSyncState: vi.fn(async () => undefined),
+      getSeasonLeagueTotals: vi.fn(async () => null),
+      getCachedLeagueTotals: vi.fn(async () => null),
+      setCachedLeagueTotals: vi.fn(async () => undefined),
+      getSeasonTotalsForPlayers: vi.fn(async () => []),
+      getGamesForSeason: vi.fn(async () => []),
+      upsertTeamSeasonStats: vi.fn(async () => 0),
+      getSeasonTotalsWithPositions: vi.fn(async () => []),
+      getPositionTsForSeason: vi.fn(async () => []),
+      upsertPositionTs: vi.fn(async () => 0),
+    };
+
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url.includes('/games?')) {
+        return new Response(
+          JSON.stringify({
+            data: [
+              {
+                id: 1,
+                date: '2026-02-05T00:00:00Z',
+                season: 2026,
+                status: 'Final',
+                home_team: { id: 10 },
+                visitor_team: { id: 20 },
+                home_team_score: 110,
+                visitor_team_score: 100,
+              },
+            ],
+            meta: { next_cursor: null },
+          }),
+          { status: 200 }
+        );
+      }
+      if (url.includes('/stats?')) {
+        return new Response(
+          JSON.stringify({
+            data: [
+              {
+                id: 99,
+                game: { id: 1, date: '2026-02-05T00:00:00Z' },
+                player: { id: 5 },
+                team: { id: 10 },
+                pts: 25,
+                reb: 8,
+                ast: 6,
+                min: '32:10',
+              },
+            ],
+            meta: { next_cursor: null },
+          }),
+          { status: 200 }
+        );
+      }
+      throw new Error(`unexpected url ${url}`);
+    });
+
+    const originalFetch = globalThis.fetch;
+    // @ts-expect-error - mock
+    globalThis.fetch = fetchMock;
+
+    await runSeasonSync({
+      db: mockDb,
+      dryRun: false,
+      now: new Date('2026-02-07T08:00:00Z'),
+    });
+
+    globalThis.fetch = originalFetch;
+
+    expect(mockDb.upsertPositionTs).not.toHaveBeenCalled();
+  });
+
+  it('skips position TS upsert when no season totals were updated', async () => {
+    const mockDb: DbAdapter = {
+      upsertGames: vi.fn(async () => 1),
+      upsertPlayerGameStats: vi.fn(async () => 1),
+      getMaxSeasonInRecentGames: vi.fn(async () => 2026),
+      getLastGameDateForSeason: vi.fn(async () => null),
+      updateSeasonTotalsForPlayers: vi.fn(async () => 0),
+      rebuildSeasonTotals: vi.fn(async () => 0),
+      getSyncState: vi.fn(async () => null),
+      upsertSyncState: vi.fn(async () => undefined),
+      getSeasonLeagueTotals: vi.fn(async () => null),
+      getCachedLeagueTotals: vi.fn(async () => null),
+      setCachedLeagueTotals: vi.fn(async () => undefined),
+      getSeasonTotalsForPlayers: vi.fn(async () => []),
+      getGamesForSeason: vi.fn(async () => []),
+      upsertTeamSeasonStats: vi.fn(async () => 0),
+      getSeasonTotalsWithPositions: vi.fn(async () => [
+        { playerId: 1, pts: 100, fga: 80, fta: 20, position: 'G' },
+      ]),
+      getPositionTsForSeason: vi.fn(async () => []),
+      upsertPositionTs: vi.fn(async () => 0),
+    };
+
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url.includes('/games?')) {
+        return new Response(
+          JSON.stringify({
+            data: [
+              {
+                id: 1,
+                date: '2026-02-05T00:00:00Z',
+                season: 2026,
+                status: 'Final',
+                home_team: { id: 10 },
+                visitor_team: { id: 20 },
+                home_team_score: 110,
+                visitor_team_score: 100,
+              },
+            ],
+            meta: { next_cursor: null },
+          }),
+          { status: 200 }
+        );
+      }
+      if (url.includes('/stats?')) {
+        return new Response(
+          JSON.stringify({
+            data: [
+              {
+                id: 99,
+                game: { id: 1, date: '2026-02-05T00:00:00Z' },
+                player: { id: 5 },
+                team: { id: 10 },
+                pts: 25,
+                reb: 8,
+                ast: 6,
+                min: '32:10',
+              },
+            ],
+            meta: { next_cursor: null },
+          }),
+          { status: 200 }
+        );
+      }
+      throw new Error(`unexpected url ${url}`);
+    });
+
+    const originalFetch = globalThis.fetch;
+    // @ts-expect-error - mock
+    globalThis.fetch = fetchMock;
+
+    await runSeasonSync({
+      db: mockDb,
+      dryRun: false,
+      now: new Date('2026-02-07T08:00:00Z'),
+    });
+
+    globalThis.fetch = originalFetch;
+
+    expect(mockDb.upsertPositionTs).not.toHaveBeenCalled();
+  });
+
+  it('updates position TS when season totals change', async () => {
+    const mockDb: DbAdapter = {
+      upsertGames: vi.fn(async () => 1),
+      upsertPlayerGameStats: vi.fn(async () => 1),
+      getMaxSeasonInRecentGames: vi.fn(async () => 2026),
+      getLastGameDateForSeason: vi.fn(async () => null),
+      updateSeasonTotalsForPlayers: vi.fn(async () => 2),
+      rebuildSeasonTotals: vi.fn(async () => 0),
+      getSyncState: vi.fn(async () => null),
+      upsertSyncState: vi.fn(async () => undefined),
+      getSeasonLeagueTotals: vi.fn(async () => null),
+      getCachedLeagueTotals: vi.fn(async () => null),
+      setCachedLeagueTotals: vi.fn(async () => undefined),
+      getSeasonTotalsForPlayers: vi.fn(async () => []),
+      getGamesForSeason: vi.fn(async () => []),
+      upsertTeamSeasonStats: vi.fn(async () => 0),
+      getSeasonTotalsWithPositions: vi.fn(async () => [
+        { playerId: 1, pts: 100, fga: 80, fta: 20, position: 'G' },
+      ]),
+      getPositionTsForSeason: vi.fn(async () => []),
+      upsertPositionTs: vi.fn(async () => 0),
+    };
+
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url.includes('/games?')) {
+        return new Response(
+          JSON.stringify({
+            data: [
+              {
+                id: 1,
+                date: '2026-02-05T00:00:00Z',
+                season: 2026,
+                status: 'Final',
+                home_team: { id: 10 },
+                visitor_team: { id: 20 },
+                home_team_score: 110,
+                visitor_team_score: 100,
+              },
+            ],
+            meta: { next_cursor: null },
+          }),
+          { status: 200 }
+        );
+      }
+      if (url.includes('/stats?')) {
+        return new Response(
+          JSON.stringify({
+            data: [
+              {
+                id: 99,
+                game: { id: 1, date: '2026-02-05T00:00:00Z' },
+                player: { id: 5 },
+                team: { id: 10 },
+                pts: 25,
+                reb: 8,
+                ast: 6,
+                min: '32:10',
+              },
+            ],
+            meta: { next_cursor: null },
+          }),
+          { status: 200 }
+        );
+      }
+      throw new Error(`unexpected url ${url}`);
+    });
+
+    const originalFetch = globalThis.fetch;
+    // @ts-expect-error - mock
+    globalThis.fetch = fetchMock;
+
+    await runSeasonSync({
+      db: mockDb,
+      dryRun: false,
+      now: new Date('2026-02-07T08:00:00Z'),
+    });
+
+    globalThis.fetch = originalFetch;
+
+    expect(mockDb.upsertPositionTs).toHaveBeenCalled();
   });
 });

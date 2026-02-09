@@ -15,6 +15,9 @@ const mockAdapter = {
   getSeasonLeagueTotals: vi.fn(async () => null),
   setCachedLeagueTotals: vi.fn(async () => undefined),
   getSeasonTotalsForPlayers: vi.fn(async () => []),
+  getPositionTsForSeason: vi.fn(async () => []),
+  getSeasonTotalsWithPositions: vi.fn(async () => []),
+  upsertPositionTs: vi.fn(async () => 0),
 };
 
 vi.mock('@/lib/db/adapter', () => ({
