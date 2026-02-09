@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { getDb } from '@/lib/db/client';
 import { createDbAdapter } from '@/lib/db/adapter';
 import { runSeasonSync } from '@/lib/sync/seasonSync';
@@ -21,6 +22,9 @@ export async function GET(request: Request) {
   try {
     const adapter = createDbAdapter(getDb());
     const result = await runSeasonSync({ db: adapter });
+    revalidateTag('top-week', 'max');
+    revalidatePath('/');
+    revalidatePath('/by-position');
     return NextResponse.json({ ok: true, ...result });
   } catch (error: any) {
     logEvent('error', 'cron_sync_failed', {

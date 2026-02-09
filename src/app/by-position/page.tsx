@@ -8,22 +8,10 @@ import { parseFilters, DEFAULT_MIN_GAMES, DEFAULT_MIN_PTS, DEFAULT_MIN_MINUTES }
 import { pickBestByPosition, type PositionTsSummary } from '@/lib/position-utils';
 import type { PlayerWeekStats, DebugInfo } from '@/types/player';
 import type { PlayerFilters } from '@/lib/filters';
+import { getTopWeekPlayers } from '@/lib/top-week';
 
 async function getTopPlayers(filters: PlayerFilters) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const params = new URLSearchParams();
-  params.set('minGames', String(filters.minGames));
-  params.set('minPts', String(filters.minPts));
-  params.set('minMinutes', String(filters.minMinutes));
-  const res = await fetch(`${baseUrl}/api/players/top-week?${params.toString()}`, {
-    next: { revalidate: 3600 },
-  });
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch players');
-  }
-
-  return res.json() as Promise<{
+  return getTopWeekPlayers(filters) as Promise<{
     players: PlayerWeekStats[];
     positionAverages?: PositionTsSummary;
     debug?: DebugInfo;
