@@ -2,24 +2,23 @@ const API_BASE = 'https://api.balldontlie.io';
 const API_KEY = process.env.BALLDONTLIE_API_KEY;
 
 /**
- * Calculate the NBA season year (season is named after the year it ends in)
- * NBA seasons run from October to June
- * - Oct-Dec: Season ends next year (currentYear + 1)
- * - Jan-Jun: Season ends this year (currentYear)
- * - Jul-Sep: Off-season, use current year (season that just ended)
+ * Calculate the NBA season year (balldontlie uses the season START year).
+ * NBA seasons run from October to June.
+ * - Oct-Dec: Season starts this year (currentYear)
+ * - Jan-Jun: Season started last year (currentYear - 1)
+ * - Jul-Sep: Off-season, use last season's start year (currentYear - 1)
  */
 export function getCurrentNBASeason(): number {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1; // 1-12
 
-    // October (10) through December (12): season ends next year
+    // October (10) through December (12): season starts this year
     if (month >= 10) {
-        return year + 1;
+        return year;
     }
-    // January (1) through June (6): season ends this year
-    // July (7) through September (9): off-season, use current year
-    return year;
+    // January (1) through September (9): season started last year
+    return year - 1;
 }
 
 function getHeaders(): HeadersInit {
