@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
-import { subDays, format } from 'date-fns';
+import { subDays, format, differenceInDays } from 'date-fns';
 import { getAllGames, getLastCompletedGame, getAllStatsForGames, getCurrentNBASeason } from '@/lib/balldontlie';
 import { aggregatePlayerStats } from '@/lib/utils';
 import { parseFilters } from '@/lib/filters';
@@ -10,6 +10,7 @@ import { createDbAdapter } from '@/lib/db/adapter';
 import { getSeasonForSync } from '@/lib/sync/seasonSync';
 import { buildSeasonStats, buildDeltaStats, type SeasonTotalsRow } from '@/lib/season-stats';
 import { calculatePERFromTotals } from '@/lib/per';
+import { calculatePositionTsAverages } from '@/lib/position-utils';
 
 export const revalidate = 3600;
 
@@ -119,6 +120,12 @@ export async function GET(request: NextRequest) {
         const lastGame = await getLastCompletedGame();
         if (lastGame) {
           const fallbackEnd = new Date(lastGame.date);
+          const daysSinceLastGame = differenceInDays(new Date(), fallbackEnd);
+          if (daysSinceLastGame > 30) {
+            debugInfo.warnings.push(
+              `Fallback skipped: last completed game is ${daysSinceLastGame} days old`
+            );
+          } else {
           const fallbackStart = subDays(fallbackEnd, 7);
           activeStart = format(fallbackStart, 'yyyy-MM-dd');
           activeEnd = format(fallbackEnd, 'yyyy-MM-dd');
@@ -129,6 +136,7 @@ export async function GET(request: NextRequest) {
           games = await getCachedGames(activeStart, activeEnd);
           debugInfo.gamesProcessed = games.length;
           console.debug('[top-week] fallback games:', games.length);
+          }
         }
       } catch (error: any) {
         debugInfo.errors.push(`Fallback failed: ${error.message}`);
@@ -257,6 +265,7 @@ export async function GET(request: NextRequest) {
     filtered.sort((a, b) => (b.perAdjusted ?? b.per) - (a.perAdjusted ?? a.per));
 
     // Step 9: Limit to top 10
+    const positionAverages = calculatePositionTsAverages(playerWeekStats);
     const players = filtered.slice(0, 10);
 
     // Step 10: Attach season averages and deltas
@@ -286,6 +295,7 @@ export async function GET(request: NextRequest) {
 
     const response = {
       players,
+      positionAverages,
       generatedAt: new Date().toISOString(),
       ...(process.env.NODE_ENV === 'development' && { debug: debugInfo }),
     };

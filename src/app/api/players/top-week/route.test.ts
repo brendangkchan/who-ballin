@@ -205,9 +205,12 @@ describe('GET /api/players/top-week', () => {
   });
 
   it('uses fallback date range when no games in primary range', async () => {
-    const fallbackGame = createGame({ id: 1, date: '2025-06-10' });
+    const now = new Date();
+    const recentFallback = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const recentDate = recentFallback.toISOString().slice(0, 10);
+    const fallbackGame = createGame({ id: 1, date: recentDate });
     const stat = createGameStats({
-      game: { id: 1, date: '2025-06-10' },
+      game: { id: 1, date: recentDate },
       player: { id: 100, first_name: 'LeBron', last_name: 'James' },
       team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
       pts: 25,
@@ -220,7 +223,7 @@ describe('GET /api/players/top-week', () => {
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([fallbackGame])
       .mockResolvedValue([fallbackGame]);
-    vi.mocked(getLastCompletedGame).mockResolvedValue({ date: '2025-06-10' });
+    vi.mocked(getLastCompletedGame).mockResolvedValue({ date: recentDate });
     vi.mocked(getAllStatsForGames).mockResolvedValue([stat]);
 
     const req = createRequest('http://localhost/api/players/top-week?minGames=1&minPts=1&minMinutes=1');
