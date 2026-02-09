@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import type { PlayerWeekStats } from '@/types/player';
 import { getTeamColors } from '@/lib/nba-team-colors';
+import { getPositionCategory, type PositionTsSummary } from '@/lib/position-utils';
 import { getNbaPlayerId } from '@/lib/utils';
 import NoteCardBorder from '@/components/NoteCardBorder';
 
@@ -8,6 +9,7 @@ interface PlayerCardProps {
   player: PlayerWeekStats;
   rank?: number;
   label?: string;
+  positionAverages?: PositionTsSummary;
 }
 
 function getTeamGrade(
@@ -27,7 +29,7 @@ function getTeamGrade(
   return { letter: 'F', colorClass: 'text-rose-700 dark:text-rose-600' };
 }
 
-export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
+export default function PlayerCard({ player, rank, label, positionAverages }: PlayerCardProps) {
   const fullName = `${player.player.first_name} ${player.player.last_name}`;
   const teamName = player.player.team
     ? `${player.player.team.city} ${player.player.team.name}`
@@ -45,8 +47,38 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
     seasonPts != null && seasonPts > 0 ? player.pts - seasonPts : null;
   const showHotHand =
     seasonPts != null && seasonPts > 0 && player.pts >= seasonPts * 1.25;
+  const positionCategory = getPositionCategory(player.player.position);
+  const rawPosition = player.player.position?.trim().toUpperCase();
+  const positionLabel =
+    rawPosition === 'G'
+      ? 'guard'
+      : rawPosition === 'F' || rawPosition === 'G-F' || rawPosition === 'F-G'
+        ? 'wing'
+        : rawPosition === 'C' || rawPosition === 'F-C' || rawPosition === 'C-F'
+          ? 'big'
+          : 'player';
+  const averageCategory =
+    rawPosition === 'F' || rawPosition === 'G-F' || rawPosition === 'F-G'
+      ? 'forward'
+      : rawPosition === 'C' || rawPosition === 'F-C' || rawPosition === 'C-F'
+      ? 'center'
+      : positionCategory;
+  const positionAverageTs = averageCategory ? positionAverages?.averages?.[averageCategory] ?? null : null;
   const tsDelta = seasonTs != null ? player.ts - seasonTs : null;
-  const showTsHotHand = seasonTs != null && player.ts >= seasonTs + 10;
+  const showTsHotHand =
+    seasonTs != null && player.ts - seasonTs >= 5 && player.ts >= 60;
+  const ultraEfficientDelta =
+    positionAverageTs != null ? player.ts - positionAverageTs : null;
+  const ultraEfficientDeltaText =
+    ultraEfficientDelta != null ? ultraEfficientDelta.toFixed(1) : '0.0';
+  const showUltraEfficient =
+    !showTsHotHand &&
+    player.pts >= 15 &&
+    player.ts >= 65 &&
+    averageCategory != null &&
+    positionAverageTs != null &&
+    ultraEfficientDelta != null &&
+    ultraEfficientDelta >= 0;
   const astDelta =
     seasonAst != null && seasonAst > 0 ? player.ast - seasonAst : null;
   const showMakingPlays = astDelta != null && astDelta > 2;
@@ -57,7 +89,7 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
   const threesPerGame = player.games > 0 ? player.totalFg3m / player.games : 0;
   const showSniper = threesPerGame > 3;
 
-  const badgeContent = showHotHand || showTsHotHand || showMakingPlays || showBoardMan || showSniper ? (
+  const badgeContent = showHotHand || showTsHotHand || showUltraEfficient || showMakingPlays || showBoardMan || showSniper ? (
     <div className="mt-4 inline-block bg-accent/20 px-3 py-2 text-[clamp(0.75rem,0.35vw+0.7rem,0.82rem)]">
       <div className="text-foreground-muted uppercase tracking-[0.2em] text-[0.6rem]">
         Highlights
@@ -68,14 +100,6 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
             <span className="font-semibold text-foreground">Getting Buckets</span>
             <span className="font-semibold text-positive">
               <span className="text-[0.6rem] align-baseline">▲</span> {hotHandDelta?.toFixed(1)} pts
-            </span>
-          </div>
-        )}
-        {showTsHotHand && (
-          <div className="flex items-baseline gap-2">
-            <span className="font-semibold text-foreground">Hot Hand</span>
-            <span className="font-semibold text-positive">
-              <span className="text-[0.6rem] align-baseline">▲</span> {tsDelta?.toFixed(1)}% TS
             </span>
           </div>
         )}
@@ -100,6 +124,22 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
             <span className="font-semibold text-foreground">Sniper</span>
             <span className="font-semibold text-positive">
               {player.totalFg3m.toFixed(0)} 3s
+            </span>
+          </div>
+        )}
+        {showTsHotHand && (
+          <div className="flex items-baseline gap-2">
+            <span className="font-semibold text-foreground">Hot Hand</span>
+            <span className="font-semibold text-positive">
+              <span className="text-[0.6rem] align-baseline">▲</span> {tsDelta?.toFixed(1)}% TS
+            </span>
+          </div>
+        )}
+        {showUltraEfficient && (
+          <div className="flex items-baseline gap-2">
+            <span className="font-semibold text-foreground">Ultra Efficient</span>
+            <span className="font-semibold text-positive">
+              <span className="text-[0.6rem] align-baseline">▲</span> {ultraEfficientDeltaText}% TS relative to avg {positionLabel}
             </span>
           </div>
         )}

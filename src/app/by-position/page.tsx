@@ -5,7 +5,7 @@ import RefreshButtonWrapper from '@/components/RefreshButtonWrapper';
 import FilterBar from '@/components/FilterBar';
 import DebugPanel from '@/components/DebugPanel';
 import { parseFilters, DEFAULT_MIN_GAMES, DEFAULT_MIN_PTS, DEFAULT_MIN_MINUTES } from '@/lib/filters';
-import { pickBestByPosition } from '@/lib/position-utils';
+import { pickBestByPosition, type PositionTsSummary } from '@/lib/position-utils';
 import type { PlayerWeekStats, DebugInfo } from '@/types/player';
 import type { PlayerFilters } from '@/lib/filters';
 
@@ -25,6 +25,7 @@ async function getTopPlayers(filters: PlayerFilters) {
 
   return res.json() as Promise<{
     players: PlayerWeekStats[];
+    positionAverages?: PositionTsSummary;
     debug?: DebugInfo;
   }>;
 }
@@ -54,7 +55,12 @@ async function ByPositionList({
 }) {
   const resolved = searchParams instanceof Promise ? await searchParams : searchParams ?? {};
   const filters = parseFilters(resolved);
-  const { players, debug } = await getTopPlayers(filters);
+  const { players, debug, positionAverages } = await getTopPlayers(filters);
+  const averages =
+    positionAverages?.averages ??
+    (positionAverages as unknown as { guard?: number; forward?: number; center?: number } | undefined);
+  const counts = positionAverages?.counts ?? { guard: 0, forward: 0, center: 0 };
+  const attemptCutoff = positionAverages?.attemptCutoff ?? 25;
 
   if (players.length === 0) {
     return (
@@ -85,15 +91,25 @@ async function ByPositionList({
 
   return (
     <>
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mb-6">
+          <FilterBar />
+          {positionAverages && (
+            <div className="mt-6 rounded border border-foreground/10 bg-panel-tint/70 px-4 py-3 text-sm text-foreground-muted">
+              Position TS averages (all players, FGA + FTA &gt; {attemptCutoff}): Guard {averages?.guard?.toFixed(1) ?? '—'}% ({counts.guard}), Forward {averages?.forward?.toFixed(1) ?? '—'}% ({counts.forward}), Center {averages?.center?.toFixed(1) ?? '—'}% ({counts.center})
+            </div>
+          )}
+        </div>
+      )}
       <div className="space-y-0">
         {best.guard && (
-          <PlayerCard player={best.guard} label="Best Guard" />
+          <PlayerCard player={best.guard} label="Best Guard" positionAverages={positionAverages} />
         )}
         {best.forward && (
-          <PlayerCard player={best.forward} label="Best Forward" />
+          <PlayerCard player={best.forward} label="Best Forward" positionAverages={positionAverages} />
         )}
         {best.center && (
-          <PlayerCard player={best.center} label="Best Center" />
+          <PlayerCard player={best.center} label="Best Center" positionAverages={positionAverages} />
         )}
       </div>
       {debug && <DebugPanel debugInfo={debug} />}
@@ -132,13 +148,6 @@ export default function ByPositionPage({
             <RefreshButtonWrapper />
           </div>
         </div>
-        {process.env.NODE_ENV === 'development' && (
-          <Suspense fallback={null}>
-            <div className="mb-6">
-              <FilterBar />
-            </div>
-          </Suspense>
-        )}
         <ByPositionContent searchParams={searchParams} />
       </main>
     </div>

@@ -7,6 +7,7 @@ import DebugPanel from '@/components/DebugPanel';
 import { parseFilters, DEFAULT_MIN_GAMES, DEFAULT_MIN_PTS, DEFAULT_MIN_MINUTES } from '@/lib/filters';
 import { formatLastUpdated } from '@/lib/utils';
 import type { PlayerWeekStats, DebugInfo } from '@/types/player';
+import type { PositionTsSummary } from '@/lib/position-utils';
 import type { PlayerFilters } from '@/lib/filters';
 
 async function getTopPlayers(filters: PlayerFilters) {
@@ -25,6 +26,7 @@ async function getTopPlayers(filters: PlayerFilters) {
 
   return res.json() as Promise<{
     players: PlayerWeekStats[];
+    positionAverages?: PositionTsSummary;
     debug?: DebugInfo;
     generatedAt?: string;
   }>;
@@ -33,10 +35,18 @@ async function getTopPlayers(filters: PlayerFilters) {
 function PlayersList({
   players,
   debug,
+  positionAverages,
 }: {
   players: PlayerWeekStats[];
   debug: DebugInfo | undefined;
+  positionAverages: PositionTsSummary | undefined;
 }) {
+  const averages =
+    positionAverages?.averages ??
+    (positionAverages as unknown as { guard?: number; forward?: number; center?: number } | undefined);
+  const counts = positionAverages?.counts ?? { guard: 0, forward: 0, center: 0 };
+  const attemptCutoff = positionAverages?.attemptCutoff ?? 25;
+
   return (
     <>
       {players.length === 0 ? (
@@ -47,7 +57,12 @@ function PlayersList({
         <>
           <div className="space-y-0">
             {players.map((player, index) => (
-              <PlayerCard key={player.player.id} player={player} rank={index + 1} />
+              <PlayerCard
+                key={player.player.id}
+                player={player}
+                rank={index + 1}
+                positionAverages={positionAverages}
+              />
             ))}
           </div>
           {debug && <DebugPanel debugInfo={debug} />}
@@ -64,7 +79,12 @@ export default async function Home({
 }) {
   const resolved = searchParams instanceof Promise ? await searchParams : searchParams ?? {};
   const filters = parseFilters(resolved);
-  const { players, debug, generatedAt } = await getTopPlayers(filters);
+  const { players, debug, generatedAt, positionAverages } = await getTopPlayers(filters);
+  const averages =
+    positionAverages?.averages ??
+    (positionAverages as unknown as { guard?: number; forward?: number; center?: number } | undefined);
+  const counts = positionAverages?.counts ?? { guard: 0, forward: 0, center: 0 };
+  const attemptCutoff = positionAverages?.attemptCutoff ?? 25;
 
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -99,6 +119,11 @@ export default async function Home({
             <div className="mb-6">
               <FilterBar />
             </div>
+            {positionAverages && (
+              <div className="mb-6 rounded border border-foreground/10 bg-panel-tint/70 px-4 py-3 text-sm text-foreground-muted">
+                Position TS averages (all players, FGA + FTA &gt; {attemptCutoff}): Guard {averages?.guard?.toFixed(1) ?? '—'}% ({counts.guard}), Forward {averages?.forward?.toFixed(1) ?? '—'}% ({counts.forward}), Center {averages?.center?.toFixed(1) ?? '—'}% ({counts.center})
+              </div>
+            )}
             <div className="flex items-center gap-3">
               <Link
                 href="/by-position"
@@ -110,9 +135,8 @@ export default async function Home({
             </div>
           </Suspense>
         )}
-        <PlayersList players={players} debug={debug} />
+        <PlayersList players={players} debug={debug} positionAverages={positionAverages} />
       </main>
     </div>
   );
 }
-
