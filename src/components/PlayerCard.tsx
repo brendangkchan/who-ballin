@@ -214,8 +214,8 @@ export default function PlayerCard({ player, rank, label }: PlayerCardProps) {
                 </div>
               )}
             </div>
-            <div className="text-left pl-0 sm:pl-[calc(var(--photo-size)+var(--photo-gap)-1rem)] sm:pt-6">
-              <div className="mt-8 sm:pl-0 flex flex-col gap-1 sm:mt-0 sm:-ml-5">
+            <div className="text-left pl-0 sm:pl-[calc(var(--photo-size)+var(--photo-gap)-1rem)] sm:pt-2">
+              <div className="mt-8 sm:pl-0 flex flex-col gap-1 sm:mt-0 sm:-ml-8">
                 {rankingNameBlock}
                 {rankingTeamBlock('pl-8')}
               </div>
