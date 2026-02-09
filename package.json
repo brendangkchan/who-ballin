@@ -17,10 +17,12 @@
     "revalidate": "node scripts/revalidate.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
+    "prepare": "husky install",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "backfill:season": "tsx scripts/backfill-season.ts",
-    "db:check": "tsx scripts/check-db.ts"
+    "db:check": "tsx scripts/check-db.ts",
+    "sandbox:check": "bash scripts/sandbox-setup.sh"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
