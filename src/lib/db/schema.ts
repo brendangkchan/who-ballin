@@ -6,6 +6,7 @@ import {
   jsonb,
   primaryKey,
   uniqueIndex,
+  doublePrecision,
 } from 'drizzle-orm/pg-core';
 
 export const games = pgTable('games', {
@@ -90,6 +91,29 @@ export const syncState = pgTable('sync_state', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
 });
 
+export const teamSeasonStats = pgTable(
+  'team_season_stats',
+  {
+    teamId: integer('team_id').notNull(),
+    season: integer('season').notNull(),
+    conference: text('conference').notNull(),
+    division: text('division').notNull(),
+    wins: integer('wins').notNull(),
+    losses: integer('losses').notNull(),
+    winPct: doublePrecision('win_pct').notNull(),
+    pointsFor: integer('points_for').notNull(),
+    pointsAgainst: integer('points_against').notNull(),
+    pointDiff: integer('point_diff').notNull(),
+    strengthOfSchedule: doublePrecision('strength_of_schedule').notNull(),
+    seed: integer('seed').notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  },
+  table => ({
+    pk: primaryKey({ columns: [table.teamId, table.season] }),
+  })
+);
+
 export type GameRow = typeof games.$inferInsert;
 export type PlayerGameStatRow = typeof playerGameStats.$inferInsert;
 export type PlayerSeasonTotalsRow = typeof playerSeasonTotals.$inferInsert;
+export type TeamSeasonStatsRow = typeof teamSeasonStats.$inferInsert;

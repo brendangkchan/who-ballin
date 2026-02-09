@@ -12,4 +12,27 @@ narratives
 - comeback
 - carried
 - overperformed
-- tough opponent
+- tough opponent (top 4 seed)
+- upset
+- clutch wins
+- consistency
+
+badges
+- blocks
+- ast/to ratio. ball security
+- consistency
+
+team
+- record
+- seeding
+- point diff
+- win %
+- strength of schedule by opp win %
+- clutch record
+- net rating
+
+
+est
+- ortg, drtg
+
+- download and hardcode seed rules

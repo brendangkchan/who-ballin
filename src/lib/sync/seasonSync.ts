@@ -1,6 +1,7 @@
 import { format, startOfDay, subDays } from 'date-fns';
 import type { DbAdapter } from '@/lib/db/adapter';
 import type { GameRow, PlayerGameStatRow } from '@/lib/db/schema';
+import { buildTeamSeasonStats } from '@/lib/team-season-stats';
 import { createTokenBucket } from './rateLimiter';
 import { fetchWithRetry } from './fetchWithRetry';
 import { logEvent } from './logger';
@@ -332,6 +333,12 @@ export async function runSeasonSync(options: SyncOptions) {
     if (leagueTotals) {
       await options.db.setCachedLeagueTotals(season, leagueTotals);
     }
+  }
+
+  if (!dryRun) {
+    const seasonGames = await options.db.getGamesForSeason(season);
+    const teamStats = buildTeamSeasonStats(season, seasonGames, { now });
+    await options.db.upsertTeamSeasonStats(teamStats);
   }
 
   const durationMs = Date.now() - startTime;

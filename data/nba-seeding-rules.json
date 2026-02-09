@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "league": "NBA",
+  "last_verified": "2026-02-09",
+  "sources": [
+    {
+      "label": "NBA Standings (tiebreaker rules)",
+      "url": "https://www.nba.com/standings",
+      "accessed": "2026-02-09"
+    },
+    {
+      "label": "NBA Play-In Tournament format",
+      "url": "https://www.nba.com/news/nba-play-in-tournament",
+      "accessed": "2026-02-09"
+    }
+  ],
+  "seeding_overview": {
+    "guaranteed_playoff_seeds_per_conference": [1, 2, 3, 4, 5, 6],
+    "play_in_seeds_per_conference": [7, 8, 9, 10],
+    "notes": [
+      "Seeds 1-6 are guaranteed playoff spots in each conference.",
+      "Seeds 7-10 enter the Play-In Tournament to determine seeds 7 and 8."
+    ]
+  },
+  "play_in_format": {
+    "per_conference": {
+      "game_1": {
+        "matchup": "Seed 7 hosts Seed 8",
+        "winner": "Earns Seed 7",
+        "loser": "Advances to final play-in game"
+      },
+      "game_2": {
+        "matchup": "Seed 9 hosts Seed 10",
+        "winner": "Advances to final play-in game",
+        "loser": "Eliminated"
+      },
+      "final_game": {
+        "matchup": "Loser of Game 1 hosts Winner of Game 2",
+        "winner": "Earns Seed 8",
+        "loser": "Eliminated"
+      }
+    },
+    "notes": [
+      "Seeds 7 and 8 can qualify by winning one game; seeds 9 and 10 must win two games."
+    ]
+  },
+  "inputs": {
+    "team_fields": {
+      "id": "string",
+      "conference": "string",
+      "division": "string",
+      "wins": "number",
+      "losses": "number",
+      "conferenceWins": "number",
+      "conferenceLosses": "number",
+      "divisionWins": "number (required only if division_win_pct may apply)",
+      "divisionLosses": "number (required only if division_win_pct may apply)",
+      "isDivisionWinner": "boolean",
+      "vsPlayoffEligibleOwnConfWins": "number",
+      "vsPlayoffEligibleOwnConfLosses": "number",
+      "vsPlayoffEligibleOtherConfWins": "number",
+      "vsPlayoffEligibleOtherConfLosses": "number",
+      "pointDifferential": "number"
+    },
+    "head_to_head": {
+      "type": "per-team map",
+      "shape": {
+        "teamId": {
+          "opponentTeamId": {
+            "wins": "number",
+            "losses": "number"
+          }
+        }
+      },
+      "notes": [
+        "For multi-way ties, head_to_head should include results against all tied teams.",
+        "Missing matchup data should be treated as an error in the resolver."
+      ]
+    },
+    "playoff_eligible_teams": {
+      "definition": "Teams that finished the regular season tied for one of the best 10 records in their conference."
+    }
+  },
+  "tiebreakers": {
+    "two_way_order": [
+      "head_to_head",
+      "division_winner",
+      "division_win_pct",
+      "conference_win_pct",
+      "vs_playoff_own_conf",
+      "vs_playoff_other_conf",
+      "point_differential"
+    ],
+    "multi_way_order": [
+      "division_winner",
+      "head_to_head",
+      "division_win_pct",
+      "conference_win_pct",
+      "vs_playoff_own_conf",
+      "vs_playoff_other_conf",
+      "point_differential"
+    ],
+    "criteria": {
+      "head_to_head": {
+        "label": "Better head-to-head winning percentage (two-way) or winning percentage in games among tied teams (multi-way)",
+        "requires": ["head_to_head"],
+        "applies_when": {
+          "two_way": "always",
+          "multi_way": "always"
+        }
+      },
+      "division_winner": {
+        "label": "Division winner ranks higher than teams not leading a division",
+        "requires": ["isDivisionWinner"],
+        "applies_when": {
+          "two_way": "always",
+          "multi_way": "always"
+        }
+      },
+      "division_win_pct": {
+        "label": "Better division winning percentage",
+        "requires": ["divisionWins", "divisionLosses"],
+        "applies_when": {
+          "two_way": "only if teams are in same division",
+          "multi_way": "only if all tied teams are in same division"
+        }
+      },
+      "conference_win_pct": {
+        "label": "Better conference winning percentage",
+        "requires": ["conferenceWins", "conferenceLosses"],
+        "applies_when": {
+          "two_way": "always",
+          "multi_way": "always"
+        }
+      },
+      "vs_playoff_own_conf": {
+        "label": "Better winning percentage vs playoff-eligible teams in own conference",
+        "requires": ["vsPlayoffEligibleOwnConfWins", "vsPlayoffEligibleOwnConfLosses"],
+        "applies_when": {
+          "two_way": "always",
+          "multi_way": "always"
+        }
+      },
+      "vs_playoff_other_conf": {
+        "label": "Better winning percentage vs playoff-eligible teams in opposite conference",
+        "requires": ["vsPlayoffEligibleOtherConfWins", "vsPlayoffEligibleOtherConfLosses"],
+        "applies_when": {
+          "two_way": "always",
+          "multi_way": "always"
+        }
+      },
+      "point_differential": {
+        "label": "Better net points (points scored minus points allowed)",
+        "requires": ["pointDifferential"],
+        "applies_when": {
+          "two_way": "always",
+          "multi_way": "always"
+        }
+      }
+    }
+  },
+  "guidelines": [
+    "Ties to determine division winners must be broken before any other ties.",
+    "When a tie must be broken to determine a division winner, the results of the tie-break are used only to determine the division winner.",
+    "For multi-team ties, apply the criteria in order until the tie is completely or partially broken.",
+    "If partially broken, teams still tied restart from the beginning of the applicable criteria list.",
+    "If no criteria break the tie, playoff positions are determined by random drawing."
+  ]
+}

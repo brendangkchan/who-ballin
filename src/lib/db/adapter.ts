@@ -5,8 +5,10 @@ import {
   playerGameStats,
   playerSeasonTotals,
   syncState,
+  teamSeasonStats,
   type GameRow,
   type PlayerGameStatRow,
+  type TeamSeasonStatsRow,
 } from './schema';
 
 export type DbAdapter = {
@@ -94,6 +96,8 @@ export type DbAdapter = {
   rebuildSeasonTotals: (season: number) => Promise<number>;
   getSyncState: (key: string) => Promise<unknown | null>;
   upsertSyncState: (key: string, value: unknown) => Promise<void>;
+  getGamesForSeason: (season: number) => Promise<GameRow[]>;
+  upsertTeamSeasonStats: (rows: TeamSeasonStatsRow[]) => Promise<number>;
 };
 
 export function createDbAdapter(db: NeonHttpDatabase<Record<string, never>>): DbAdapter {
@@ -417,6 +421,21 @@ export function createDbAdapter(db: NeonHttpDatabase<Record<string, never>>): Db
         .where(eq(syncState.key, key));
       return result[0]?.value ?? null;
     },
+    async getGamesForSeason(season) {
+      return db
+        .select({
+          id: games.id,
+          date: games.date,
+          season: games.season,
+          status: games.status,
+          homeTeamId: games.homeTeamId,
+          visitorTeamId: games.visitorTeamId,
+          homeTeamScore: games.homeTeamScore,
+          visitorTeamScore: games.visitorTeamScore,
+        })
+        .from(games)
+        .where(eq(games.season, season));
+    },
     async upsertSyncState(key, value) {
       await db
         .insert(syncState)
@@ -428,6 +447,29 @@ export function createDbAdapter(db: NeonHttpDatabase<Record<string, never>>): Db
             updatedAt: sql`excluded.updated_at`,
           },
         });
+    },
+    async upsertTeamSeasonStats(rows) {
+      if (rows.length === 0) return 0;
+      await db
+        .insert(teamSeasonStats)
+        .values(rows)
+        .onConflictDoUpdate({
+          target: [teamSeasonStats.teamId, teamSeasonStats.season],
+          set: {
+            conference: sql`excluded.conference`,
+            division: sql`excluded.division`,
+            wins: sql`excluded.wins`,
+            losses: sql`excluded.losses`,
+            winPct: sql`excluded.win_pct`,
+            pointsFor: sql`excluded.points_for`,
+            pointsAgainst: sql`excluded.points_against`,
+            pointDiff: sql`excluded.point_diff`,
+            strengthOfSchedule: sql`excluded.strength_of_schedule`,
+            seed: sql`excluded.seed`,
+            updatedAt: sql`excluded.updated_at`,
+          },
+        });
+      return rows.length;
     },
   };
 }

@@ -23,6 +23,9 @@
     "db:migrate": "drizzle-kit migrate",
     "backfill:season": "tsx scripts/backfill-season.ts",
     "db:check": "tsx scripts/check-db.ts",
+    "db:check-teams": "tsx scripts/check-team-season-stats.ts",
+    "teams:validate": "tsx scripts/validate-team-ids.ts",
+    "teams:backfill": "tsx scripts/backfill-team-season-stats.ts",
     "sandbox:check": "bash scripts/sandbox-setup.sh"
   },
   "dependencies": {
