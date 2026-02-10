@@ -1,4 +1,4 @@
-import { and, eq, gte, inArray, max, sql } from 'drizzle-orm';
+import { and, eq, gte, inArray, max, sql, lte } from 'drizzle-orm';
 import type { NeonHttpDatabase } from 'drizzle-orm/neon-http';
 import {
   games,
@@ -21,6 +21,36 @@ export type DbAdapter = {
   upsertPlayerGameStats: (rows: PlayerGameStatRow[]) => Promise<number>;
   getMaxSeasonInRecentGames: (sinceDate: Date) => Promise<number | null>;
   getLastGameDateForSeason: (season: number) => Promise<Date | null>;
+  getLastFinalGameDate: () => Promise<Date | null>;
+  getFinalGamesInRange: (startDate: Date, endDate: Date) => Promise<GameRow[]>;
+  getPlayerStatsInRange: (startDate: Date, endDate: Date) => Promise<{
+    id: number;
+    gameId: number;
+    season: number;
+    gameDate: Date;
+    playerId: number;
+    teamId: number;
+    minutes: number;
+    pts: number;
+    reb: number;
+    ast: number;
+    oreb: number;
+    dreb: number;
+    stl: number;
+    blk: number;
+    turnover: number;
+    pf: number;
+    fgm: number;
+    fga: number;
+    fg3m: number;
+    fg3a: number;
+    ftm: number;
+    fta: number;
+    plusMinus: number | null;
+    firstName: string | null;
+    lastName: string | null;
+    position: string | null;
+  }[]>;
   getSeasonTotalsForPlayers: (season: number, playerIds: number[]) => Promise<{
     playerId: number;
     season: number;
@@ -204,6 +234,62 @@ export function createDbAdapter(db: NeonHttpDatabase<Record<string, never>>): Db
         .from(games)
         .where(eq(games.season, season));
       return result[0]?.value ?? null;
+    },
+    async getLastFinalGameDate() {
+      const result = await db
+        .select({ value: max(games.date) })
+        .from(games)
+        .where(eq(games.status, 'Final'));
+      return result[0]?.value ?? null;
+    },
+    async getFinalGamesInRange(startDate, endDate) {
+      return db
+        .select({
+          id: games.id,
+          date: games.date,
+          season: games.season,
+          status: games.status,
+          homeTeamId: games.homeTeamId,
+          visitorTeamId: games.visitorTeamId,
+          homeTeamScore: games.homeTeamScore,
+          visitorTeamScore: games.visitorTeamScore,
+        })
+        .from(games)
+        .where(and(eq(games.status, 'Final'), gte(games.date, startDate), lte(games.date, endDate)));
+    },
+    async getPlayerStatsInRange(startDate, endDate) {
+      return db
+        .select({
+          id: playerGameStats.id,
+          gameId: playerGameStats.gameId,
+          season: playerGameStats.season,
+          gameDate: playerGameStats.gameDate,
+          playerId: playerGameStats.playerId,
+          teamId: playerGameStats.teamId,
+          minutes: playerGameStats.minutes,
+          pts: playerGameStats.pts,
+          reb: playerGameStats.reb,
+          ast: playerGameStats.ast,
+          oreb: playerGameStats.oreb,
+          dreb: playerGameStats.dreb,
+          stl: playerGameStats.stl,
+          blk: playerGameStats.blk,
+          turnover: playerGameStats.turnover,
+          pf: playerGameStats.pf,
+          fgm: playerGameStats.fgm,
+          fga: playerGameStats.fga,
+          fg3m: playerGameStats.fg3m,
+          fg3a: playerGameStats.fg3a,
+          ftm: playerGameStats.ftm,
+          fta: playerGameStats.fta,
+          plusMinus: playerGameStats.plusMinus,
+          firstName: players.firstName,
+          lastName: players.lastName,
+          position: players.position,
+        })
+        .from(playerGameStats)
+        .leftJoin(players, eq(players.id, playerGameStats.playerId))
+        .where(and(gte(playerGameStats.gameDate, startDate), lte(playerGameStats.gameDate, endDate)));
     },
     async getSeasonTotalsForPlayers(season, playerIds) {
       if (playerIds.length === 0) return [];

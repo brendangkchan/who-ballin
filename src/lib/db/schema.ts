@@ -6,19 +6,26 @@ import {
   jsonb,
   primaryKey,
   uniqueIndex,
+  index,
   doublePrecision,
 } from 'drizzle-orm/pg-core';
 
-export const games = pgTable('games', {
-  id: integer('id').primaryKey(),
-  date: timestamp('date', { withTimezone: true }).notNull(),
-  season: integer('season').notNull(),
-  status: text('status').notNull(),
-  homeTeamId: integer('home_team_id').notNull(),
-  visitorTeamId: integer('visitor_team_id').notNull(),
-  homeTeamScore: integer('home_team_score').notNull(),
-  visitorTeamScore: integer('visitor_team_score').notNull(),
-});
+export const games = pgTable(
+  'games',
+  {
+    id: integer('id').primaryKey(),
+    date: timestamp('date', { withTimezone: true }).notNull(),
+    season: integer('season').notNull(),
+    status: text('status').notNull(),
+    homeTeamId: integer('home_team_id').notNull(),
+    visitorTeamId: integer('visitor_team_id').notNull(),
+    homeTeamScore: integer('home_team_score').notNull(),
+    visitorTeamScore: integer('visitor_team_score').notNull(),
+  },
+  table => ({
+    dateIdx: index('games_date_idx').on(table.date),
+  })
+);
 
 export const playerGameStats = pgTable(
   'player_game_stats',
@@ -52,6 +59,8 @@ export const playerGameStats = pgTable(
       table.gameId,
       table.playerId
     ),
+    gameDateIdx: index('player_game_stats_game_date_idx').on(table.gameDate),
+    seasonIdx: index('player_game_stats_season_idx').on(table.season),
   })
 );
 

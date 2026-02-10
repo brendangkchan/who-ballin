@@ -1,18 +1,19 @@
 import 'server-only';
 
 import { unstable_cache } from 'next/cache';
-import { subDays, format, differenceInDays } from 'date-fns';
-import { getAllGames, getLastCompletedGame, getAllStatsForGames, getCurrentNBASeason } from '@/lib/balldontlie';
+import { subDays, format, differenceInDays, startOfDay, endOfDay } from 'date-fns';
+import { getCurrentNBASeason } from '@/lib/balldontlie';
 import { aggregatePlayerStats } from '@/lib/utils';
 import type { Game, GameStats, PlayerWeekStats, DebugInfo } from '@/types/player';
 import { getDb } from '@/lib/db/client';
-import { createDbAdapter } from '@/lib/db/adapter';
+import { createDbAdapter, type DbAdapter } from '@/lib/db/adapter';
 import { getSeasonForSync } from '@/lib/sync/seasonSync';
 import { buildSeasonStats, buildDeltaStats, type SeasonTotalsRow } from '@/lib/season-stats';
 import { calculatePERFromTotals } from '@/lib/per';
 import { computePositionTsSummary, POSITION_TS_ATTEMPT_CUTOFF } from '@/lib/position-ts';
 import type { PlayerFilters } from '@/lib/filters';
 import type { PositionTsSummary } from '@/lib/position-utils';
+import { getTeamInfo, getTeamMeta } from '@/lib/team-meta';
 
 export type TopWeekResult = {
   players: PlayerWeekStats[];
@@ -33,57 +34,87 @@ export class TopWeekError extends Error {
   }
 }
 
-const BATCH_SIZE = 20; // Keep under 2MB per cache entry; 50 games ~2.4MB
 const TOP_WEEK_TTL_SECONDS = 60 * 60; // Safety valve if nightly revalidate misses.
 
-function getCachedGames(startDateStr: string, endDateStr: string) {
-  const cached = unstable_cache(
-    async () => {
-      const games = await getAllGames(startDateStr, endDateStr);
-      return games.filter((g) => g.status === 'Final');
-    },
-    ['games', startDateStr, endDateStr],
-    { revalidate: false, tags: ['top-week'] }
-  );
+type DbGameRow = Awaited<ReturnType<DbAdapter['getFinalGamesInRange']>>[number];
+type DbStatRow = Awaited<ReturnType<DbAdapter['getPlayerStatsInRange']>>[number];
 
-  return cached().catch(async () => {
-    const games = await getAllGames(startDateStr, endDateStr);
-    return games.filter((g) => g.status === 'Final');
-  });
+function formatSecondsToMinutes(totalSeconds: number): string {
+  const safeSeconds = Number.isFinite(totalSeconds) ? Math.max(0, Math.floor(totalSeconds)) : 0;
+  const mins = Math.floor(safeSeconds / 60);
+  const secs = safeSeconds % 60;
+  return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
-function getCachedStatsBatch(
-  startDateStr: string,
-  endDateStr: string,
-  batchIndex: number
-) {
-  const cached = unstable_cache(
-    async () => {
-      const games = await getCachedGames(startDateStr, endDateStr);
-      const gameIds = games.map((g) => g.id);
-      const batch = gameIds.slice(
-        batchIndex * BATCH_SIZE,
-        (batchIndex + 1) * BATCH_SIZE
-      );
-      if (batch.length === 0) return [];
-      const statsData = await getAllStatsForGames(batch, undefined);
-      return (statsData ?? []) as GameStats[];
-    },
-    ['stats', startDateStr, endDateStr, String(batchIndex)],
-    { revalidate: false, tags: ['top-week'] }
-  );
+function buildGameFromRow(row: DbGameRow): Game {
+  const home = getTeamInfo(row.homeTeamId);
+  const visitor = getTeamInfo(row.visitorTeamId);
 
-  return cached().catch(async () => {
-    const games = await getCachedGames(startDateStr, endDateStr);
-    const gameIds = games.map((g) => g.id);
-    const batch = gameIds.slice(
-      batchIndex * BATCH_SIZE,
-      (batchIndex + 1) * BATCH_SIZE
-    );
-    if (batch.length === 0) return [];
-    const statsData = await getAllStatsForGames(batch, undefined);
-    return (statsData ?? []) as GameStats[];
-  });
+  return {
+    id: row.id,
+    date: row.date.toISOString(),
+    season: row.season,
+    status: row.status,
+    home_team: {
+      id: home.id,
+      abbreviation: home.abbreviation,
+      city: home.city,
+      name: home.name,
+    },
+    visitor_team: {
+      id: visitor.id,
+      abbreviation: visitor.abbreviation,
+      city: visitor.city,
+      name: visitor.name,
+    },
+    home_team_score: row.homeTeamScore,
+    visitor_team_score: row.visitorTeamScore,
+  };
+}
+
+function buildStatFromRow(row: DbStatRow): GameStats {
+  const firstName = row.firstName?.trim() || 'N/A';
+  const lastName = row.lastName?.trim() || 'N/A';
+  const position = row.position ?? undefined;
+  const team = getTeamInfo(row.teamId);
+
+  return {
+    id: row.id,
+    game: { id: row.gameId, date: row.gameDate.toISOString() },
+    player: {
+      id: row.playerId,
+      first_name: firstName,
+      last_name: lastName,
+      ...(position ? { position } : {}),
+    },
+    team: {
+      id: team.id,
+      abbreviation: team.abbreviation,
+      city: team.city,
+      name: team.name,
+    },
+    pts: row.pts,
+    reb: row.reb,
+    ast: row.ast,
+    fg: row.fgm,
+    fga: row.fga,
+    fgm: row.fgm,
+    ft: row.ftm,
+    fta: row.fta,
+    ftm: row.ftm,
+    min: formatSecondsToMinutes(row.minutes),
+    plus_minus: row.plusMinus ?? 0,
+    stl: row.stl,
+    blk: row.blk,
+    tov: row.turnover,
+    turnover: row.turnover,
+    pf: row.pf,
+    fg3: row.fg3m,
+    fg3a: row.fg3a,
+    fg3m: row.fg3m,
+    oreb: row.oreb,
+    dreb: row.dreb,
+  };
 }
 
 async function computeTopWeekPlayers(filters: PlayerFilters): Promise<TopWeekResult> {
@@ -113,93 +144,69 @@ async function computeTopWeekPlayers(filters: PlayerFilters): Promise<TopWeekRes
       `Filters: minGames=${filters.minGames}, minPts=${filters.minPts}, minMinutes=${filters.minMinutes}`
     );
     debugInfo.warnings.push(
-      'API: cached games+stats (end=yesterday), all games in last 7 days'
+      'DB: cached games+stats (end=latest final game), all games in last 7 days'
     );
     debugInfo.warnings.push(
       'Qualifying: exclude lost>50% games, exclude negative +/- unless won all'
     );
 
-    // Step 1: Determine date range (end = yesterday so all games are completed)
-    const endDate = subDays(new Date(), 1);
-    const startDate = subDays(endDate, 7);
+    const adapter = createDbAdapter(getDb());
+
+    const lastFinalGameDate = await adapter.getLastFinalGameDate();
+    if (!lastFinalGameDate) {
+      debugInfo.warnings.push('No final games found in database');
+      debugInfo.processingTime = Date.now() - startTime;
+      return {
+        players: [],
+        generatedAt: new Date().toISOString(),
+        ...(isDev && { debug: debugInfo }),
+      };
+    }
+
+    const lastGameDay = startOfDay(lastFinalGameDate);
+    const daysSinceLastGame = differenceInDays(startOfDay(new Date()), lastGameDay);
+    if (daysSinceLastGame > 30) {
+      debugInfo.warnings.push(
+        `Fallback skipped: last completed game is ${daysSinceLastGame} days old`
+      );
+      debugInfo.processingTime = Date.now() - startTime;
+      return {
+        players: [],
+        generatedAt: new Date().toISOString(),
+        ...(isDev && { debug: debugInfo }),
+      };
+    }
+
+    const endDate = endOfDay(lastFinalGameDate);
+    const startDate = startOfDay(subDays(endDate, 7));
     const startDateStr = format(startDate, 'yyyy-MM-dd');
     const endDateStr = format(endDate, 'yyyy-MM-dd');
 
     debugInfo.dateRange.start = startDateStr;
     debugInfo.dateRange.end = endDateStr;
-    console.debug('[top-week] date range:', startDateStr, '..', endDateStr);
+    debugInfo.dateRange.usedFallback = daysSinceLastGame > 1;
 
     const nbaSeason = getCurrentNBASeason();
     debugInfo.warnings.push(
       `NBA Season: ${nbaSeason} (calculated from current date: ${new Date().toISOString()})`
     );
 
-    // Step 2: Fetch games (cached)
-    let games: Game[] = [];
-    let activeStart = startDateStr;
-    let activeEnd = endDateStr;
-
+    let gameRows: DbGameRow[] = [];
     try {
-      games = await getCachedGames(startDateStr, endDateStr);
-      debugInfo.gamesProcessed = games.length;
-      console.debug('[top-week] games:', games.length);
+      gameRows = await adapter.getFinalGamesInRange(startDate, endDate);
     } catch (error: any) {
       debugInfo.errors.push(`Failed to fetch games: ${error.message}`);
       throw error;
     }
 
-    // If no games found, try fallback (off-season etc.)
-    if (games.length === 0) {
-      console.debug('[top-week] no games, trying fallback');
-      debugInfo.warnings.push('No games found, trying fallback');
-      debugInfo.dateRange.usedFallback = true;
-
-      try {
-        const lastGame = await getLastCompletedGame();
-        if (lastGame) {
-          const fallbackEnd = new Date(lastGame.date);
-          const daysSinceLastGame = differenceInDays(new Date(), fallbackEnd);
-          if (daysSinceLastGame > 30) {
-            debugInfo.warnings.push(
-              `Fallback skipped: last completed game is ${daysSinceLastGame} days old`
-            );
-          } else {
-            const fallbackStart = subDays(fallbackEnd, 7);
-            activeStart = format(fallbackStart, 'yyyy-MM-dd');
-            activeEnd = format(fallbackEnd, 'yyyy-MM-dd');
-
-            debugInfo.dateRange.start = activeStart;
-            debugInfo.dateRange.end = activeEnd;
-
-            games = await getCachedGames(activeStart, activeEnd);
-            debugInfo.gamesProcessed = games.length;
-            console.debug('[top-week] fallback games:', games.length);
-          }
-        }
-      } catch (error: any) {
-        debugInfo.errors.push(`Fallback failed: ${error.message}`);
-      }
-    }
-
-    // Step 3: Fetch stats batches (cached)
-    let allStats: GameStats[] = [];
-    const numBatches = Math.ceil(games.length / BATCH_SIZE);
-    debugInfo.batchCount = numBatches;
-
-    try {
-      for (let i = 0; i < numBatches; i++) {
-        const batch = await getCachedStatsBatch(activeStart, activeEnd, i);
-        allStats.push(...batch);
-      }
-      debugInfo.statsProcessed = allStats.length;
-      debugInfo.warnings.push(
-        `Fetched ${games.length} games, ${allStats.length} stats (cached)`
-      );
-      console.debug('[top-week] stats:', allStats.length);
-    } catch (error: any) {
-      debugInfo.errors.push(`Failed to fetch stats: ${error.message}`);
-      throw error;
-    }
+    const missingTeamIds = new Set<number>();
+    const games: Game[] = gameRows.map(row => {
+      if (!getTeamMeta(row.homeTeamId)) missingTeamIds.add(row.homeTeamId);
+      if (!getTeamMeta(row.visitorTeamId)) missingTeamIds.add(row.visitorTeamId);
+      return buildGameFromRow(row);
+    });
+    debugInfo.gamesProcessed = games.length;
+    console.debug('[top-week] games:', games.length);
 
     if (games.length === 0) {
       debugInfo.processingTime = Date.now() - startTime;
@@ -208,6 +215,40 @@ async function computeTopWeekPlayers(filters: PlayerFilters): Promise<TopWeekRes
         generatedAt: new Date().toISOString(),
         ...(isDev && { debug: debugInfo }),
       };
+    }
+
+    let statRows: DbStatRow[] = [];
+    try {
+      statRows = await adapter.getPlayerStatsInRange(startDate, endDate);
+    } catch (error: any) {
+      debugInfo.errors.push(`Failed to fetch stats: ${error.message}`);
+      throw error;
+    }
+
+    const gameIdSet = new Set(gameRows.map(row => row.id));
+    const relevantStatRows = statRows.filter(row => gameIdSet.has(row.gameId));
+    const missingPlayerIds = new Set<number>();
+    const allStats: GameStats[] = relevantStatRows.map(row => {
+      if (!row.firstName || !row.lastName) missingPlayerIds.add(row.playerId);
+      if (!getTeamMeta(row.teamId)) missingTeamIds.add(row.teamId);
+      return buildStatFromRow(row);
+    });
+
+    debugInfo.statsProcessed = allStats.length;
+    debugInfo.batchCount = 1;
+    console.debug('[top-week] stats:', allStats.length);
+
+    if (missingPlayerIds.size > 0) {
+      debugInfo.warnings.push(`Missing player metadata for ${missingPlayerIds.size} player(s)`);
+    }
+    if (missingTeamIds.size > 0) {
+      debugInfo.warnings.push(`Missing team metadata for ${missingTeamIds.size} team(s)`);
+    }
+    if ((missingPlayerIds.size > 0 || missingTeamIds.size > 0) && !debugInfo.cacheHit) {
+      console.warn('[top-week] missing metadata', {
+        players: missingPlayerIds.size,
+        teams: missingTeamIds.size,
+      });
     }
 
     // Step 4: Group stats by player
@@ -265,7 +306,6 @@ async function computeTopWeekPlayers(filters: PlayerFilters): Promise<TopWeekRes
     console.debug('[top-week] qualifying filters (win % / +/-):', beforeQualifying, '->', filtered.length);
 
     // Step 8: Load season-based position TS averages (DB-backed)
-    const adapter = createDbAdapter(getDb());
     const season = await getSeasonForSync(adapter, new Date());
     let positionAverages: PositionTsSummary | undefined;
 

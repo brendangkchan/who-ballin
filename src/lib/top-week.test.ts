@@ -17,6 +17,9 @@ const mockAdapter = {
   getPositionTsForSeason: vi.fn(async () => []),
   getSeasonTotalsWithPositions: vi.fn(async () => []),
   upsertPositionTs: vi.fn(async () => 0),
+  getLastFinalGameDate: vi.fn(async () => new Date('2026-02-08T10:00:00Z')),
+  getFinalGamesInRange: vi.fn(async () => []),
+  getPlayerStatsInRange: vi.fn(async () => []),
 };
 
 vi.mock('@/lib/db/adapter', () => ({
@@ -27,46 +30,86 @@ vi.mock('@/lib/sync/seasonSync', () => ({
   getSeasonForSync: vi.fn(async () => 2025),
 }));
 
-vi.mock('@/lib/balldontlie', () => ({
-  getAllGames: vi.fn(),
-  getLastCompletedGame: vi.fn(),
-  getAllStatsForGames: vi.fn(),
-  getCurrentNBASeason: vi.fn(() => 2025),
-}));
-
-import { getAllGames, getLastCompletedGame, getAllStatsForGames } from '@/lib/balldontlie';
-import type { Game, GameStats } from '@/types/player';
 import type { PlayerFilters } from '@/lib/filters';
 
-function createGame(overrides: Partial<Game> = {}): Game {
+function createGameRow(overrides: Partial<{
+  id: number;
+  date: Date;
+  season: number;
+  status: string;
+  homeTeamId: number;
+  visitorTeamId: number;
+  homeTeamScore: number;
+  visitorTeamScore: number;
+}> = {}) {
   return {
     id: 1,
-    date: '2026-01-15',
+    date: new Date('2026-02-08T10:00:00Z'),
     season: 2025,
     status: 'Final',
-    home_team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
-    visitor_team: { id: 2, abbreviation: 'BOS', city: 'Boston', name: 'Celtics' },
-    home_team_score: 110,
-    visitor_team_score: 105,
+    homeTeamId: 14, // LAL
+    visitorTeamId: 2, // BOS
+    homeTeamScore: 110,
+    visitorTeamScore: 105,
     ...overrides,
   };
 }
 
-function createGameStats(overrides: Partial<GameStats> = {}): GameStats {
+function createStatRow(overrides: Partial<{
+  id: number;
+  gameId: number;
+  season: number;
+  gameDate: Date;
+  playerId: number;
+  teamId: number;
+  minutes: number;
+  pts: number;
+  reb: number;
+  ast: number;
+  oreb: number;
+  dreb: number;
+  stl: number;
+  blk: number;
+  turnover: number;
+  pf: number;
+  fgm: number;
+  fga: number;
+  fg3m: number;
+  fg3a: number;
+  ftm: number;
+  fta: number;
+  plusMinus: number | null;
+  firstName: string | null;
+  lastName: string | null;
+  position: string | null;
+}> = {}) {
   return {
     id: 1,
-    game: { id: 1, date: '2026-01-15' },
-    player: { id: 100, first_name: 'LeBron', last_name: 'James' },
-    team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
+    gameId: 1,
+    season: 2025,
+    gameDate: new Date('2026-02-08T10:00:00Z'),
+    playerId: 100,
+    teamId: 14,
+    minutes: 2100,
     pts: 25,
     reb: 7,
     ast: 8,
-    fg: 10,
+    oreb: 1,
+    dreb: 6,
+    stl: 1,
+    blk: 0,
+    turnover: 2,
+    pf: 2,
+    fgm: 10,
     fga: 18,
-    ft: 4,
+    fg3m: 2,
+    fg3a: 5,
+    ftm: 4,
     fta: 5,
-    min: '35:00',
-    plus_minus: 5,
+    plusMinus: 5,
+    firstName: 'LeBron',
+    lastName: 'James',
+    position: 'F',
     ...overrides,
   };
 }
@@ -75,13 +118,13 @@ describe('getTopWeekPlayers', () => {
   const origNodeEnv = process.env.NODE_ENV;
 
   beforeEach(() => {
-    vi.mocked(getAllGames).mockResolvedValue([]);
-    vi.mocked(getLastCompletedGame).mockResolvedValue(null);
-    vi.mocked(getAllStatsForGames).mockResolvedValue([]);
     mockAdapter.getCachedLeagueTotals.mockResolvedValue(null);
     mockAdapter.getSeasonLeagueTotals.mockResolvedValue(null);
     mockAdapter.setCachedLeagueTotals.mockResolvedValue(undefined);
     mockAdapter.getSeasonTotalsForPlayers.mockResolvedValue([]);
+    mockAdapter.getLastFinalGameDate.mockResolvedValue(new Date('2026-02-08T10:00:00Z'));
+    mockAdapter.getFinalGamesInRange.mockResolvedValue([]);
+    mockAdapter.getPlayerStatsInRange.mockResolvedValue([]);
     process.env.NODE_ENV = 'development';
   });
 
@@ -109,18 +152,11 @@ describe('getTopWeekPlayers', () => {
   });
 
   it('returns players when games and stats exist', async () => {
-    const game = createGame({ id: 1, home_team_score: 110, visitor_team_score: 105 });
-    const stat = createGameStats({
-      game: { id: 1, date: '2026-01-15' },
-      player: { id: 100, first_name: 'LeBron', last_name: 'James' },
-      team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
-      pts: 25,
-      min: '35:00',
-      plus_minus: 5,
-    });
+    const gameRow = createGameRow();
+    const statRow = createStatRow();
 
-    vi.mocked(getAllGames).mockResolvedValue([game]);
-    vi.mocked(getAllStatsForGames).mockResolvedValue([stat]);
+    mockAdapter.getFinalGamesInRange.mockResolvedValue([gameRow]);
+    mockAdapter.getPlayerStatsInRange.mockResolvedValue([statRow]);
 
     const filters: PlayerFilters = { minGames: 1, minPts: 1, minMinutes: 1 };
     const data = await getTopWeekPlayers(filters);
@@ -131,23 +167,16 @@ describe('getTopWeekPlayers', () => {
     expect(data.players[0].totalPts).toBe(25);
     expect(data.players[0].gameResults).toHaveLength(1);
     expect(data.players[0].gameResults[0].result).toBe('W');
-    expect(data.players[0].gameResults[0].opponent.name).toBe('Celtics');
+    expect(data.players[0].gameResults[0].opponent.name).toBe('Boston Celtics');
     expect(data.generatedAt).toBeDefined();
   });
 
   it('sets adjusted PER when league totals are available', async () => {
-    const game = createGame({ id: 1, home_team_score: 110, visitor_team_score: 105 });
-    const stat = createGameStats({
-      game: { id: 1, date: '2026-01-15' },
-      player: { id: 100, first_name: 'LeBron', last_name: 'James' },
-      team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
-      pts: 25,
-      min: '35:00',
-      plus_minus: 5,
-    });
+    const gameRow = createGameRow();
+    const statRow = createStatRow();
 
-    vi.mocked(getAllGames).mockResolvedValue([game]);
-    vi.mocked(getAllStatsForGames).mockResolvedValue([stat]);
+    mockAdapter.getFinalGamesInRange.mockResolvedValue([gameRow]);
+    mockAdapter.getPlayerStatsInRange.mockResolvedValue([statRow]);
     mockAdapter.getSeasonLeagueTotals.mockResolvedValue({
       minutes: 10000,
       pts: 10000,
@@ -174,58 +203,31 @@ describe('getTopWeekPlayers', () => {
     expect(typeof data.players[0].perAdjusted).toBe('number');
   });
 
-  it('uses fallback date range when no games in primary range', async () => {
-    const now = new Date();
-    const recentFallback = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const recentDate = recentFallback.toISOString().slice(0, 10);
-    const fallbackGame = createGame({ id: 1, date: recentDate });
-    const stat = createGameStats({
-      game: { id: 1, date: recentDate },
-      player: { id: 100, first_name: 'LeBron', last_name: 'James' },
-      team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
-      pts: 25,
-      min: '35:00',
-      plus_minus: 5,
-    });
-
-    vi.mocked(getAllGames)
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([fallbackGame])
-      .mockResolvedValue([fallbackGame]);
-    vi.mocked(getLastCompletedGame).mockResolvedValue({ date: recentDate });
-    vi.mocked(getAllStatsForGames).mockResolvedValue([stat]);
+  it('uses fallback date range when last game is older than 1 day', async () => {
+    const now = new Date('2026-02-09T10:00:00Z');
+    const lastGame = new Date('2026-02-07T10:00:00Z');
+    mockAdapter.getLastFinalGameDate.mockResolvedValue(lastGame);
+    mockAdapter.getFinalGamesInRange.mockResolvedValue([createGameRow({ date: lastGame })]);
+    mockAdapter.getPlayerStatsInRange.mockResolvedValue([createStatRow({ gameDate: lastGame })]);
 
     const filters: PlayerFilters = { minGames: 1, minPts: 1, minMinutes: 1 };
+    const originalDateNow = Date.now;
+    Date.now = () => now.getTime();
     const data = await getTopWeekPlayers(filters);
+    Date.now = originalDateNow;
 
     expect(data.debug?.dateRange.usedFallback).toBe(true);
     expect(data.players).toHaveLength(1);
   });
 
   it('excludes players who lost more than half their games', async () => {
-    const game1 = createGame({ id: 1, home_team_score: 90, visitor_team_score: 100 });
-    const game2 = createGame({ id: 2, home_team_score: 85, visitor_team_score: 95 });
-    const stat1 = createGameStats({
-      id: 1,
-      game: { id: 1, date: '2026-01-15' },
-      player: { id: 100, first_name: 'Player', last_name: 'A' },
-      team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
-      pts: 20,
-      min: '30:00',
-      plus_minus: -10,
-    });
-    const stat2 = createGameStats({
-      id: 2,
-      game: { id: 2, date: '2026-01-16' },
-      player: { id: 100, first_name: 'Player', last_name: 'A' },
-      team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
-      pts: 22,
-      min: '32:00',
-      plus_minus: -10,
-    });
+    const game1 = createGameRow({ id: 1, homeTeamId: 14, visitorTeamId: 2, homeTeamScore: 90, visitorTeamScore: 100 });
+    const game2 = createGameRow({ id: 2, homeTeamId: 14, visitorTeamId: 2, homeTeamScore: 85, visitorTeamScore: 95 });
+    const stat1 = createStatRow({ id: 1, gameId: 1, pts: 20, plusMinus: -10 });
+    const stat2 = createStatRow({ id: 2, gameId: 2, pts: 22, plusMinus: -10 });
 
-    vi.mocked(getAllGames).mockResolvedValue([game1, game2]);
-    vi.mocked(getAllStatsForGames).mockResolvedValue([stat1, stat2]);
+    mockAdapter.getFinalGamesInRange.mockResolvedValue([game1, game2]);
+    mockAdapter.getPlayerStatsInRange.mockResolvedValue([stat1, stat2]);
 
     const filters: PlayerFilters = { minGames: 2, minPts: 1, minMinutes: 1 };
     const data = await getTopWeekPlayers(filters);
@@ -234,29 +236,13 @@ describe('getTopWeekPlayers', () => {
   });
 
   it('excludes players with negative +/- unless they won all games', async () => {
-    const game1 = createGame({ id: 1, home_team_score: 100, visitor_team_score: 90 });
-    const game2 = createGame({ id: 2, home_team_score: 85, visitor_team_score: 95 });
-    const stat1 = createGameStats({
-      id: 1,
-      game: { id: 1, date: '2026-01-15' },
-      player: { id: 100, first_name: 'Player', last_name: 'A' },
-      team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
-      pts: 25,
-      min: '35:00',
-      plus_minus: 10,
-    });
-    const stat2 = createGameStats({
-      id: 2,
-      game: { id: 2, date: '2026-01-16' },
-      player: { id: 100, first_name: 'Player', last_name: 'A' },
-      team: { id: 1, abbreviation: 'LAL', city: 'Los Angeles', name: 'Lakers' },
-      pts: 20,
-      min: '30:00',
-      plus_minus: -15,
-    });
+    const game1 = createGameRow({ id: 1, homeTeamScore: 100, visitorTeamScore: 90 });
+    const game2 = createGameRow({ id: 2, homeTeamScore: 85, visitorTeamScore: 95 });
+    const stat1 = createStatRow({ id: 1, gameId: 1, pts: 25, plusMinus: 10 });
+    const stat2 = createStatRow({ id: 2, gameId: 2, pts: 20, plusMinus: -15 });
 
-    vi.mocked(getAllGames).mockResolvedValue([game1, game2]);
-    vi.mocked(getAllStatsForGames).mockResolvedValue([stat1, stat2]);
+    mockAdapter.getFinalGamesInRange.mockResolvedValue([game1, game2]);
+    mockAdapter.getPlayerStatsInRange.mockResolvedValue([stat1, stat2]);
 
     const filters: PlayerFilters = { minGames: 2, minPts: 1, minMinutes: 1 };
     const data = await getTopWeekPlayers(filters);
@@ -264,8 +250,50 @@ describe('getTopWeekPlayers', () => {
     expect(data.players).toHaveLength(0);
   });
 
+  it('handles missing player metadata without error', async () => {
+    const gameRow = createGameRow();
+    const statRow = createStatRow({ firstName: null, lastName: null, position: null });
+
+    mockAdapter.getFinalGamesInRange.mockResolvedValue([gameRow]);
+    mockAdapter.getPlayerStatsInRange.mockResolvedValue([statRow]);
+
+    const filters: PlayerFilters = { minGames: 1, minPts: 1, minMinutes: 1 };
+    const data = await getTopWeekPlayers(filters);
+
+    expect(data.players).toHaveLength(1);
+    expect(data.players[0].player.first_name).toBe('N/A');
+  });
+
+  it('handles missing team metadata without error', async () => {
+    const gameRow = createGameRow({ homeTeamId: 999, visitorTeamId: 998 });
+    const statRow = createStatRow({ teamId: 999 });
+
+    mockAdapter.getFinalGamesInRange.mockResolvedValue([gameRow]);
+    mockAdapter.getPlayerStatsInRange.mockResolvedValue([statRow]);
+
+    const filters: PlayerFilters = { minGames: 1, minPts: 1, minMinutes: 1 };
+    const data = await getTopWeekPlayers(filters);
+
+    expect(data.players).toHaveLength(1);
+    expect(data.players[0].gameResults[0].opponent.name).toBe('N/A');
+  });
+
+  it('converts minutes from seconds to MM:SS', async () => {
+    const gameRow = createGameRow();
+    const statRow = createStatRow({ minutes: 90 });
+
+    mockAdapter.getFinalGamesInRange.mockResolvedValue([gameRow]);
+    mockAdapter.getPlayerStatsInRange.mockResolvedValue([statRow]);
+
+    const filters: PlayerFilters = { minGames: 1, minPts: 1, minMinutes: 1 };
+    const data = await getTopWeekPlayers(filters);
+
+    expect(data.players).toHaveLength(1);
+    expect(data.players[0].totalMinutes).toBeCloseTo(1.5, 3);
+  });
+
   it('throws TopWeekError when upstream fetch fails', async () => {
-    vi.mocked(getAllGames).mockRejectedValue(new Error('API error'));
+    mockAdapter.getFinalGamesInRange.mockRejectedValue(new Error('DB error'));
 
     const filters: PlayerFilters = { minGames: 2, minPts: 20, minMinutes: 40 };
 
@@ -275,7 +303,7 @@ describe('getTopWeekPlayers', () => {
       await getTopWeekPlayers(filters);
     } catch (error: any) {
       expect(error).toBeInstanceOf(TopWeekError);
-      expect(error.debug?.errors.some((e: string) => e.includes('API error'))).toBe(true);
+      expect(error.debug?.errors.some((e: string) => e.includes('DB error'))).toBe(true);
     }
   });
 });
