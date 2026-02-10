@@ -92,7 +92,7 @@ export default function PlayerCard({ player, rank, label, positionAverages }: Pl
   const badgeContent = showHotHand || showTsHotHand || showUltraEfficient || showMakingPlays || showBoardMan || showSniper ? (
     <div className="mt-4 inline-block bg-accent/20 px-3 py-2 text-[clamp(0.75rem,0.35vw+0.7rem,0.82rem)]">
       <div className="text-foreground-muted uppercase tracking-[0.2em] text-[0.6rem]">
-        Highlights
+        TRENDING UP
       </div>
       <div className="mt-2 grid gap-1.5">
         {showHotHand && (
