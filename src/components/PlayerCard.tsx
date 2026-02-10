@@ -236,7 +236,7 @@ export default function PlayerCard({ player, rank, label, positionAverages }: Pl
             </div>
           )}
           <div
-            className="relative"
+            className="relative sm:min-h-[var(--photo-size)]"
             style={
               {
                 '--photo-size': '300px',
