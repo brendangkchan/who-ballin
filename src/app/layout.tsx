@@ -1,21 +1,28 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Newsreader } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const geistSans = Geist({
+const geistSans = localFont({
+  src: [{ path: "../../public/fonts/Geist-Variable.woff2", weight: "100 900", style: "normal" }],
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: [{ path: "../../public/fonts/GeistMono-Variable.woff2", weight: "100 900", style: "normal" }],
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
-const newsreader = Newsreader({
+const newsreader = localFont({
+  src: [
+    { path: "../../public/fonts/Newsreader16pt-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../../public/fonts/Newsreader16pt-Medium.woff2", weight: "500", style: "normal" },
+    { path: "../../public/fonts/Newsreader16pt-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "../../public/fonts/Newsreader16pt-Bold.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-serif",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
