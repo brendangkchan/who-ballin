@@ -94,7 +94,7 @@ export default async function Home({
               </p>
             )}
             <p className="max-w-md mt-2 text-foreground-muted text-[clamp(0.6875rem,0.3vw+0.65rem,0.75rem)]">
-              Minimum {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, and {DEFAULT_MIN_MINUTES} min this week on teams that won more than lost. Powered by{' '}
+              Minimum {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, {DEFAULT_MIN_MINUTES} min per game in the last week on teams that went .500 or better. Powered by{' '}
               <a href="https://www.balldontlie.io" target="_blank" rel="noopener noreferrer" className="text-accent-navy hover:underline">
                 balldontlie.io
               </a>

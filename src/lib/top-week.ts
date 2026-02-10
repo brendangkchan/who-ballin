@@ -280,14 +280,16 @@ async function computeTopWeekPlayers(filters: PlayerFilters): Promise<TopWeekRes
     }
     console.debug('[top-week] aggregated:', playerWeekStats.length, 'players');
 
-    // Step 6: Filter by min games, min points, min minutes
-    let filtered = playerWeekStats.filter(
-      p =>
-        p.games >= filters.minGames &&
-        p.totalPts >= filters.minPts &&
-        p.totalMinutes >= filters.minMinutes
-    );
-    console.debug('[top-week] filter minGames/minPts/minMinutes:', playerWeekStats.length, '->', filtered.length);
+    // Step 6: Filter by min games, min points
+    let filtered = playerWeekStats.filter(p => p.games >= filters.minGames && p.totalPts >= filters.minPts);
+    console.debug('[top-week] filter minGames/minPts:', playerWeekStats.length, '->', filtered.length);
+
+    // Step 6b: Filter by minutes per game
+    const beforeMinutesFilter = filtered.length;
+    filtered = filtered.filter(p => {
+      return p.totalMinutes / p.games >= filters.minMinutes;
+    });
+    console.debug('[top-week] filter minMinutes per game:', beforeMinutesFilter, '->', filtered.length);
 
     // Step 7: Qualifying filters: exclude players who lost >50% of games,
     // and exclude negative +/- unless they won all games

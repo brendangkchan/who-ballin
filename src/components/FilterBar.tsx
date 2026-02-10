@@ -2,32 +2,54 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { DEFAULT_MIN_GAMES, DEFAULT_MIN_PTS, DEFAULT_MIN_MINUTES } from '@/lib/filters';
+import {
+  DEFAULT_MIN_GAMES,
+  DEFAULT_MIN_PTS,
+  DEFAULT_MIN_MINUTES,
+  MIN_MIN_GAMES,
+  MIN_MIN_MINUTES,
+} from '@/lib/filters';
 
 export default function FilterBar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [minGames, setMinGames] = useState(searchParams.get('minGames') ?? String(DEFAULT_MIN_GAMES));
-  const [minPts, setMinPts] = useState(searchParams.get('minPts') ?? String(DEFAULT_MIN_PTS));
-  const [minMinutes, setMinMinutes] = useState(searchParams.get('minMinutes') ?? String(DEFAULT_MIN_MINUTES));
+  const [minGames, setMinGames] = useState(
+    String(coerceMin(searchParams.get('minGames') ?? '', DEFAULT_MIN_GAMES, MIN_MIN_GAMES))
+  );
+  const [minPts, setMinPts] = useState(
+    String(coerceMin(searchParams.get('minPts') ?? '', DEFAULT_MIN_PTS, 0))
+  );
+  const [minMinutes, setMinMinutes] = useState(
+    String(coerceMin(searchParams.get('minMinutes') ?? '', DEFAULT_MIN_MINUTES, MIN_MIN_MINUTES))
+  );
 
   useEffect(() => {
-    setMinGames(searchParams.get('minGames') ?? String(DEFAULT_MIN_GAMES));
-    setMinPts(searchParams.get('minPts') ?? String(DEFAULT_MIN_PTS));
-    setMinMinutes(searchParams.get('minMinutes') ?? String(DEFAULT_MIN_MINUTES));
+    setMinGames(
+      String(coerceMin(searchParams.get('minGames') ?? '', DEFAULT_MIN_GAMES, MIN_MIN_GAMES))
+    );
+    setMinPts(String(coerceMin(searchParams.get('minPts') ?? '', DEFAULT_MIN_PTS, 0)));
+    setMinMinutes(
+      String(
+        coerceMin(
+          searchParams.get('minMinutes') ?? '',
+          DEFAULT_MIN_MINUTES,
+          MIN_MIN_MINUTES
+        )
+      )
+    );
   }, [searchParams]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const params = new URLSearchParams();
-    const mg = minGames || String(DEFAULT_MIN_GAMES);
-    const mp = minPts || String(DEFAULT_MIN_PTS);
-    const mm = minMinutes || String(DEFAULT_MIN_MINUTES);
-    if (mg !== String(DEFAULT_MIN_GAMES)) params.set('minGames', mg);
-    if (mp !== String(DEFAULT_MIN_PTS)) params.set('minPts', mp);
-    if (mm !== String(DEFAULT_MIN_MINUTES)) params.set('minMinutes', mm);
+    const mgVal = coerceMin(minGames, DEFAULT_MIN_GAMES, MIN_MIN_GAMES);
+    const mpVal = coerceMin(minPts, DEFAULT_MIN_PTS, 0);
+    const mmVal = coerceMin(minMinutes, DEFAULT_MIN_MINUTES, MIN_MIN_MINUTES);
+    if (mgVal !== DEFAULT_MIN_GAMES) params.set('minGames', String(mgVal));
+    if (mpVal !== DEFAULT_MIN_PTS) params.set('minPts', String(mpVal));
+    if (mmVal !== DEFAULT_MIN_MINUTES) params.set('minMinutes', String(mmVal));
     const qs = params.toString();
     const base = pathname || '/';
     router.push(qs ? `${base}?${qs}` : base);
@@ -35,17 +57,17 @@ export default function FilterBar() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-4 py-4">
-      <FilterLabel label="Min games">
+      <FilterLabel label="Games">
         <input
           type="number"
           name="minGames"
-          min={0}
+          min={MIN_MIN_GAMES}
           value={minGames}
           onChange={(e) => setMinGames(e.target.value)}
           className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground text-[clamp(0.75rem,1vw+0.7rem,0.875rem)]"
         />
       </FilterLabel>
-      <FilterLabel label="Min pts">
+      <FilterLabel label="Points">
         <input
           type="number"
           name="minPts"
@@ -55,11 +77,11 @@ export default function FilterBar() {
           className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground text-[clamp(0.75rem,1vw+0.7rem,0.875rem)]"
         />
       </FilterLabel>
-      <FilterLabel label="Min minutes">
+      <FilterLabel label="Minutes">
         <input
           type="number"
           name="minMinutes"
-          min={0}
+          min={MIN_MIN_MINUTES}
           value={minMinutes}
           onChange={(e) => setMinMinutes(e.target.value)}
           className="w-20 rounded border border-border bg-background px-2 py-1.5 text-foreground text-[clamp(0.75rem,1vw+0.7rem,0.875rem)]"
@@ -85,4 +107,11 @@ function FilterLabel({ label, children }: { label: string; children: React.React
       {children}
     </label>
   );
+}
+
+function coerceMin(value: string, fallback: number, minVal: number): number {
+  if (value === '') return fallback;
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(parsed, minVal);
 }

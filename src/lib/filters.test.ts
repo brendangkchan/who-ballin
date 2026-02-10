@@ -4,6 +4,8 @@ import {
   DEFAULT_MIN_GAMES,
   DEFAULT_MIN_PTS,
   DEFAULT_MIN_MINUTES,
+  MIN_MIN_GAMES,
+  MIN_MIN_MINUTES,
 } from './filters';
 
 describe('parseFilters', () => {
@@ -42,13 +44,13 @@ describe('parseFilters', () => {
     });
   });
 
-  it('falls back to default for negative values', () => {
+  it('clamps to minimums for negative values', () => {
     const p = new URLSearchParams({ minGames: '-5', minPts: '-10', minMinutes: '-1' });
     const filters = parseFilters(p);
     expect(filters).toEqual({
-      minGames: DEFAULT_MIN_GAMES,
+      minGames: MIN_MIN_GAMES,
       minPts: DEFAULT_MIN_PTS,
-      minMinutes: DEFAULT_MIN_MINUTES,
+      minMinutes: MIN_MIN_MINUTES,
     });
   });
 
@@ -59,6 +61,16 @@ describe('parseFilters', () => {
       minGames: 5,
       minPts: DEFAULT_MIN_PTS,
       minMinutes: 30,
+    });
+  });
+
+  it('clamps values below minimums', () => {
+    const p = new URLSearchParams({ minGames: '0', minPts: '10', minMinutes: '3' });
+    const filters = parseFilters(p);
+    expect(filters).toEqual({
+      minGames: MIN_MIN_GAMES,
+      minPts: 10,
+      minMinutes: MIN_MIN_MINUTES,
     });
   });
 

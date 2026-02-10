@@ -119,7 +119,7 @@ export default function ByPositionPage({
               <span className="highlight-title">By Position</span>
             </h1>
             <p className="mt-4 max-w-xl text-foreground-muted text-[clamp(0.875rem,0.5vw+0.8rem,1rem)]">
-              Best guard, forward, and center this week (by PER). Same filters apply: at least {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, {DEFAULT_MIN_MINUTES} minutes. Powered by{' '}
+              Best guard, forward, and center this week (by PER). Same filters apply: Minimum {DEFAULT_MIN_GAMES} games, {DEFAULT_MIN_PTS} pts, {DEFAULT_MIN_MINUTES} min per game in the last week on teams that went .500 or better. Powered by{' '}
               <a href="https://www.balldontlie.io" target="_blank" rel="noopener noreferrer" className="text-accent-navy hover:underline">
                 balldontlie.io
               </a>
