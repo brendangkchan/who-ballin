@@ -17,6 +17,7 @@ const mockAdapter = {
   getPositionTsForSeason: vi.fn(async () => []),
   getSeasonTotalsWithPositions: vi.fn(async () => []),
   upsertPositionTs: vi.fn(async () => 0),
+  getTeamSeasonStatsForTeams: vi.fn(async () => []),
   getLastFinalGameDate: vi.fn(async () => new Date('2026-02-08T10:00:00Z')),
   getFinalGamesInRange: vi.fn(async () => []),
   getPlayerStatsInRange: vi.fn(async () => []),
@@ -201,6 +202,42 @@ describe('getTopWeekPlayers', () => {
 
     expect(data.players).toHaveLength(1);
     expect(typeof data.players[0].perAdjusted).toBe('number');
+  });
+
+  it('attaches team season stats when available', async () => {
+    const gameRow = createGameRow();
+    const statRow = createStatRow();
+
+    mockAdapter.getFinalGamesInRange.mockResolvedValue([gameRow]);
+    mockAdapter.getPlayerStatsInRange.mockResolvedValue([statRow]);
+    mockAdapter.getTeamSeasonStatsForTeams.mockResolvedValue([
+      {
+        teamId: 14,
+        season: 2025,
+        conference: 'West',
+        division: 'Pacific',
+        wins: 33,
+        losses: 10,
+        winPct: 0.767,
+        pointsFor: 5500,
+        pointsAgainst: 5200,
+        pointDiff: 300,
+        strengthOfSchedule: 0.52,
+        seed: 1,
+        updatedAt: new Date('2026-02-08T10:00:00Z'),
+      },
+    ]);
+
+    const filters: PlayerFilters = { minGames: 1, minPts: 1, minMinutes: 1 };
+    const data = await getTopWeekPlayers(filters);
+
+    expect(data.players).toHaveLength(1);
+    expect(data.players[0].teamSeason).toEqual({
+      wins: 33,
+      losses: 10,
+      seed: 1,
+      conference: 'West',
+    });
   });
 
   it('uses fallback date range when last game is older than 1 day', async () => {

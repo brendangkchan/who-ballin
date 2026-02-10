@@ -140,6 +140,12 @@ export interface PlayerWeekStats {
   imageUrl?: string;
   profileUrl: string;
   gameResults: GameResult[];
+  teamSeason?: {
+    wins: number;
+    losses: number;
+    seed: number;
+    conference: string;
+  };
   season?: {
     games: number;
     totals: {

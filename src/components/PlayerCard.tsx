@@ -29,15 +29,29 @@ function getTeamGrade(
   return { letter: 'F', colorClass: 'text-rose-700 dark:text-rose-600' };
 }
 
+function formatOrdinal(value: number): string {
+  const mod100 = value % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${value}th`;
+  const mod10 = value % 10;
+  if (mod10 === 1) return `${value}st`;
+  if (mod10 === 2) return `${value}nd`;
+  if (mod10 === 3) return `${value}rd`;
+  return `${value}th`;
+}
+
 export default function PlayerCard({ player, rank, label, positionAverages }: PlayerCardProps) {
   const fullName = `${player.player.first_name} ${player.player.last_name}`;
   const teamName = player.player.team
-    ? `${player.player.team.city} ${player.player.team.name}`
+    ? player.player.team.name
     : 'N/A';
   const teamColors = getTeamColors(player.player.team?.abbreviation);
   const wins = player.gameResults.filter((g) => g.result === 'W');
   const losses = player.gameResults.filter((g) => g.result === 'L');
   const { letter: gradeLetter, colorClass: gradeColorClass } = getTeamGrade(wins.length, losses.length);
+  const teamSeason = player.teamSeason;
+  const teamSeasonLine = teamSeason
+    ? `(${formatOrdinal(teamSeason.seed)} | ${teamSeason.wins}-${teamSeason.losses})`
+    : null;
 
   const useRankingLayout = rank != null || label != null;
   const seasonPts = player.season?.perGame.pts ?? null;
@@ -61,8 +75,8 @@ export default function PlayerCard({ player, rank, label, positionAverages }: Pl
     rawPosition === 'F' || rawPosition === 'G-F' || rawPosition === 'F-G'
       ? 'forward'
       : rawPosition === 'C' || rawPosition === 'F-C' || rawPosition === 'C-F'
-      ? 'center'
-      : positionCategory;
+        ? 'center'
+        : positionCategory;
   const positionAverageTs = averageCategory ? positionAverages?.averages?.[averageCategory] ?? null : null;
   const tsDelta = seasonTs != null ? player.ts - seasonTs : null;
   const showTsHotHand =
@@ -190,10 +204,15 @@ export default function PlayerCard({ player, rank, label, positionAverages }: Pl
 
   const rankingTeamBlock = (teamPlClass: string) => (
     <div
-      className={`font-sans text-sm font-normal sm:text-base italic ${teamPlClass}`.trim()}
+      className={`flex items-baseline gap-2 font-sans text-sm font-normal sm:text-base ${teamPlClass}`.trim()}
       style={teamColors ? { color: teamColors.primary } : { color: 'var(--foreground-muted)' }}
     >
-      {teamName}
+      <span className="italic">{teamName}</span>
+      {teamSeasonLine && (
+        <span className="text-[clamp(0.56rem,0.26vw+0.52rem,0.66rem)] not-italic">
+          {teamSeasonLine}
+        </span>
+      )}
     </div>
   );
 
@@ -340,14 +359,19 @@ export default function PlayerCard({ player, rank, label, positionAverages }: Pl
                   {fullName}
                 </h3>
                 <p
-                  className="text-xl"
+                  className="flex items-baseline gap-2 text-xl"
                   style={
                     teamColors
                       ? { color: teamColors.primary, opacity: 0.9 }
                       : { color: 'var(--foreground-muted)' }
                   }
                 >
-                  {teamName}
+                  <span className="italic">{teamName}</span>
+                  {teamSeasonLine && (
+                    <span className="text-[clamp(0.56rem,0.26vw+0.52rem,0.66rem)] not-italic">
+                      {teamSeasonLine}
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
