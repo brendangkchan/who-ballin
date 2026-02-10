@@ -29,15 +29,29 @@ function getTeamGrade(
   return { letter: 'F', colorClass: 'text-rose-700 dark:text-rose-600' };
 }
 
+function formatOrdinal(value: number): string {
+  const mod100 = value % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${value}th`;
+  const mod10 = value % 10;
+  if (mod10 === 1) return `${value}st`;
+  if (mod10 === 2) return `${value}nd`;
+  if (mod10 === 3) return `${value}rd`;
+  return `${value}th`;
+}
+
 export default function PlayerCard({ player, rank, label, positionAverages }: PlayerCardProps) {
   const fullName = `${player.player.first_name} ${player.player.last_name}`;
   const teamName = player.player.team
-    ? `${player.player.team.city} ${player.player.team.name}`
+    ? player.player.team.name
     : 'N/A';
   const teamColors = getTeamColors(player.player.team?.abbreviation);
   const wins = player.gameResults.filter((g) => g.result === 'W');
   const losses = player.gameResults.filter((g) => g.result === 'L');
   const { letter: gradeLetter, colorClass: gradeColorClass } = getTeamGrade(wins.length, losses.length);
+  const teamSeason = player.teamSeason;
+  const teamSeasonLine = teamSeason
+    ? `(${formatOrdinal(teamSeason.seed)} | ${teamSeason.wins}-${teamSeason.losses})`
+    : null;
 
   const useRankingLayout = rank != null || label != null;
   const seasonPts = player.season?.perGame.pts ?? null;
@@ -61,8 +75,8 @@ export default function PlayerCard({ player, rank, label, positionAverages }: Pl
     rawPosition === 'F' || rawPosition === 'G-F' || rawPosition === 'F-G'
       ? 'forward'
       : rawPosition === 'C' || rawPosition === 'F-C' || rawPosition === 'C-F'
-      ? 'center'
-      : positionCategory;
+        ? 'center'
+        : positionCategory;
   const positionAverageTs = averageCategory ? positionAverages?.averages?.[averageCategory] ?? null : null;
   const tsDelta = seasonTs != null ? player.ts - seasonTs : null;
   const showTsHotHand =
@@ -190,10 +204,15 @@ export default function PlayerCard({ player, rank, label, positionAverages }: Pl
 
   const rankingTeamBlock = (teamPlClass: string) => (
     <div
-      className={`font-sans text-sm font-normal sm:text-base italic ${teamPlClass}`.trim()}
+      className={`flex items-baseline gap-2 font-sans text-sm font-normal sm:text-base ${teamPlClass}`.trim()}
       style={teamColors ? { color: teamColors.primary } : { color: 'var(--foreground-muted)' }}
     >
-      {teamName}
+      <span className="italic">{teamName}</span>
+      {teamSeasonLine && (
+        <span className="text-[clamp(0.56rem,0.26vw+0.52rem,0.66rem)] not-italic">
+          {teamSeasonLine}
+        </span>
+      )}
     </div>
   );
 
@@ -268,29 +287,29 @@ export default function PlayerCard({ player, rank, label, positionAverages }: Pl
           <div className="note-card mt-8 sm:mt-12">
             <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
               <div className="col-span-2 mb-2 flex items-baseline">
-                <span className="mr-2 font-serif text-lg font-bold text-foreground">Team Grade: </span>
+                <span className="mr-2 font-serif text-lg font-bold text-foreground">Team Weekly Grade: </span>
                 <span className={`font-sans text-xl font-bold ${gradeColorClass}`}>{gradeLetter}</span>
               </div>
-              <div>
-                <p className="mb-2 font-bold text-positive">
-                  {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
-                </p>
-                <div className="space-y-1">
-                  {wins.map((game, index) => (
-                    <GameResultRow key={index} game={game} />
-                  ))}
+              <div className="pr-4">
+                  <p className="mb-1 font-sans text-[0.65rem] font-bold uppercase tracking-[0.2em] text-positive opacity-75">
+                    {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
+                  </p>
+                  <div className="space-y-1 font-sans">
+                    {wins.map((game, index) => (
+                      <GameResultRow key={index} game={game} />
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <p className="mb-2 font-bold text-rose-700 dark:text-rose-600">
-                  {losses.length === 1 ? '1 Loss' : `${losses.length} Losses`}
-                </p>
-                <div className="space-y-1">
-                  {losses.map((game, index) => (
-                    <GameResultRow key={index} game={game} />
-                  ))}
+                <div className="pr-4">
+                  <p className="mb-1 font-sans text-[0.65rem] font-bold uppercase tracking-[0.2em] text-rose-700 opacity-75 dark:text-rose-600">
+                    {losses.length === 1 ? '1 Loss' : `${losses.length} Losses`}
+                  </p>
+                  <div className="space-y-1 font-sans">
+                    {losses.map((game, index) => (
+                      <GameResultRow key={index} game={game} />
+                    ))}
+                  </div>
                 </div>
-              </div>
             </NoteCardBorder>
           </div>
         </>
@@ -340,14 +359,19 @@ export default function PlayerCard({ player, rank, label, positionAverages }: Pl
                   {fullName}
                 </h3>
                 <p
-                  className="text-xl"
+                  className="flex items-baseline gap-2 text-xl"
                   style={
                     teamColors
                       ? { color: teamColors.primary, opacity: 0.9 }
                       : { color: 'var(--foreground-muted)' }
                   }
                 >
-                  {teamName}
+                  <span className="italic">{teamName}</span>
+                  {teamSeasonLine && (
+                    <span className="text-[clamp(0.56rem,0.26vw+0.52rem,0.66rem)] not-italic">
+                      {teamSeasonLine}
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
@@ -385,24 +409,24 @@ export default function PlayerCard({ player, rank, label, positionAverages }: Pl
             <div className="note-card mt-4">
               <NoteCardBorder borderColor={teamColors?.primary ?? '#1a1a1a'}>
                 <div className="col-span-2 mb-2 flex items-baseline">
-                  <span className="mr-2 font-serif text-lg font-bold text-foreground">Weekly Grade: </span>
+                <span className="mr-2 font-serif text-lg font-bold text-foreground">Team Weekly Grade: </span>
                   <span className={`font-sans text-lg font-bold ${gradeColorClass}`}>{gradeLetter}</span>
                 </div>
-                <div>
-                  <p className="mb-2 font-bold text-positive">
+              <div className="pr-4">
+                  <p className="mb-1 font-sans text-[0.65rem] font-bold uppercase tracking-[0.2em] text-positive opacity-75">
                     {wins.length === 1 ? '1 Win' : `${wins.length} Wins`}
                   </p>
-                  <div className="space-y-1">
+                  <div className="space-y-1 font-sans">
                     {wins.map((game, index) => (
                       <GameResultRow key={index} game={game} />
                     ))}
                   </div>
                 </div>
-                <div>
-                  <p className="mb-2 font-bold text-rose-700 dark:text-rose-600">
+                <div className="pr-4">
+                  <p className="mb-1 font-sans text-[0.65rem] font-bold uppercase tracking-[0.2em] text-rose-700 opacity-75 dark:text-rose-600">
                     {losses.length === 1 ? '1 Loss' : `${losses.length} Losses`}
                   </p>
-                  <div className="space-y-1">
+                  <div className="space-y-1 font-sans">
                     {losses.map((game, index) => (
                       <GameResultRow key={index} game={game} />
                     ))}
@@ -438,13 +462,18 @@ function PerStat({ value }: { value: string }) {
 }
 
 function GameResultRow({ game }: { game: any }) {
-  const opponentName = game.opponent.name ?? game.opponent.abbreviation;
+  const opponentName = game.opponent.nickname ?? game.opponent.name ?? game.opponent.abbreviation;
   const scoreText = `${game.playerTeamScore}-${game.opponentScore}`;
   const comeback = game.comebackInfo;
 
   return (
-    <div className="font-normal text-foreground text-[clamp(0.875rem,0.5vw+0.8rem,1rem)]">
-      {opponentName}: {scoreText}
+    <div className="font-sans text-foreground text-[clamp(0.8125rem,0.45vw+0.78rem,0.95rem)]">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-[clamp(0.78rem,0.42vw+0.74rem,0.9rem)] text-foreground-muted">{opponentName}</span>
+        <span className="ml-auto text-right font-bold text-foreground-muted tabular-nums text-[clamp(0.72rem,0.4vw+0.68rem,0.85rem)]">
+          {scoreText}
+        </span>
+      </div>
       {comeback && (
         <div className="text-muted-foreground text-[clamp(0.75rem,0.4vw+0.7rem,0.875rem)]">
           (comeback from down {comeback.deficit} after {comeback.afterQuarters} quarter{comeback.afterQuarters === 1 ? "" : "s"})

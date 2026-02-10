@@ -147,6 +147,7 @@ export type DbAdapter = {
   getSyncState: (key: string) => Promise<unknown | null>;
   upsertSyncState: (key: string, value: unknown) => Promise<void>;
   getGamesForSeason: (season: number) => Promise<GameRow[]>;
+  getTeamSeasonStatsForTeams: (season: number, teamIds: number[]) => Promise<TeamSeasonStatsRow[]>;
   upsertTeamSeasonStats: (rows: TeamSeasonStatsRow[]) => Promise<number>;
 };
 
@@ -598,6 +599,13 @@ export function createDbAdapter(db: NeonHttpDatabase<Record<string, never>>): Db
         })
         .from(games)
         .where(eq(games.season, season));
+    },
+    async getTeamSeasonStatsForTeams(season, teamIds) {
+      if (teamIds.length === 0) return [];
+      return db
+        .select()
+        .from(teamSeasonStats)
+        .where(and(eq(teamSeasonStats.season, season), inArray(teamSeasonStats.teamId, teamIds)));
     },
     async upsertSyncState(key, value) {
       await db

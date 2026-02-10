@@ -147,6 +147,7 @@ export function calculateGameResult(
       abbreviation: opponent.abbreviation,
       city: opponent.city,
       name: opponent.name,
+      nickname: opponent.nickname,
     },
     homeScore: game.home_team_score,
     awayScore: game.visitor_team_score,
@@ -264,7 +265,16 @@ export function aggregatePlayerStats(
 
   return {
     player: statTeam
-      ? { ...basePlayer, team: { id: statTeam.id, abbreviation: statTeam.abbreviation, city: statTeam.city, name: statTeam.name } }
+      ? {
+        ...basePlayer,
+        team: {
+          id: statTeam.id,
+          abbreviation: statTeam.abbreviation,
+          city: statTeam.city,
+          name: statTeam.name,
+          nickname: statTeam.nickname,
+        },
+      }
       : basePlayer,
     games: gamesPlayed,
     totalMinutes,

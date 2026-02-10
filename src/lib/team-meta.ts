@@ -13,6 +13,7 @@ export type TeamInfo = {
   abbreviation: string;
   city: string;
   name: string;
+  nickname: string;
 };
 
 const teams = (teamsData as { teams: TeamMeta[] }).teams;
@@ -34,6 +35,7 @@ export function getTeamInfo(teamId: number): TeamInfo {
       abbreviation: 'N/A',
       city: 'N/A',
       name: 'N/A',
+      nickname: 'N/A',
     };
   }
   const name = meta.name || `${meta.city} ${meta.nickname}`.trim() || 'N/A';
@@ -42,5 +44,6 @@ export function getTeamInfo(teamId: number): TeamInfo {
     abbreviation: meta.abbreviation || 'N/A',
     city: meta.city || 'N/A',
     name,
+    nickname: meta.nickname || 'N/A',
   };
 }

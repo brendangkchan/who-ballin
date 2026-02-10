@@ -8,6 +8,7 @@ export interface Player {
     abbreviation: string;
     city: string;
     name: string;
+    nickname?: string;
   };
 }
 
@@ -21,12 +22,14 @@ export interface Game {
     abbreviation: string;
     city: string;
     name: string;
+    nickname?: string;
   };
   visitor_team: {
     id: number;
     abbreviation: string;
     city: string;
     name: string;
+    nickname?: string;
   };
   home_team_score: number;
   visitor_team_score: number;
@@ -53,6 +56,7 @@ export interface GameStats {
     abbreviation: string;
     city: string;
     name: string;
+    nickname?: string;
   };
   pts: number;
   reb: number;
@@ -84,6 +88,7 @@ export interface GameResult {
     abbreviation: string;
     city: string;
     name: string;
+    nickname?: string;
   };
   homeScore: number;
   awayScore: number;
@@ -140,6 +145,12 @@ export interface PlayerWeekStats {
   imageUrl?: string;
   profileUrl: string;
   gameResults: GameResult[];
+  teamSeason?: {
+    wins: number;
+    losses: number;
+    seed: number;
+    conference: string;
+  };
   season?: {
     games: number;
     totals: {

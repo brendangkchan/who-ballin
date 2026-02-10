@@ -60,12 +60,14 @@ function buildGameFromRow(row: DbGameRow): Game {
       abbreviation: home.abbreviation,
       city: home.city,
       name: home.name,
+      nickname: home.nickname,
     },
     visitor_team: {
       id: visitor.id,
       abbreviation: visitor.abbreviation,
       city: visitor.city,
       name: visitor.name,
+      nickname: visitor.nickname,
     },
     home_team_score: row.homeTeamScore,
     visitor_team_score: row.visitorTeamScore,
@@ -92,6 +94,7 @@ function buildStatFromRow(row: DbStatRow): GameStats {
       abbreviation: team.abbreviation,
       city: team.city,
       name: team.name,
+      nickname: team.nickname,
     },
     pts: row.pts,
     reb: row.reb,
@@ -309,6 +312,29 @@ async function computeTopWeekPlayers(filters: PlayerFilters): Promise<TopWeekRes
 
     // Step 8: Load season-based position TS averages (DB-backed)
     const season = await getSeasonForSync(adapter, new Date());
+    const teamIds = Array.from(
+      new Set(
+        filtered
+          .map(player => player.player.team?.id)
+          .filter((id): id is number => typeof id === 'number')
+      )
+    );
+    if (teamIds.length > 0) {
+      const teamSeasonRows = await adapter.getTeamSeasonStatsForTeams(season, teamIds);
+      const teamSeasonById = new Map(teamSeasonRows.map(row => [row.teamId, row]));
+      for (const player of filtered) {
+        const teamId = player.player.team?.id;
+        const teamSeason = teamId != null ? teamSeasonById.get(teamId) : undefined;
+        if (teamSeason) {
+          player.teamSeason = {
+            wins: teamSeason.wins,
+            losses: teamSeason.losses,
+            seed: teamSeason.seed,
+            conference: teamSeason.conference,
+          };
+        }
+      }
+    }
     let positionAverages: PositionTsSummary | undefined;
 
     try {
